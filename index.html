@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamSpeak Challenge - English Communication Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --secondary: #F7931E;
+            --accent: #004E89;
+            --dark: #1A1A2E;
+            --light: #F4F4F9;
+            --success: #06D6A0;
+            --danger: #EF476F;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(6, 214, 160, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 50px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            color: #666;
+            font-weight: 400;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 20px;
+            animation: fadeIn 0.8s ease-out 0.6s both;
+        }
+
+        .score-item {
+            text-align: center;
+            color: white;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-top: 5px;
+        }
+
+        .game-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-card {
+            background: white;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .mode-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .mode-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(0, 78, 137, 0.1));
+        }
+
+        .mode-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mode-desc {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-area {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 300px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .question {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #E0E0E0;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .option-btn:hover::before {
+            left: 100%;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.2);
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .input-area {
+            margin-top: 20px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #E0E0E0;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            margin-top: 20px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .feedback.error {
+            background: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen h2 {
+            font-size: 2em;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .game-modes {
+                grid-template-columns: 1fr;
+            }
+
+            .score-value {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 TeamSpeak Challenge</h1>
+            <p class="tagline">Sharpen Your English Skills Together</p>
+        </header>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Score</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Streak</div>
+                <div class="score-value" id="streak">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Round</div>
+                <div class="score-value" id="round">0</div>
+            </div>
+        </div>
+
+        <div id="modeSelection" class="game-modes">
+            <div class="mode-card" data-mode="vocabulary">
+                <div class="mode-title">📚 Vocabulary Builder</div>
+                <div class="mode-desc">Test your word knowledge with synonyms, antonyms, and definitions</div>
+            </div>
+            <div class="mode-card" data-mode="grammar">
+                <div class="mode-title">✍️ Grammar Master</div>
+                <div class="mode-desc">Perfect your grammar with tense, structure, and usage challenges</div>
+            </div>
+            <div class="mode-card" data-mode="idioms">
+                <div class="mode-title">🎭 Idiom Detective</div>
+                <div class="mode-desc">Decode common English idioms and phrases</div>
+            </div>
+            <div class="mode-card" data-mode="sentence">
+                <div class="mode-title">🔧 Sentence Builder</div>
+                <div class="mode-desc">Rearrange words to form correct sentences</div>
+            </div>
+        </div>
+
+        <div id="gameArea" class="game-area hidden">
+            <div class="timer" id="timer"></div>
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="input-area hidden" id="inputArea">
+                <input type="text" class="text-input" id="textInput" placeholder="Type your answer here...">
+                <button class="btn" id="submitBtn">Submit Answer</button>
+            </div>
+            <div class="feedback hidden" id="feedback"></div>
+            <button class="btn hidden" id="nextBtn">Next Question</button>
+        </div>
+
+        <div id="startScreen" class="start-screen">
+            <h2>Welcome to TeamSpeak Challenge!</h2>
+            <p>Select a game mode above to begin your English communication journey. Each mode focuses on different skills to help your team improve together. Track your progress with the scoreboard and challenge your colleagues!</p>
+            <p><strong>Perfect for Microsoft Teams meetings!</strong> Share your screen or send this link to team members.</p>
+        </div>
+    </div>
+
+    <script>
+        const gameData = {
+            vocabulary: [
+                {
+                    question: "What is a synonym for 'ELOQUENT'?",
+                    options: ["Articulate", "Silent", "Confused", "Brief"],
+                    correct: 0,
+                    explanation: "Eloquent means fluent and persuasive in speaking - articulate has a similar meaning."
+                },
+                {
+                    question: "What does 'AMBIGUOUS' mean?",
+                    options: ["Clear and precise", "Open to multiple interpretations", "Very small", "Extremely loud"],
+                    correct: 1,
+                    explanation: "Ambiguous means unclear or having more than one possible meaning."
+                },
+                {
+                    question: "Choose the ANTONYM of 'SCARCE':",
+                    options: ["Rare", "Abundant", "Minimal", "Limited"],
+                    correct: 1,
+                    explanation: "Scarce means in short supply, while abundant means plentiful."
+                },
+                {
+                    question: "What is the meaning of 'COLLABORATE'?",
+                    options: ["To compete", "To work together", "To avoid", "To criticize"],
+                    correct: 1,
+                    explanation: "Collaborate means to work jointly with others on a project or activity."
+                },
+                {
+                    question: "Which word means 'to make something easier'?",
+                    options: ["Complicate", "Facilitate", "Obstruct", "Confuse"],
+                    correct: 1,
+                    explanation: "Facilitate means to make an action or process easier or more efficient."
+                },
+                {
+                    question: "What does 'DILIGENT' mean?",
+                    options: ["Lazy", "Careless", "Hardworking and careful", "Quick"],
+                    correct: 2,
+                    explanation: "Diligent means showing careful and persistent work or effort."
+                },
+                {
+                    question: "Choose a synonym for 'CONCISE':",
+                    options: ["Lengthy", "Brief", "Confusing", "Detailed"],
+                    correct: 1,
+                    explanation: "Concise means expressing much in few words - brief has a similar meaning."
+                },
+                {
+                    question: "What is the ANTONYM of 'OPTIMISTIC'?",
+                    options: ["Hopeful", "Pessimistic", "Cheerful", "Positive"],
+                    correct: 1,
+                    explanation: "Optimistic means hopeful, while pessimistic means expecting the worst."
+                },
+                {
+                    question: "Which word means 'to examine carefully'?",
+                    options: ["Ignore", "Scrutinize", "Overlook", "Skip"],
+                    correct: 1,
+                    explanation: "Scrutinize means to examine or inspect closely and thoroughly."
+                },
+                {
+                    question: "What does 'INNOVATIVE' mean?",
+                    options: ["Traditional", "Introducing new ideas", "Old-fashioned", "Conservative"],
+                    correct: 1,
+                    explanation: "Innovative means featuring new methods or original and creative ideas."
+                },
+                {
+                    question: "Choose a synonym for 'PROFICIENT':",
+                    options: ["Incompetent", "Skilled", "Beginner", "Amateur"],
+                    correct: 1,
+                    explanation: "Proficient means competent or skilled in doing something."
+                },
+                {
+                    question: "What is the meaning of 'TRANSPARENT'?",
+                    options: ["Hidden", "Secretive", "Easy to understand or open", "Complicated"],
+                    correct: 2,
+                    explanation: "Transparent means open, frank, and easy to perceive or detect."
+                },
+                {
+                    question: "Choose the ANTONYM of 'VAGUE':",
+                    options: ["Unclear", "Specific", "Ambiguous", "Uncertain"],
+                    correct: 1,
+                    explanation: "Vague means unclear or imprecise, while specific means clearly defined."
+                },
+                {
+                    question: "What does 'ENHANCE' mean?",
+                    options: ["Reduce", "Improve or increase", "Damage", "Remove"],
+                    correct: 1,
+                    explanation: "Enhance means to intensify, increase, or further improve the quality of something."
+                },
+                {
+                    question: "Which word means 'to emphasize'?",
+                    options: ["Minimize", "Highlight", "Ignore", "Reduce"],
+                    correct: 1,
+                    explanation: "Highlight means to emphasize or make something more prominent."
+                },
+                {
+                    question: "What is a synonym for 'RESILIENT'?",
+                    options: ["Fragile", "Tough", "Weak", "Brittle"],
+                    correct: 1,
+                    explanation: "Resilient means able to withstand or recover quickly from difficult conditions."
+                },
+                {
+                    question: "What does 'MITIGATE' mean?",
+                    options: ["Worsen", "Make less severe", "Ignore", "Complicate"],
+                    correct: 1,
+                    explanation: "Mitigate means to make something less severe, serious, or painful."
+                },
+                {
+                    question: "Choose the ANTONYM of 'CONVENTIONAL':",
+                    options: ["Traditional", "Typical", "Unconventional", "Normal"],
+                    correct: 2,
+                    explanation: "Conventional means traditional, while unconventional means not based on tradition."
+                },
+                {
+                    question: "What does 'COMPREHENSIVE' mean?",
+                    options: ["Incomplete", "Including everything", "Brief", "Limited"],
+                    correct: 1,
+                    explanation: "Comprehensive means complete and including all or nearly all elements."
+                },
+                {
+                    question: "Which word means 'to confirm or support'?",
+                    options: ["Deny", "Validate", "Reject", "Dispute"],
+                    correct: 1,
+                    explanation: "Validate means to check or prove the validity or accuracy of something."
+                }
+            ],
+            grammar: [
+                {
+                    question: "Choose the correct sentence:",
+                    options: [
+                        "She don't like coffee",
+                        "She doesn't likes coffee",
+                        "She doesn't like coffee",
+                        "She don't likes coffee"
+                    ],
+                    correct: 2,
+                    explanation: "Use 'doesn't' with third person singular, followed by the base form of the verb."
+                },
+                {
+                    question: "Which sentence uses the present perfect correctly?",
+                    options: [
+                        "I have went to London",
+                        "I has gone to London",
+                        "I have been to London",
+                        "I have be to London"
+                    ],
+                    correct: 2,
+                    explanation: "Present perfect uses 'have/has' + past participle. 'Been' is the past participle of 'be'."
+                },
+                {
+                    question: "Identify the correct conditional sentence:",
+                    options: [
+                        "If I will see him, I tell him",
+                        "If I see him, I will tell him",
+                        "If I saw him, I will tell him",
+                        "If I see him, I would tell him"
+                    ],
+                    correct: 1,
+                    explanation: "First conditional: If + present simple, will + base verb (for future possibilities)."
+                },
+                {
+                    question: "Which is the correct passive voice?",
+                    options: [
+                        "The report was wrote by John",
+                        "The report written by John",
+                        "The report was written by John",
+                        "The report is wrote by John"
+                    ],
+                    correct: 2,
+                    explanation: "Passive voice uses: be + past participle. 'Written' is the past participle of 'write'."
+                },
+                {
+                    question: "Choose the sentence with correct subject-verb agreement:",
+                    options: [
+                        "The team are working hard",
+                        "The team is working hard",
+                        "The team be working hard",
+                        "The team were working hard"
+                    ],
+                    correct: 1,
+                    explanation: "Collective nouns like 'team' take singular verbs in American English."
+                },
+                {
+                    question: "Which sentence is correct?",
+                    options: [
+                        "Each of the students have a book",
+                        "Each of the students has a book",
+                        "Each of the students having a book",
+                        "Each of the students are having a book"
+                    ],
+                    correct: 1,
+                    explanation: "'Each' is singular and requires a singular verb 'has'."
+                },
+                {
+                    question: "Identify the correct comparative form:",
+                    options: [
+                        "She is more smart than him",
+                        "She is more smarter than him",
+                        "She is smarter than him",
+                        "She is smartest than him"
+                    ],
+                    correct: 2,
+                    explanation: "One-syllable adjectives add -er for comparative form, not 'more'."
+                },
+                {
+                    question: "Choose the correct reported speech:",
+                    options: [
+                        "She said she will come tomorrow",
+                        "She said she would come tomorrow",
+                        "She said she is coming tomorrow",
+                        "She said she comes tomorrow"
+                    ],
+                    correct: 1,
+                    explanation: "In reported speech, 'will' changes to 'would' when the reporting verb is past tense."
+                },
+                {
+                    question: "Which sentence uses 'fewer' correctly?",
+                    options: [
+                        "There are less people today",
+                        "There are fewer people today",
+                        "There is fewer people today",
+                        "There are less of people today"
+                    ],
+                    correct: 1,
+                    explanation: "Use 'fewer' with countable nouns (people, books) and 'less' with uncountable nouns (water, time)."
+                },
+                {
+                    question: "Identify the correct use of the gerund:",
+                    options: [
+                        "I enjoy to swim",
+                        "I enjoy swim",
+                        "I enjoy swimming",
+                        "I enjoy swam"
+                    ],
+                    correct: 2,
+                    explanation: "The verb 'enjoy' is followed by a gerund (verb + -ing), not an infinitive."
+                },
+                {
+                    question: "Choose the correct article:",
+                    options: [
+                        "She is a honest person",
+                        "She is an honest person",
+                        "She is the honest person",
+                        "She is honest person"
+                    ],
+                    correct: 1,
+                    explanation: "Use 'an' before words that begin with a vowel sound (honest has a silent 'h')."
+                },
+                {
+                    question: "Which sentence uses modals correctly?",
+                    options: [
+                        "You must to arrive on time",
+                        "You must arriving on time",
+                        "You must arrive on time",
+                        "You must arrives on time"
+                    ],
+                    correct: 2,
+                    explanation: "Modal verbs (must, can, should) are followed by the base form of the verb."
+                },
+                {
+                    question: "Identify the correct preposition:",
+                    options: [
+                        "She is good in mathematics",
+                        "She is good at mathematics",
+                        "She is good with mathematics",
+                        "She is good for mathematics"
+                    ],
+                    correct: 1,
+                    explanation: "We use 'good at' when talking about skills or abilities."
+                },
+                {
+                    question: "Choose the correct relative pronoun:",
+                    options: [
+                        "The person which helped me was kind",
+                        "The person what helped me was kind",
+                        "The person who helped me was kind",
+                        "The person whom helped me was kind"
+                    ],
+                    correct: 2,
+                    explanation: "Use 'who' for people as subjects, 'which' for things, and 'that' for both."
+                },
+                {
+                    question: "Which is the correct past continuous?",
+                    options: [
+                        "I was work when you called",
+                        "I working when you called",
+                        "I was working when you called",
+                        "I am working when you called"
+                    ],
+                    correct: 2,
+                    explanation: "Past continuous: was/were + verb-ing (for actions in progress in the past)."
+                },
+                {
+                    question: "Identify the correct tag question:",
+                    options: [
+                        "You are coming, isn't it?",
+                        "You are coming, aren't you?",
+                        "You are coming, don't you?",
+                        "You are coming, doesn't you?"
+                    ],
+                    correct: 1,
+                    explanation: "Tag questions match the auxiliary verb and subject: 'are coming' → 'aren't you'."
+                },
+                {
+                    question: "Choose the correct future form:",
+                    options: [
+                        "I go to the store tomorrow",
+                        "I will going to the store tomorrow",
+                        "I will go to the store tomorrow",
+                        "I am go to the store tomorrow"
+                    ],
+                    correct: 2,
+                    explanation: "Simple future: will + base form of the verb."
+                },
+                {
+                    question: "Which sentence uses 'whom' correctly?",
+                    options: [
+                        "Who did you speak to?",
+                        "Whom did you speak to?",
+                        "Who did you speak with?",
+                        "Whom did you speak with?"
+                    ],
+                    correct: 3,
+                    explanation: "Use 'whom' as the object of a verb or preposition (though 'who' is often acceptable in informal speech)."
+                },
+                {
+                    question: "Identify the correct parallel structure:",
+                    options: [
+                        "She likes reading, writing, and to paint",
+                        "She likes reading, writing, and painting",
+                        "She likes to read, writing, and painting",
+                        "She likes reading, to write, and painting"
+                    ],
+                    correct: 1,
+                    explanation: "Parallel structure requires all items in a list to have the same grammatical form."
+                },
+                {
+                    question: "Choose the correct superlative:",
+                    options: [
+                        "He is the most tall in the class",
+                        "He is the taller in the class",
+                        "He is the tallest in the class",
+                        "He is most tallest in the class"
+                    ],
+                    correct: 2,
+                    explanation: "One-syllable adjectives use -est for superlative, not 'most'."
+                }
+            ],
+            idioms: [
+                {
+                    question: "What does 'break the ice' mean?",
+                    options: [
+                        "To start a fight",
+                        "To make people feel more comfortable",
+                        "To work very hard",
+                        "To break something accidentally"
+                    ],
+                    correct: 1,
+                    explanation: "'Break the ice' means to initiate conversation or ease tension in a social situation."
+                },
+                {
+                    question: "If someone 'spills the beans', they:",
+                    options: [
+                        "Make a mess",
+                        "Reveal a secret",
+                        "Cook dinner",
+                        "Waste resources"
+                    ],
+                    correct: 1,
+                    explanation: "'Spill the beans' means to reveal confidential or secret information."
+                },
+                {
+                    question: "What does 'hit the nail on the head' mean?",
+                    options: [
+                        "To hurt yourself",
+                        "To be exactly right",
+                        "To build something",
+                        "To miss the point"
+                    ],
+                    correct: 1,
+                    explanation: "This idiom means to describe something exactly or to be precisely correct."
+                },
+                {
+                    question: "'Once in a blue moon' means:",
+                    options: [
+                        "Very frequently",
+                        "Never",
+                        "Very rarely",
+                        "Every month"
+                    ],
+                    correct: 2,
+                    explanation: "'Once in a blue moon' means something that happens very rarely or almost never."
+                },
+                {
+                    question: "If you 'bite off more than you can chew', you:",
+                    options: [
+                        "Eat too much food",
+                        "Take on more than you can handle",
+                        "Make a good decision",
+                        "Save money"
+                    ],
+                    correct: 1,
+                    explanation: "This idiom means to take on a task that is too big or difficult to complete successfully."
+                },
+                {
+                    question: "What does 'the ball is in your court' mean?",
+                    options: [
+                        "You are playing sports",
+                        "It's your turn to take action",
+                        "You lost the game",
+                        "You are in trouble"
+                    ],
+                    correct: 1,
+                    explanation: "This means it's your turn to make a decision or take action."
+                },
+                {
+                    question: "'Burning the midnight oil' means:",
+                    options: [
+                        "Wasting electricity",
+                        "Working late into the night",
+                        "Starting a fire",
+                        "Being very tired"
+                    ],
+                    correct: 1,
+                    explanation: "This idiom means to work late into the night or early morning hours."
+                },
+                {
+                    question: "If something 'costs an arm and a leg', it:",
+                    options: [
+                        "Is very dangerous",
+                        "Is extremely expensive",
+                        "Is very cheap",
+                        "Requires physical effort"
+                    ],
+                    correct: 1,
+                    explanation: "This expression means something is very expensive or costs a lot of money."
+                },
+                {
+                    question: "What does 'get cold feet' mean?",
+                    options: [
+                        "To be physically cold",
+                        "To become nervous and hesitant",
+                        "To run away quickly",
+                        "To catch a cold"
+                    ],
+                    correct: 1,
+                    explanation: "To 'get cold feet' means to become nervous or lose confidence about doing something."
+                },
+                {
+                    question: "'Let the cat out of the bag' means:",
+                    options: [
+                        "To free an animal",
+                        "To reveal a secret accidentally",
+                        "To clean up",
+                        "To cause chaos"
+                    ],
+                    correct: 1,
+                    explanation: "This idiom means to accidentally reveal a secret or surprise."
+                },
+                {
+                    question: "What does 'piece of cake' mean?",
+                    options: [
+                        "A dessert",
+                        "Something very easy",
+                        "A small portion",
+                        "Something delicious"
+                    ],
+                    correct: 1,
+                    explanation: "'Piece of cake' means something that is very easy to do."
+                },
+                {
+                    question: "If you 'pull someone's leg', you:",
+                    options: [
+                        "Help them walk",
+                        "Joke with them",
+                        "Trip them",
+                        "Annoy them"
+                    ],
+                    correct: 1,
+                    explanation: "To 'pull someone's leg' means to tease or joke with them in a playful way."
+                },
+                {
+                    question: "'Under the weather' means:",
+                    options: [
+                        "Outside in the rain",
+                        "Feeling sick or unwell",
+                        "Very happy",
+                        "Working hard"
+                    ],
+                    correct: 1,
+                    explanation: "This idiom means feeling ill or not well."
+                },
+                {
+                    question: "What does 'the elephant in the room' refer to?",
+                    options: [
+                        "A large animal",
+                        "An obvious problem no one wants to discuss",
+                        "A big celebration",
+                        "A heavy object"
+                    ],
+                    correct: 1,
+                    explanation: "This refers to an obvious problem or difficult situation that people avoid discussing."
+                },
+                {
+                    question: "'Barking up the wrong tree' means:",
+                    options: [
+                        "Training a dog",
+                        "Pursuing the wrong course of action",
+                        "Making noise",
+                        "Climbing incorrectly"
+                    ],
+                    correct: 1,
+                    explanation: "This means making a wrong assumption or pursuing a mistaken approach."
+                },
+                {
+                    question: "If you 'throw in the towel', you:",
+                    options: [
+                        "Do laundry",
+                        "Give up or quit",
+                        "Get angry",
+                        "Help someone"
+                    ],
+                    correct: 1,
+                    explanation: "To 'throw in the towel' means to give up or admit defeat."
+                },
+                {
+                    question: "What does 'cutting corners' mean?",
+                    options: [
+                        "Driving carefully",
+                        "Doing something poorly to save time or money",
+                        "Being precise",
+                        "Making shapes"
+                    ],
+                    correct: 1,
+                    explanation: "This means doing something in the easiest or cheapest way, often sacrificing quality."
+                },
+                {
+                    question: "'On cloud nine' means:",
+                    options: [
+                        "Flying in an airplane",
+                        "Extremely happy",
+                        "Confused",
+                        "Sleepy"
+                    ],
+                    correct: 1,
+                    explanation: "To be 'on cloud nine' means to be extremely happy or euphoric."
+                },
+                {
+                    question: "If something happens 'out of the blue', it:",
+                    options: [
+                        "Happens in the sky",
+                        "Happens unexpectedly",
+                        "Happens slowly",
+                        "Never happens"
+                    ],
+                    correct: 1,
+                    explanation: "'Out of the blue' means something happens suddenly and unexpectedly."
+                },
+                {
+                    question: "What does 'reading between the lines' mean?",
+                    options: [
+                        "Reading carefully",
+                        "Understanding the hidden meaning",
+                        "Reading out loud",
+                        "Skipping parts of text"
+                    ],
+                    correct: 1,
+                    explanation: "This means to understand the implicit or hidden meaning in what someone says or writes."
+                }
+            ],
+            sentence: [
+                {
+                    question: "Rearrange: 'meeting / the / tomorrow / is / scheduled'",
+                    options: [
+                        "The meeting is scheduled tomorrow",
+                        "Tomorrow the meeting is scheduled",
+                        "Is scheduled the meeting tomorrow",
+                        "The meeting tomorrow is scheduled"
+                    ],
+                    correct: 0,
+                    explanation: "Standard word order: subject + verb + complement + time adverb."
+                },
+                {
+                    question: "Rearrange: 'carefully / read / should / you / instructions / the'",
+                    options: [
+                        "Carefully you should read the instructions",
+                        "You should read the instructions carefully",
+                        "The instructions you should read carefully",
+                        "Read carefully you should the instructions"
+                    ],
+                    correct: 1,
+                    explanation: "Subject + modal + verb + object + adverb is the natural English word order."
+                },
+                {
+                    question: "Rearrange: 'never / I / such / seen / have / a / thing / beautiful'",
+                    options: [
+                        "I have never seen such a beautiful thing",
+                        "Never I have seen such a beautiful thing",
+                        "I never have seen a such beautiful thing",
+                        "Such a beautiful thing I have never seen"
+                    ],
+                    correct: 0,
+                    explanation: "Present perfect: subject + have/has + never + past participle + object."
+                },
+                {
+                    question: "Rearrange: 'late / always / John / is / meetings / for'",
+                    options: [
+                        "John always is late for meetings",
+                        "John is always late for meetings",
+                        "Always John is late for meetings",
+                        "For meetings John is always late"
+                    ],
+                    correct: 1,
+                    explanation: "Adverbs of frequency go after 'be' verbs: subject + be + adverb + adjective."
+                },
+                {
+                    question: "Rearrange: 'finished / has / who / project / the / already'",
+                    options: [
+                        "Who has already finished the project",
+                        "Who already has finished the project",
+                        "The project who has already finished",
+                        "Already who has finished the project"
+                    ],
+                    correct: 0,
+                    explanation: "Question word + auxiliary + adverb + past participle + object."
+                },
+                {
+                    question: "Rearrange: 'to / library / went / yesterday / she / the'",
+                    options: [
+                        "She went to the library yesterday",
+                        "Yesterday she went to the library",
+                        "To the library she went yesterday",
+                        "She yesterday went to the library"
+                    ],
+                    correct: 0,
+                    explanation: "Standard past tense order: subject + verb + prepositional phrase + time."
+                },
+                {
+                    question: "Rearrange: 'been / they / working / have / hours / for / three'",
+                    options: [
+                        "They have been working for three hours",
+                        "For three hours they have been working",
+                        "They for three hours have been working",
+                        "Been working for three hours they have"
+                    ],
+                    correct: 0,
+                    explanation: "Present perfect continuous: subject + have been + verb-ing + duration."
+                },
+                {
+                    question: "Rearrange: 'if / rain / stay / will / home / we / it / rains'",
+                    options: [
+                        "If it rains we will stay home",
+                        "We will stay home if it rains",
+                        "If rains it we will stay home",
+                        "Stay home we will if it rains"
+                    ],
+                    correct: 1,
+                    explanation: "Conditional: main clause + if clause (or vice versa with comma)."
+                },
+                {
+                    question: "Rearrange: 'dinner / cooking / was / mother / when / arrived / I'",
+                    options: [
+                        "Mother was cooking dinner when I arrived",
+                        "When I arrived mother was cooking dinner",
+                        "Mother when I arrived was cooking dinner",
+                        "Was cooking dinner mother when I arrived"
+                    ],
+                    correct: 0,
+                    explanation: "Past continuous: subject + was/were + verb-ing + when clause."
+                },
+                {
+                    question: "Rearrange: 'movie / watching / enjoy / they / on / weekends'",
+                    options: [
+                        "They enjoy watching movie on weekends",
+                        "They enjoy watching movies on weekends",
+                        "Watching movies they enjoy on weekends",
+                        "On weekends they watching movies enjoy"
+                    ],
+                    correct: 1,
+                    explanation: "Subject + verb + gerund + prepositional phrase."
+                },
+                {
+                    question: "Rearrange: 'written / book / was / by / famous / a / author / this'",
+                    options: [
+                        "This book was written by a famous author",
+                        "By a famous author this book was written",
+                        "This book by a famous author was written",
+                        "Was written this book by a famous author"
+                    ],
+                    correct: 0,
+                    explanation: "Passive voice: subject + be + past participle + by agent."
+                },
+                {
+                    question: "Rearrange: 'call / as / as / me / you / soon / can'",
+                    options: [
+                        "Call me as soon as you can",
+                        "As soon as you can call me",
+                        "Call as soon as me you can",
+                        "You can call me as soon as"
+                    ],
+                    correct: 0,
+                    explanation: "Imperative + time clause: verb + object + as soon as + clause."
+                },
+                {
+                    question: "Rearrange: 'most / in / building / tallest / the / city / is / this / the'",
+                    options: [
+                        "This is the tallest building in the city",
+                        "The tallest building is this in the city",
+                        "In the city this is the tallest building",
+                        "This building is the tallest in the city"
+                    ],
+                    correct: 0,
+                    explanation: "Superlative structure: subject + be + the + superlative + noun + prepositional phrase."
+                },
+                {
+                    question: "Rearrange: 'could / speak / I / wish / languages / foreign / I'",
+                    options: [
+                        "I wish I could speak foreign languages",
+                        "I could speak foreign languages I wish",
+                        "Could speak foreign languages I wish I",
+                        "Foreign languages I wish I could speak"
+                    ],
+                    correct: 0,
+                    explanation: "Wish structure: I wish + subject + modal + verb + object."
+                },
+                {
+                    question: "Rearrange: 'harder / study / you / better / the / will / grades / your / be'",
+                    options: [
+                        "The harder you study the better your grades will be",
+                        "Your grades will be better the harder you study",
+                        "The harder you study your grades will be better",
+                        "You study harder your grades the better will be"
+                    ],
+                    correct: 0,
+                    explanation: "Comparative structure: The + comparative, the + comparative."
+                },
+                {
+                    question: "Rearrange: 'since / living / been / has / here / she / 2020'",
+                    options: [
+                        "She has been living here since 2020",
+                        "Since 2020 she has been living here",
+                        "She since 2020 has been living here",
+                        "Has been living here she since 2020"
+                    ],
+                    correct: 0,
+                    explanation: "Present perfect continuous: subject + has/have been + verb-ing + since."
+                },
+                {
+                    question: "Rearrange: 'not / only / talented / also / is / but / she / hardworking'",
+                    options: [
+                        "She is not only talented but also hardworking",
+                        "Not only she is talented but also hardworking",
+                        "She not only is talented but also hardworking",
+                        "Is she not only talented but also hardworking"
+                    ],
+                    correct: 0,
+                    explanation: "Correlative conjunctions: subject + be + not only X but also Y."
+                },
+                {
+                    question: "Rearrange: 'made / cake / was / delicious / the / by / grandmother / my'",
+                    options: [
+                        "The delicious cake was made by my grandmother",
+                        "The cake delicious was made by my grandmother",
+                        "By my grandmother the delicious cake was made",
+                        "Was made the delicious cake by my grandmother"
+                    ],
+                    correct: 0,
+                    explanation: "Passive with adjective: article + adjective + noun + passive verb + agent."
+                },
+                {
+                    question: "Rearrange: 'would / known / earlier / had / I / told / you / if / I'",
+                    options: [
+                        "I would have told you if I had known earlier",
+                        "If I had known earlier I would have told you",
+                        "I would told you if I had known earlier",
+                        "Had I known earlier would have told you"
+                    ],
+                    correct: 1,
+                    explanation: "Third conditional: If + past perfect, would have + past participle."
+                },
+                {
+                    question: "Rearrange: 'looking / been / job / new / have / a / they / for / months / three'",
+                    options: [
+                        "They have been looking for a new job for three months",
+                        "For three months they have been looking for a new job",
+                        "They for three months have been looking for a new job",
+                        "Have been looking for a new job they for three months"
+                    ],
+                    correct: 0,
+                    explanation: "Present perfect continuous: subject + have been + verb-ing + prepositional phrase + duration."
+                }
+            ]
+        };
+
+        let currentMode = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let round = 0;
+        let answered = false;
+        let timer = 30;
+        let timerInterval;
+
+        const modeCards = document.querySelectorAll('.mode-card');
+        const gameArea = document.getElementById('gameArea');
+        const startScreen = document.getElementById('startScreen');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('nextBtn');
+        const scoreEl = document.getElementById('score');
+        const streakEl = document.getElementById('streak');
+        const roundEl = document.getElementById('round');
+        const timerEl = document.getElementById('timer');
+
+        modeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const mode = card.dataset.mode;
+                startGame(mode);
+                modeCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            });
+        });
+
+        function startGame(mode) {
+            currentMode = mode;
+            // Randomly select 5 questions from the pool
+            const allQuestions = [...gameData[mode]];
+            currentQuestions = shuffleArray(allQuestions).slice(0, 5);
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            round = 0;
+            
+            startScreen.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            
+            updateScoreboard();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                showFinalScore();
+                return;
+            }
+
+            answered = false;
+            round++;
+            updateScoreboard();
+            
+            const question = currentQuestions[currentQuestionIndex];
+            questionEl.textContent = question.question;
+            optionsEl.innerHTML = '';
+            feedbackEl.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            // Start timer
+            timer = 30;
+            updateTimer();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimer();
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    if (!answered) {
+                        showFeedback(false, question.explanation);
+                    }
+                }
+            }, 1000);
+
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.addEventListener('click', () => checkAnswer(index, question));
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function updateTimer() {
+            timerEl.textContent = `⏱️ Time: ${timer}s`;
+            if (timer <= 10) {
+                timerEl.style.color = 'var(--danger)';
+            } else {
+                timerEl.style.color = 'var(--accent)';
+            }
+        }
+
+        function checkAnswer(selectedIndex, question) {
+            if (answered) return;
+            
+            answered = true;
+            clearInterval(timerInterval);
+            
+            const buttons = optionsEl.querySelectorAll('.option-btn');
+            const isCorrect = selectedIndex === question.correct;
+            
+            buttons[selectedIndex].classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) {
+                buttons[question.correct].classList.add('correct');
+            }
+            
+            showFeedback(isCorrect, question.explanation);
+            
+            if (isCorrect) {
+                score += 10 + Math.floor(timer / 3); // Bonus for speed
+                streak++;
+            } else {
+                streak = 0;
+            }
+            
+            updateScoreboard();
+        }
+
+        function showFeedback(isCorrect, explanation) {
+            feedbackEl.classList.remove('hidden', 'success', 'error');
+            feedbackEl.classList.add(isCorrect ? 'success' : 'error');
+            feedbackEl.textContent = isCorrect ? 
+                `🎉 Correct! ${explanation}` : 
+                `❌ Not quite. ${explanation}`;
+            
+            nextBtn.classList.remove('hidden');
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        });
+
+        function updateScoreboard() {
+            scoreEl.textContent = score;
+            streakEl.textContent = streak;
+            roundEl.textContent = round;
+        }
+
+        function showFinalScore() {
+            clearInterval(timerInterval);
+            const percentage = Math.round((score / (currentQuestions.length * 10)) * 100);
+            let message = '';
+            
+            if (percentage >= 90) message = '🏆 Outstanding! You\'re a communication champion!';
+            else if (percentage >= 70) message = '🌟 Great job! Your skills are impressive!';
+            else if (percentage >= 50) message = '👍 Good effort! Keep practicing!';
+            else message = '💪 Nice try! Practice makes perfect!';
+            
+            questionEl.innerHTML = `<h2>Game Complete!</h2>`;
+            optionsEl.innerHTML = `
+                <div style="text-align: center; padding: 30px;">
+                    <p style="font-size: 1.8em; margin: 20px 0;">${message}</p>
+                    <p style="font-size: 1.3em; color: var(--accent); margin: 15px 0;">
+                        Final Score: <strong>${score}</strong> points
+                    </p>
+                    <p style="font-size: 1.2em; color: #666;">
+                        You got ${Math.round(percentage)}% correct!
+                    </p>
+                </div>
+            `;
+            
+            feedbackEl.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            timerEl.style.display = 'none';
+            
+            setTimeout(() => {
+                const playAgainBtn = document.createElement('button');
+                playAgainBtn.className = 'btn';
+                playAgainBtn.textContent = '🔄 Play Again';
+                playAgainBtn.addEventListener('click', () => {
+                    location.reload();
+                });
+                optionsEl.appendChild(playAgainBtn);
+            }, 1000);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>

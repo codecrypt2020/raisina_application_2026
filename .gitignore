@@ -1,0 +1,18 @@
+# Ignore everything by default
+*
+
+# But don't ignore these files
+!.gitignore
+!index.html
+!README.md
+!QUICKSTART.md
+!pubspec.yaml
+!lib/
+!lib/**
+!LICENSE
+!DEPLOYMENT.md
+!setup-github.sh
+!setup-github.bat
+
+# FVM Version Cache
+.fvm/
