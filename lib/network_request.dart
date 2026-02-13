@@ -32,28 +32,20 @@ static Future login_api(username,password) async {
     var body = {
         // 'username': username,
         // 'password': password
-        "username": "mayurwabale1221@gmail.com",
-    "password": "Mjcc\$012"
+        "username": "$username",
+    "password": "$password"
       };
     var response =
         await http.post(Uri.parse(Constants.NODE_URL + Constants.login),
          
             // headers: {},
-            body: encryptPayload(body)
+            body: body
             );
-            print('hbhdcgdgg${encryptPayload({
-              // "username": "$username",
-              // "password": "$password"
-              
-    "username": "mayurwabale1221@gmail.com",
-    "password": "Mjcc\$012"
+            ///mayurwabale1221@gmail.com
+ 
+//Mjcc$012
+            ///
 
-//payload
-//           {
-//     "username": "mayurwabale1221@gmail.com",
-//     "password": "Mjcc$012"
-// }
-            })}');
     Map<String, dynamic> jsonData = decryptResponse(response.body);
     if (response.statusCode == 200 && jsonData["success"] == true) {
       var res = decryptResponse(response.body);
