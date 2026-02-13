@@ -1,15 +1,16 @@
 
 import 'package:attendee_app/main.dart';
+import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
 
-class Logingscreen extends StatefulWidget {
-  const Logingscreen({super.key});
+class Loginscreen extends StatefulWidget {
+  const Loginscreen({super.key});
 
   @override
-  State<Logingscreen> createState() => _LogingscreenState();
+  State<Loginscreen> createState() => _LogingscreenState();
 }
 
-class _LogingscreenState extends State<Logingscreen> {
+class _LogingscreenState extends State<Loginscreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -115,6 +116,8 @@ class _LogingscreenState extends State<Logingscreen> {
                   onPressed: () {
                     print("user email id check: ${emailController.text}");
                     print("user password check: ${passwordController.text}");
+                    //call the api for fetching the login details
+                    Network_request.login_api(emailController.text,passwordController.text);
                     Navigator.pushReplacement( //open new screen and remove login screen from stack
                       context,
                       MaterialPageRoute(

@@ -1,5 +1,6 @@
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
+import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
-      home:  const Logingscreen(),
+      home:  const Loginscreen(),
     );
   }
 }
@@ -372,139 +373,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
 //   }
 // }
 
-class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Row(
-          children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: AppColors.gold,
-              child: const Text(
-                'JD',
-                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-              ),
-            ),
-            const SizedBox(width: 16),
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dr. John Doe',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-                ),
-                SizedBox(height: 4),
-                Text('Speaker · Strategic Track', style: TextStyle(color: AppColors.textSecondary)),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.navyMid,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _ProfileRow(
-                title: 'Digital badge',
-                subtitle: 'Speaker pass · updated 5 mins ago',
-                icon: Icons.badge_outlined,
-                color: AppColors.gold,
-              ),
-              Divider(color: AppColors.navySurface),
-              _ProfileRow(
-                title: 'Travel & logistics',
-                subtitle: 'Hotel car confirmed at 7:30 AM',
-                icon: Icons.flight_takeoff_outlined,
-                color: AppColors.teal,
-              ),
-              Divider(color: AppColors.navySurface),
-              _ProfileRow(
-                title: 'Speaker kit',
-                subtitle: 'Slides due in 2 days',
-                icon: Icons.shield_outlined,
-                color: AppColors.goldLight,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 30),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.navySurface,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Preparation checklist',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Upload slides · Confirm co-speakers · Rehearsal notes.',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () {},
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Review checklist'),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 30),
-        SizedBox(
-        width: double.infinity,
-        height: 50,
-        child: OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: AppColors.red),
-      foregroundColor: AppColors.red,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-         ),
-       ),
-       onPressed: () {
-       Navigator.pushAndRemoveUntil( //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
-        context,
-         MaterialPageRoute(builder: (context) => const Logingscreen()),
-         (route) => false,
-        );      
-      },
-      icon: const Icon(Icons.logout),
-      label: const Text(
-          "Logout",
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-     ),
-    ),
-
-      ],
-    );
-  }
-}
 
 class _EventHeroCard extends StatelessWidget {
   const _EventHeroCard();
@@ -1017,43 +886,4 @@ class _MeetupCard extends StatelessWidget {
   }
 }
 
-class _ProfileRow extends StatelessWidget {
-  const _ProfileRow({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-  });
 
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundColor: color.withOpacity(0.15),
-          child: Icon(icon, color: color),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-              ),
-              const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(color: AppColors.textSecondary)),
-            ],
-          ),
-        ),
-        const Icon(Icons.chevron_right, color: AppColors.textMuted),
-      ],
-    );
-  }
-}

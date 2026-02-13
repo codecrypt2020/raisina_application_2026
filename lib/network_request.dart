@@ -25,24 +25,40 @@ import 'dart:convert';
 //   }
 // }
 
-// login api
-Future login_api() async {
+class Network_request {
+ // login api
+static Future login_api(username,password) async {
   try {
+    var body = {
+        // 'username': username,
+        // 'password': password
+        "username": "mayurwabale1221@gmail.com",
+    "password": "Mjcc\$012"
+      };
     var response =
         await http.post(Uri.parse(Constants.NODE_URL + Constants.login),
-            headers: {},
-            body: jsonEncode(encryptPayload({
-              "username": "",
-              "password": ""
+         
+            // headers: {},
+            body: encryptPayload(body)
+            );
+            print('hbhdcgdgg${encryptPayload({
+              // "username": "$username",
+              // "password": "$password"
+              
+    "username": "mayurwabale1221@gmail.com",
+    "password": "Mjcc\$012"
+
 //payload
 //           {
 //     "username": "mayurwabale1221@gmail.com",
 //     "password": "Mjcc$012"
 // }
-            })));
+            })}');
     Map<String, dynamic> jsonData = decryptResponse(response.body);
     if (response.statusCode == 200 && jsonData["success"] == true) {
       var res = decryptResponse(response.body);
+      print("this is the response ${res}");
+
     }
 // RESPONSE
 // {
@@ -210,3 +226,7 @@ Future getAgenda() async {
     debugPrint("this is the error in getAgendaApi: ${e}");
   }
 }
+
+}
+
+
