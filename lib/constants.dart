@@ -1,5 +1,4 @@
-class Constants{
-
+class Constants {
   //String for identifying dev build or prod build.
   //Prod environment
   // static String NODE_URL = 'https://raisina-orfonline.com/';
@@ -7,17 +6,14 @@ class Constants{
   // static String NODE_URL_FORGOT_PASSWORD = "https://misafeadmin.in";
   // static const String env = "Production";
 
-
 //DEV
-static const String NODE_URL = 'https://devapi.raisina-orfonline.com/'; 
+  static const String NODE_URL = 'https://devapi.raisina-orfonline.com/';
   // static const String IMG_BASE_N_URL = 'https://api.devmisafeadmin.in/';
   // static String NODE_URL_FORGOT_PASSWORD = "https://devmisafeadmin.in";
   static const String env = "Development";
 
-
-
- static const String login = "users/login";
- static const String assignedUserDetails ="qr/assignedUserDetials";
- static const String event-start-date ="registration/event-start-date";
- static const String get-agenda ="registration/get-agenda";
+  static const String login = "users/login";
+  static const String assignedUserDetails = "qr/assignedUserDetials";
+  static const String eventStartDate = "registration/event-start-date";
+  static const String getAgenda = "registration/get-agenda";
 }

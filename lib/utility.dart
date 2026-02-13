@@ -43,7 +43,3 @@ decryptResponse(encResponse) {
     return json.decode(encResponse);
   }
 }
-
-
-
-
