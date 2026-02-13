@@ -1,3 +1,6 @@
+import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
+import 'package:attendee_app/Dining/Screens/dining.dart';
+import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -71,9 +74,11 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [ 
-    HomeDashboard(),
-    AgendaView(),
-    NetworkingView(),
+    // HomeDashboard(),
+    AgendaMain(),
+    Dining(),
+    SpeakingMain(),
+    // NetworkingView(),
     ProfileView(),
   ];
 
@@ -118,14 +123,22 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
           });
         },
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+          // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
           NavigationDestination(
             icon: Icon(Icons.event_note_outlined),
             label: 'Agenda',
           ),
+          // NavigationDestination(
+          //   icon: Icon(Icons.connect_without_contact_outlined),
+          //   label: 'Network',
+          // ),
           NavigationDestination(
-            icon: Icon(Icons.connect_without_contact_outlined),
-            label: 'Network',
+            icon: Icon(Icons.wine_bar_outlined),
+            label: 'Dining',
+          ),
+           NavigationDestination(
+            icon: Icon(Icons.school_outlined),
+            label: 'Speaking Eng',
           ),
           NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
@@ -134,294 +147,230 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   }
 }
 
-class HomeDashboard extends StatelessWidget {
-  const HomeDashboard({super.key});
+// class HomeDashboard extends StatelessWidget {
+//   const HomeDashboard({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        const _EventHeroCard(),
-        const SizedBox(height: 24),
-        const Text(
-          'Quick actions',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-        ),
-        const SizedBox(height: 12),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final cardWidth = (constraints.maxWidth - 12) / 2;
-            return Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                _ActionCard(
-                  icon: Icons.mic_none,
-                  title: 'Speaking',
-                  subtitle: 'Your sessions',
-                  color: AppColors.gold,
-                  width: cardWidth,
-                ),
-                _ActionCard(
-                  icon: Icons.restaurant_menu,
-                  title: 'Dining',
-                  subtitle: 'Invites & RSVP',
-                  color: AppColors.teal,
-                  width: cardWidth,
-                ),
-                _ActionCard(
-                  icon: Icons.groups_outlined,
-                  title: 'Directory',
-                  subtitle: 'Find attendees',
-                  color: AppColors.goldLight,
-                  width: cardWidth,
-                ),
-                _ActionCard(
-                  icon: Icons.folder_open,
-                  title: 'Resources',
-                  subtitle: 'Briefings & kits',
-                  color: AppColors.textSecondary,
-                  width: cardWidth,
-                ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 24),
-        const _SectionHeader(title: 'Today at a glance', action: 'See full agenda'),
-        const SizedBox(height: 12),
-        const _AgendaCard(
-          time: '09:30 AM',
-          title: 'Opening keynote: The geopolitics of 2030',
-          location: 'Innovation Hall A',
-          speaker: 'Prime Minister Arjun Mehra',
-          isLive: true,
-        ),
-        const SizedBox(height: 12),
-        const _AgendaCard(
-          time: '11:00 AM',
-          title: 'Roundtable: Technology and trust',
-          location: 'Forum Studio 2',
-          speaker: 'Dr. John Doe · Speaker',
-          tag: "You're Speaking",
-          tagColor: AppColors.gold,
-        ),
-        const SizedBox(height: 12),
-        const _AgendaCard(
-          time: '02:00 PM',
-          title: 'Strategic dialogues: Indo-Pacific security',
-          location: 'Raisina Hall B',
-          speaker: 'Session · 45 mins',
-          tag: 'Session',
-          tagColor: AppColors.teal,
-        ),
-        const SizedBox(height: 24),
-        const _SectionHeader(title: 'Key participants', action: 'View all'),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 160,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: const [
-              _SpeakerCard(
-                name: 'Amb. Leena Rao',
-                role: 'Special Envoy, MEA',
-                tag: 'Diplomacy',
-              ),
-              _SpeakerCard(
-                name: 'Dr. R. Banerjee',
-                role: 'Economist, IGS',
-                tag: 'Geo-economics',
-              ),
-              _SpeakerCard(
-                name: 'Maya Torres',
-                role: 'VP Policy, TerraNet',
-                tag: 'Tech Policy',
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        const _SectionHeader(title: 'Venue updates', action: 'Live status'),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.navyMid,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _StatusRow(
-                label: 'Innovation Hall A',
-                status: 'On time',
-                color: AppColors.gold,
-              ),
-              const Divider(color: AppColors.navySurface),
-              _StatusRow(
-                label: 'Wellness Suite',
-                status: '15 min wait',
-                color: AppColors.teal,
-              ),
-              const Divider(color: AppColors.navySurface),
-              _StatusRow(
-                label: 'VIP Shuttle',
-                status: 'Arriving',
-                color: AppColors.goldLight,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView(
+//       padding: const EdgeInsets.all(20),
+//       children: [
+//         const _EventHeroCard(),
+//         const SizedBox(height: 24),
+//         const Text(
+//           'Quick actions',
+//           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+//         ),
+//         const SizedBox(height: 12),
+//         LayoutBuilder(
+//           builder: (context, constraints) {
+//             final cardWidth = (constraints.maxWidth - 12) / 2;
+//             return Wrap(
+//               spacing: 12,
+//               runSpacing: 12,
+//               children: [
+//                 _ActionCard(
+//                   icon: Icons.mic_none,
+//                   title: 'Speaking',
+//                   subtitle: 'Your sessions',
+//                   color: AppColors.gold,
+//                   width: cardWidth,
+//                 ),
+//                 _ActionCard(
+//                   icon: Icons.restaurant_menu,
+//                   title: 'Dining',
+//                   subtitle: 'Invites & RSVP',
+//                   color: AppColors.teal,
+//                   width: cardWidth,
+//                 ),
+//                 _ActionCard(
+//                   icon: Icons.groups_outlined,
+//                   title: 'Directory',
+//                   subtitle: 'Find attendees',
+//                   color: AppColors.goldLight,
+//                   width: cardWidth,
+//                 ),
+//                 _ActionCard(
+//                   icon: Icons.folder_open,
+//                   title: 'Resources',
+//                   subtitle: 'Briefings & kits',
+//                   color: AppColors.textSecondary,
+//                   width: cardWidth,
+//                 ),
+//               ],
+//             );
+//           },
+//         ),
+//         const SizedBox(height: 24),
+//         const _SectionHeader(title: 'Today at a glance', action: 'See full agenda'),
+//         const SizedBox(height: 12),
+//         const _AgendaCard(
+//           time: '09:30 AM',
+//           title: 'Opening keynote: The geopolitics of 2030',
+//           location: 'Innovation Hall A',
+//           speaker: 'Prime Minister Arjun Mehra',
+//           isLive: true,
+//         ),
+//         const SizedBox(height: 12),
+//         const _AgendaCard(
+//           time: '11:00 AM',
+//           title: 'Roundtable: Technology and trust',
+//           location: 'Forum Studio 2',
+//           speaker: 'Dr. John Doe · Speaker',
+//           tag: "You're Speaking",
+//           tagColor: AppColors.gold,
+//         ),
+//         const SizedBox(height: 12),
+//         const _AgendaCard(
+//           time: '02:00 PM',
+//           title: 'Strategic dialogues: Indo-Pacific security',
+//           location: 'Raisina Hall B',
+//           speaker: 'Session · 45 mins',
+//           tag: 'Session',
+//           tagColor: AppColors.teal,
+//         ),
+//         const SizedBox(height: 24),
+//         const _SectionHeader(title: 'Key participants', action: 'View all'),
+//         const SizedBox(height: 12),
+//         SizedBox(
+//           height: 160,
+//           child: ListView(
+//             scrollDirection: Axis.horizontal,
+//             children: const [
+//               _SpeakerCard(
+//                 name: 'Amb. Leena Rao',
+//                 role: 'Special Envoy, MEA',
+//                 tag: 'Diplomacy',
+//               ),
+//               _SpeakerCard(
+//                 name: 'Dr. R. Banerjee',
+//                 role: 'Economist, IGS',
+//                 tag: 'Geo-economics',
+//               ),
+//               _SpeakerCard(
+//                 name: 'Maya Torres',
+//                 role: 'VP Policy, TerraNet',
+//                 tag: 'Tech Policy',
+//               ),
+//             ],
+//           ),
+//         ),
+//         const SizedBox(height: 24),
+//         const _SectionHeader(title: 'Venue updates', action: 'Live status'),
+//         const SizedBox(height: 12),
+//         Container(
+//           padding: const EdgeInsets.all(16),
+//           decoration: BoxDecoration(
+//             color: AppColors.navyMid,
+//             borderRadius: BorderRadius.circular(20),
+//             boxShadow: [
+//               BoxShadow(
+//                 color: Colors.black.withOpacity(0.2),
+//                 blurRadius: 16,
+//                 offset: const Offset(0, 8),
+//               ),
+//             ],
+//           ),
+//           child: Column(
+//             children: [
+//               _StatusRow(
+//                 label: 'Innovation Hall A',
+//                 status: 'On time',
+//                 color: AppColors.gold,
+//               ),
+//               const Divider(color: AppColors.navySurface),
+//               _StatusRow(
+//                 label: 'Wellness Suite',
+//                 status: '15 min wait',
+//                 color: AppColors.teal,
+//               ),
+//               const Divider(color: AppColors.navySurface),
+//               _StatusRow(
+//                 label: 'VIP Shuttle',
+//                 status: 'Arriving',
+//                 color: AppColors.goldLight,
+//               ),
+//             ],
+//           ),
+//         ),
+//         const SizedBox(height: 32),
+//       ],
+//     );
+//   }
+// }
 
-class AgendaView extends StatelessWidget {
-  const AgendaView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        const Text(
-          'Agenda',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: const [
-            _FilterChip(label: 'Day 1 · Feb 12', selected: true),
-            _FilterChip(label: 'Day 2 · Feb 13'),
-            _FilterChip(label: 'Day 3 · Feb 14'),
-            _FilterChip(label: 'Day 4 · Feb 15'),
-          ],
-        ),
-        const SizedBox(height: 20),
-        const _AgendaCard(
-          time: '08:00 AM',
-          title: 'Speaker breakfast: Strategic foresight',
-          location: 'Grand Atrium',
-          speaker: 'Invite only',
-          highlight: true,
-          tag: "You're Speaking",
-          tagColor: AppColors.gold,
-        ),
-        const SizedBox(height: 12),
-        const _AgendaCard(
-          time: '10:30 AM',
-          title: 'Panel: Global South & climate finance',
-          location: 'Forum Studio 1',
-          speaker: 'Session · 60 mins',
-          tag: 'Session',
-          tagColor: AppColors.teal,
-          isLive: true,
-        ),
-        const SizedBox(height: 12),
-        const _AgendaCard(
-          time: '01:00 PM',
-          title: 'Closed-door: Maritime security',
-          location: 'Raisina Room 3',
-          speaker: 'Limited seats',
-          tag: 'Closed-door',
-          tagColor: AppColors.goldLight,
-        ),
-        const SizedBox(height: 12),
-        const _AgendaCard(
-          time: '03:30 PM',
-          title: 'Fireside chat: The future of alliances',
-          location: 'Summit Theatre',
-          speaker: 'Session · 40 mins',
-          tag: 'Session',
-          tagColor: AppColors.teal,
-        ),
-      ],
-    );
-  }
-}
 
-class NetworkingView extends StatelessWidget {
-  const NetworkingView({super.key});
+// class NetworkingView extends StatelessWidget {
+//   const NetworkingView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        const Text(
-          'Connect',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.navySurface,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.auto_awesome, color: AppColors.gold, size: 28),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'AI introductions based on your sessions, interests, and role.',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        const _SectionHeader(title: 'Recommended connections', action: 'Refresh'),
-        const SizedBox(height: 12),
-        const _ConnectionCard(
-          name: 'Amb. Raghav Menon',
-          role: 'High Commissioner · Singapore',
-          tags: ['Diplomacy', 'ASEAN'],
-        ),
-        const SizedBox(height: 12),
-        const _ConnectionCard(
-          name: 'Dr. Salma Idris',
-          role: 'Director · PeaceLab',
-          tags: ['Conflict resolution', 'MENA'],
-        ),
-        const SizedBox(height: 12),
-        const _ConnectionCard(
-          name: 'Neeraj Kapoor',
-          role: 'Partner · Bharat Ventures',
-          tags: ['Strategic capital', 'South Asia'],
-        ),
-        const SizedBox(height: 20),
-        const _SectionHeader(title: 'Meetups near you', action: 'View map'),
-        const SizedBox(height: 12),
-        const _MeetupCard(
-          title: 'Geo-economics briefing',
-          time: '4:30 PM · Lotus Lounge',
-          members: 18,
-        ),
-        const SizedBox(height: 12),
-        const _MeetupCard(
-          title: 'Speaker green room',
-          time: '6:00 PM · Raisina Garden',
-          members: 9,
-        ),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView(
+//       padding: const EdgeInsets.all(20),
+//       children: [
+//         const Text(
+//           'Connect',
+//           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+//         ),
+//         const SizedBox(height: 12),
+//         Container(
+//           padding: const EdgeInsets.all(18),
+//           decoration: BoxDecoration(
+//             color: AppColors.navySurface,
+//             borderRadius: BorderRadius.circular(20),
+//           ),
+//           child: Row(
+//             children: [
+//               const Icon(Icons.auto_awesome, color: AppColors.gold, size: 28),
+//               const SizedBox(width: 12),
+//               const Expanded(
+//                 child: Text(
+//                   'AI introductions based on your sessions, interests, and role.',
+//                   style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//         const SizedBox(height: 20),
+//         const _SectionHeader(title: 'Recommended connections', action: 'Refresh'),
+//         const SizedBox(height: 12),
+//         const _ConnectionCard(
+//           name: 'Amb. Raghav Menon',
+//           role: 'High Commissioner · Singapore',
+//           tags: ['Diplomacy', 'ASEAN'],
+//         ),
+//         const SizedBox(height: 12),
+//         const _ConnectionCard(
+//           name: 'Dr. Salma Idris',
+//           role: 'Director · PeaceLab',
+//           tags: ['Conflict resolution', 'MENA'],
+//         ),
+//         const SizedBox(height: 12),
+//         const _ConnectionCard(
+//           name: 'Neeraj Kapoor',
+//           role: 'Partner · Bharat Ventures',
+//           tags: ['Strategic capital', 'South Asia'],
+//         ),
+//         const SizedBox(height: 20),
+//         const _SectionHeader(title: 'Meetups near you', action: 'View map'),
+//         const SizedBox(height: 12),
+//         const _MeetupCard(
+//           title: 'Geo-economics briefing',
+//           time: '4:30 PM · Lotus Lounge',
+//           members: 18,
+//         ),
+//         const SizedBox(height: 12),
+//         const _MeetupCard(
+//           title: 'Speaker green room',
+//           time: '6:00 PM · Raisina Garden',
+//           members: 9,
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -946,31 +895,7 @@ class _StatusRow extends StatelessWidget {
   }
 }
 
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, this.selected = false});
 
-  final String label;
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: selected ? AppColors.goldDim : AppColors.navySurface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: selected ? AppColors.gold : AppColors.navyElevated),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: selected ? AppColors.gold : AppColors.textSecondary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
 
 class _ConnectionCard extends StatelessWidget {
   const _ConnectionCard({required this.name, required this.role, required this.tags});
