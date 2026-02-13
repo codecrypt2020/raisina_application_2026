@@ -113,6 +113,8 @@ class _LogingscreenState extends State<Logingscreen> {
                     ),
                   ),
                   onPressed: () {
+                    print("user email id check: ${emailController.text}");
+                    print("user password check: ${passwordController.text}");
                     Navigator.pushReplacement( //open new screen and remove login screen from stack
                       context,
                       MaterialPageRoute(
