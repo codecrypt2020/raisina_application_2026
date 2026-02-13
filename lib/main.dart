@@ -1,3 +1,4 @@
+import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -53,10 +54,11 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
-      home: const AttendeeHomePage(),
+      home:  const Logingscreen(),
     );
   }
 }
+
 
 class AttendeeHomePage extends StatefulWidget {
   const AttendeeHomePage({super.key});
@@ -68,7 +70,7 @@ class AttendeeHomePage extends StatefulWidget {
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
+  final List<Widget> _pages = [ 
     HomeDashboard(),
     AgendaView(),
     NetworkingView(),
@@ -475,14 +477,14 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.badge_outlined,
                 color: AppColors.gold,
               ),
-              const Divider(color: AppColors.navySurface),
+              Divider(color: AppColors.navySurface),
               _ProfileRow(
                 title: 'Travel & logistics',
                 subtitle: 'Hotel car confirmed at 7:30 AM',
                 icon: Icons.flight_takeoff_outlined,
                 color: AppColors.teal,
               ),
-              const Divider(color: AppColors.navySurface),
+              Divider(color: AppColors.navySurface),
               _ProfileRow(
                 title: 'Speaker kit',
                 subtitle: 'Slides due in 2 days',
@@ -492,7 +494,7 @@ class ProfileView extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 30),
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -523,6 +525,33 @@ class ProfileView extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 30),
+        SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+      side: const BorderSide(color: AppColors.red),
+      foregroundColor: AppColors.red,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+         ),
+       ),
+       onPressed: () {
+       Navigator.pushAndRemoveUntil( //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
+        context,
+         MaterialPageRoute(builder: (context) => const Logingscreen()),
+         (route) => false,
+        );      
+      },
+      icon: const Icon(Icons.logout),
+      label: const Text(
+          "Logout",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+     ),
+    ),
+
       ],
     );
   }
