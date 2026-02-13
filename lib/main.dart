@@ -1,3 +1,4 @@
+import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -53,10 +54,11 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
-      home: const AttendeeHomePage(),
+      home:  const Logingscreen(),
     );
   }
 }
+
 
 class AttendeeHomePage extends StatefulWidget {
   const AttendeeHomePage({super.key});
