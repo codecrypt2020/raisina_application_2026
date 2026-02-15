@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/utility.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
  
  
@@ -17,22 +18,18 @@ class dining_data with ChangeNotifier {
             "x-encrypted" : "1",
             //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
             // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
-            'x-access-token': '581ba50d5a449325db6dcb5e4130af90',
-            'x-access-type': 'user',
-            
+            'x-access-token': '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+            'x-access-type': '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+            'Content-Type': 'application/json',
             },
       body: 
-      // jsonEncode(
-      //   encryptPayload(
+      jsonEncode(
+        encryptPayload(
           {
-            "eventId": "21"
-            //payload
-// {
-//     "eventId": "21"
-// }
+            "eventId": "${Hive.box('LoginDetails').get("Profile_details")['eventId']}"
           },
-      //   ),
-      // ),
+        ),
+      ),
     );
     print('this is the payload bhhbhfbhvb${encryptPayload(
           {
