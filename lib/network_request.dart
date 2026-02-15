@@ -67,7 +67,6 @@ class Network_request {
         var res = decryptResponse(response.body);
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
-
         print(
             "this is the response ${Hive.box('LoginDetails').get("Profile_details")}");
       }
@@ -88,19 +87,25 @@ class Network_request {
     }
   }
 
-  Future assignedUserDetails() async {
+  static Future assignedUserDetails() async {
     try {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.assignedUserDetails),
-        headers: {},
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(
           encryptPayload(
             {
-              "userId": "567"
-//respose
-// {
-//     "userId": "567"
-// }
+              "userId":
+                  "${Hive.box('LoginDetails').get("Profile_details")['userId']}",
             },
           ),
         ),
@@ -108,14 +113,8 @@ class Network_request {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
-//       {
-//     "status": 200,
-//     "success": true,
-//     "message": "Fetched Successfully",
-//     "data": {
-//         "speakingShow": false
-//     }
-// }
+        final bool speakingShow = res["data"]["speakingShow"] ?? false;
+        await Hive.box('LoginDetails').put("isSpeaker", speakingShow);
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");

@@ -91,16 +91,39 @@ class AttendeeHomePage extends StatefulWidget {
 }
 
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
+  bool isSpeakingEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isSpeakingEnabled =
+        Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+  }
+
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    // HomeDashboard(),
-    AgendaMain(),
-    DiningMain(),
-    SpeakingMain(),
-    // NetworkingView(),
-    ProfileView(),
-  ];
+  // final List<Widget> _pages = [
+  //   // HomeDashboard(),
+  //   AgendaMain(),
+  //   DiningMain(),
+  //   SpeakingMain(),
+  //   // NetworkingView(),
+  //   ProfileView(),
+  // ];
+  List<Widget> get _pages {
+    final pages = [
+      AgendaMain(),
+      DiningMain(),
+    ];
+
+    if (isSpeakingEnabled) {
+      pages.add(SpeakingMain());
+    }
+
+    pages.add(ProfileView());
+
+    return pages;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,9 +143,9 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 72,
-          title: Column(
+          title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text('Good morning, Dr. John Doe',
                   style:
                       TextStyle(fontSize: 13, color: AppColors.textSecondary)),
@@ -141,13 +164,13 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               icon: const Icon(Icons.notifications_outlined,
                   color: AppColors.textPrimary),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
+            const Padding(
+              padding: EdgeInsets.only(right: 12),
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.navySurface,
-                child: const Text('JD',
-                    style: TextStyle(color: AppColors.textPrimary)),
+                child:
+                    Text('JD', style: TextStyle(color: AppColors.textPrimary)),
               ),
             ),
           ],
@@ -160,26 +183,45 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               _selectedIndex = index;
             });
           },
-          destinations: const [
-            // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-            NavigationDestination(
+          // destinations: const [
+          //   // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+          //   NavigationDestination(
+          //     icon: Icon(Icons.event_note_outlined),
+          //     label: 'Agenda',
+          //   ),
+          //   // NavigationDestination(
+          //   //   icon: Icon(Icons.connect_without_contact_outlined),
+          //   //   label: 'Network',
+          //   // ),
+          //   NavigationDestination(
+          //     icon: Icon(Icons.wine_bar_outlined),
+          //     label: 'Dining',
+          //   ),
+          //   NavigationDestination(
+          //     icon: Icon(Icons.school_outlined),
+          //     label: 'Speaking Eng',
+          //   ),
+          //   NavigationDestination(
+          //       icon: Icon(Icons.person_outline), label: 'Profile'),
+          // ],
+          destinations: [
+            const NavigationDestination(
               icon: Icon(Icons.event_note_outlined),
               label: 'Agenda',
             ),
-            // NavigationDestination(
-            //   icon: Icon(Icons.connect_without_contact_outlined),
-            //   label: 'Network',
-            // ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.wine_bar_outlined),
               label: 'Dining',
             ),
-            NavigationDestination(
-              icon: Icon(Icons.school_outlined),
-              label: 'Speaking Eng',
+            if (isSpeakingEnabled)
+              const NavigationDestination(
+                icon: Icon(Icons.school_outlined),
+                label: 'Speaking Eng',
+              ),
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              label: 'Profile',
             ),
-            NavigationDestination(
-                icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ),
