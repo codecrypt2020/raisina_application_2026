@@ -1,5 +1,6 @@
 import 'package:attendee_app/Profile/Screens/widgets/profile_row.dart';
-import 'package:attendee_app/loging_screen.dart';
+import 'package:attendee_app/constants.dart';
+import 'package:attendee_app/login_screen.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -132,7 +133,10 @@ class ProfileView extends StatelessWidget {
               Navigator.pushAndRemoveUntil(
                 //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
                 context,
-                MaterialPageRoute(builder: (context) => const Loginscreen()),
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const LoginScreen(signUpUrl: Constants.registraionUrlDev),
+                ),
                 (route) => false,
               );
             },

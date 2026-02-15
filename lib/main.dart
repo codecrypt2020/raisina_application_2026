@@ -5,7 +5,8 @@ import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
-import 'package:attendee_app/loging_screen.dart';
+import 'package:attendee_app/constants.dart';
+import 'package:attendee_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -75,7 +76,9 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
-      home: (token != null) ? AttendeeHomePage() : Loginscreen(),
+      home: (token != null)
+          ? const AttendeeHomePage()
+          : const LoginScreen(signUpUrl: Constants.registraionUrlDev),
     );
   }
 }
