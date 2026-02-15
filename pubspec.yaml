@@ -14,6 +14,9 @@ dependencies:
   provider: ^6.0.5
   http: ^0.13.4
   aescryptojs: ^1.0.0
+  hive: ^2.2.3
+  path_provider: ^2.0.11
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:

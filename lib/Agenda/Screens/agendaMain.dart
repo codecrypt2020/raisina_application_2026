@@ -9,14 +9,8 @@ class AgendaMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // return AgendaView();
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (ctx) => Agenda_data()),
-
-          //define multiple providers
-        ],
-        child: AgendaView(
-          
-        ));
+    return AgendaView(
+      
+    );
   }
 }
