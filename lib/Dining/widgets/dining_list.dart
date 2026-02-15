@@ -1,6 +1,5 @@
 import 'package:attendee_app/Dining/Provider/dining_data.dart';
 import 'package:attendee_app/Dining/widgets/dining_card.dart';
-import 'package:attendee_app/Dining/widgets/filter_chip_dining.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,40 +14,77 @@ class Dining_list extends StatelessWidget {
     final provider = Provider.of<dining_data>(context, listen: true);
     return ListView.builder(
       padding: const EdgeInsets.all(20),
-      itemCount: provider.dining_list.length + 3, // header + chips + spacing
+      itemCount: provider.dining_list.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
-          return const Text(
-            'Dining',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Dining',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: List.generate(provider.days.length, (dayIndex) {
+                  final bool isSelected = provider.selectedIndex == dayIndex;
+
+                  return GestureDetector(
+                    onTap: () {
+                      provider.selectedIndexfun(dayIndex);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.goldDim
+                            : AppColors.navySurface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.gold
+                              : AppColors.navyElevated,
+                        ),
+                      ),
+                      child: Text(
+                        "${provider.days[dayIndex]["day"]} - ${provider.days[dayIndex]["date"]}",
+                        style: TextStyle(
+                          color: isSelected
+                              ? AppColors.gold
+                              : AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 20),
+            ],
+          );
+        }
+
+        if (provider.dining_list.isEmpty) {
+          return const SizedBox(
+            height: 120,
+            child: Center(
+              child: Text(
+                'No dining sessions found',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
             ),
           );
         }
 
-        if (index == 1) {
-          return const Padding(
-            padding: EdgeInsets.only(top: 12),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilterChip_dining(label: 'Day 1 · Feb 12', selected: true),
-                FilterChip_dining(label: 'Day 2 · Feb 13'),
-                FilterChip_dining(label: 'Day 3 · Feb 14'),
-                FilterChip_dining(label: 'Day 4 · Feb 15'),
-              ],
-            ),
-          );
-        }
-
-        if (index == 2) {
-          return const SizedBox(height: 20);
-        }
-
-        final item = provider.dining_list[index - 3];
+        final item = provider.dining_list[index - 1];
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -66,67 +102,5 @@ class Dining_list extends StatelessWidget {
         );
       },
     );
-
-    // return ListView(
-    //   padding: const EdgeInsets.all(20),
-    //   children: const [
-    //     Text(
-    //       'Dining',
-    //       style: TextStyle(
-    //           fontSize: 22,
-    //           fontWeight: FontWeight.w700,
-    //           color: AppColors.textPrimary),
-    //     ),
-    //     SizedBox(height: 12),
-    //     Wrap(
-    //       spacing: 8,
-    //       runSpacing: 8,
-    //       children: [
-    //         FilterChip_dining(label: 'Day 1 · Feb 12', selected: true),
-    //         FilterChip_dining(label: 'Day 2 · Feb 13'),
-    //         FilterChip_dining(label: 'Day 3 · Feb 14'),
-    //         FilterChip_dining(label: 'Day 4 · Feb 15'),
-    //       ],
-    //     ),
-    //     SizedBox(height: 20),
-    //     DiningCard(
-    //       time: '08:00 AM',
-    //       title: 'Speaker breakfast: Strategic foresight',
-    //       location: 'Grand Atrium',
-    //       speaker: 'Invite only',
-    //       highlight: true,
-    //       tag: "You're Speaking",
-    //       tagColor: AppColors.gold,
-    //     ),
-    //     SizedBox(height: 12),
-    //     DiningCard(
-    //       time: '10:30 AM',
-    //       title: 'Panel: Global South & climate finance',
-    //       location: 'Forum Studio 1',
-    //       speaker: 'Session · 60 mins',
-    //       tag: 'Session',
-    //       tagColor: AppColors.teal,
-    //       isLive: true,
-    //     ),
-    //     SizedBox(height: 12),
-    //     DiningCard(
-    //       time: '01:00 PM',
-    //       title: 'Closed-door: Maritime security',
-    //       location: 'Raisina Room 3',
-    //       speaker: 'Limited seats',
-    //       tag: 'Closed-door',
-    //       tagColor: AppColors.goldLight,
-    //     ),
-    //     SizedBox(height: 12),
-    //     DiningCard(
-    //       time: '03:30 PM',
-    //       title: 'Fireside chat: The future of alliances',
-    //       location: 'Summit Theatre',
-    //       speaker: 'Session · 40 mins',
-    //       tag: 'Session',
-    //       tagColor: AppColors.teal,
-    //     ),
-    //   ],
-    // );
   }
 }

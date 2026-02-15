@@ -1,3 +1,4 @@
+import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'package:attendee_app/Dining/widgets/dining_card.dart';
 import 'package:attendee_app/Dining/widgets/dining_list.dart';
 import 'package:attendee_app/Dining/widgets/filter_chip_dining.dart';
@@ -18,6 +19,11 @@ class _DiningState extends State<Dining> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    Provider.of<dining_data>(context, listen: false).event_start_date();
+    Future.microtask(() {
+      //“Do this task a little later — after the build is complete.
+      Provider.of<dining_data>(context, listen: false).resetSelectedIndex();
+    });
   }
 
   @override

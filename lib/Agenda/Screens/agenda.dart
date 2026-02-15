@@ -14,7 +14,11 @@ class _AgendaState extends State<Agenda> {
   void initState() {
     // TODO: implement initState
     super.initState();
-     Provider.of<Agenda_data>(context, listen: false).event_start_date();
+    Provider.of<Agenda_data>(context, listen: false).event_start_date();
+    Future.microtask(() {
+      //“Do this task a little later — after the build is complete.
+      Provider.of<Agenda_data>(context, listen: false).resetSelectedIndex();
+    });
   }
 
   @override

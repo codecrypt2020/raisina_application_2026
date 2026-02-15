@@ -5,27 +5,13 @@ import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AgendaView extends StatefulWidget {
-   AgendaView({super.key});
+class AgendaView extends StatelessWidget {
+  AgendaView({super.key});
 
   @override
-  State<AgendaView> createState() => _AgendaViewState();
-}
-
-class _AgendaViewState extends State<AgendaView> {
-    void initState() {
-    // TODO: implement initState
-    super.initState();
-      Future.microtask(() { //“Do this task a little later — after the build is complete.
-    Provider.of<Agenda_data>(context, listen: false)
-        .resetSelectedIndex();
-    });
-  }
-
-   @override
-  Widget build(BuildContext context) {  
-   final provider = Provider.of<Agenda_data>(context, listen: true);
-   print("bhjfhjfbgvh:${provider.agenda_list}");
+  Widget build(BuildContext context) {
+    final provider = Provider.of<Agenda_data>(context, listen: true);
+    print("bhjfhjfbgvh:${provider.agenda_list}");
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: provider.agenda_list.length + 2, // header + spacing
@@ -33,73 +19,73 @@ class _AgendaViewState extends State<AgendaView> {
         // Header
         if (index == 0) {
           return Padding(
-            padding:  EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0),
             child: Column(
-              crossAxisAlignment:CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
-              children:  [
+              children: [
                 Text(
-                      'Agenda',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                  'Agenda',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: List.generate(provider.days.length, (index) {
+                    bool isSelected = provider.selectedIndex == index;
+
+                    return GestureDetector(
+                      onTap: () {
+                        // setState(() {
+                        provider.selectedIndexfun(index); //= index;
+                        // });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.goldDim
+                              : AppColors.navySurface,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.gold
+                                : AppColors.navyElevated,
+                          ),
+                        ),
+                        child: Text(
+                          "${provider.days[index]["day"]} - ${provider.days[index]["date"]}",
+                          style: TextStyle(
+                            color: isSelected
+                                ? AppColors.gold
+                                : AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    ),
-                   SizedBox(height: 12),
-
-        
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
-          children: List.generate(provider.days.length, (index) {
-            bool isSelected = provider.selectedIndex == index;
-
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  provider.selectedIndexfun(index);//= index;
-                });               
-              },
-              child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.goldDim
-                      : AppColors.navySurface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.gold
-                        : AppColors.navyElevated,
-                  ),
-                ),
-                child: Text(
-                  "${provider.days[index]["day"]} - ${provider.days[index]["date"]}",
-                style: TextStyle(
-                  color: isSelected ? AppColors.gold : AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            );
-          }),
-        )
-
+                    );
+                  }),
+                )
               ],
             ),
           );
         }
         // Space after header
         if (index == 1) {
-          return  SizedBox(height: 20);
+          return SizedBox(height: 20);
         }
 
         final item = provider.agenda_list[index - 2];
 
         return Padding(
-          padding:  EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.only(bottom: 12),
           child: AgendaCard(
             time: item.time,
             title: item.title,
@@ -117,8 +103,8 @@ class _AgendaViewState extends State<AgendaView> {
       },
     );
 
-  //  return  
-     // ListView(
+    //  return
+    // ListView(
     //   padding:  EdgeInsets.all(20),
     //   children:  [
     //     Text(

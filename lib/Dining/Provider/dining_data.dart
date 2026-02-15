@@ -10,9 +10,36 @@ import 'package:http/http.dart' as http;
 
 class dining_data with ChangeNotifier {
   List<DiningDataItem> _dining_list = [];
+  var _selectedIndex = 0;
+
+  final List<Map<String, String>> _days = [
+    {"day": "Day 1", "date": "Feb 14"},
+    {"day": "Day 2", "date": "Feb 15"},
+    {"day": "Day 3", "date": "Feb 16"},
+    {"day": "Day 4", "date": "Feb 17"},
+  ];
 
   get dining_list {
     return _dining_list;
+  }
+
+  get days {
+    return _days;
+  }
+
+  get selectedIndex {
+    return _selectedIndex;
+  }
+
+  void selectedIndexfun(int index) {
+    _selectedIndex = index; // button highlight
+    dining(index + 1); // api call
+    notifyListeners();
+  }
+
+  void resetSelectedIndex() {
+    _selectedIndex = 0; //_selectedIndex value reset
+    notifyListeners();
   }
 
   //Dining APIs
@@ -69,7 +96,10 @@ class dining_data with ChangeNotifier {
   }
 
 //Dining APIs
-  Future dining() async {
+  Future dining([i]) async {
+    //empyting the list
+    _dining_list = [];
+
     try {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.getdining),
@@ -87,7 +117,7 @@ class dining_data with ChangeNotifier {
           encryptPayload(
             {
               // "eventId": '${Hive.box('LoginDetails').get("Profile_details")['token']}',
-              "day": "1",
+              "day": i == null ? 1 : i,
               "userId":
                   "${Hive.box('LoginDetails').get("Profile_details")['userId']}",
             },
@@ -98,7 +128,9 @@ class dining_data with ChangeNotifier {
       if (response.statusCode == 200) {
         var res = decryptResponse(response.body);
         //function to be added here
-        mapmeal(res[0]);
+        if (res.length != 0) {
+          mapmeal(res[0]);
+        }
       }
     } catch (e) {
       debugPrint("this is the error in Dining : $e");
@@ -213,6 +245,7 @@ class dining_data with ChangeNotifier {
       ));
     }
     _dining_list = dining_list_raw;
+    notifyListeners();
   }
 }
 
