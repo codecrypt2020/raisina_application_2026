@@ -12,12 +12,20 @@ dependencies:
 
   cupertino_icons: ^1.0.6
 
+  http: ^0.13.4
+  aescryptojs: ^1.0.0
+  flutter_launcher_icons: ^0.13.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.2
 
-  http: ^0.13.4
-  aescryptojs: ^1.0.0
 flutter:
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/raisinalogo1024.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/raisinalogo1024.png"
