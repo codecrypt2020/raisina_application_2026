@@ -6,6 +6,9 @@ class AgendaCard extends StatelessWidget {
     required this.time,
     required this.title,
     required this.location,
+    required this.description,
+    required this.starttime,
+    required this.endtime,
     required this.speaker,
     this.highlight = false,
     this.tag,
@@ -16,6 +19,9 @@ class AgendaCard extends StatelessWidget {
   final String time;
   final String title;
   final String location;
+  final String description;
+  final String starttime;
+  final String endtime;
   final String speaker;
   final bool highlight;
   final String? tag;
@@ -43,24 +49,35 @@ class AgendaCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: highlight ? AppColors.navySurface : AppColors.navySurface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  time.split(' ')[0],
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
+          Column(
+            children: [
+              Container(
+                padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: highlight ? AppColors.navySurface : AppColors.navySurface,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text(
-                  time.split(' ')[1],
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                child: Text(
+                  starttime,
+                  style:  TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
                 ),
-              ],
-            ),
+              ),
+              
+              SizedBox(height:20,),
+
+              // Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              //   decoration: BoxDecoration(
+              //     color: highlight ? AppColors.navySurface : AppColors.navySurface,
+              //     borderRadius: BorderRadius.circular(12),
+              //   ),
+              //   child: Text(
+              //      endtime,
+              //     style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
+              //   ),
+              // ),
+
+            ],
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -111,6 +128,22 @@ class AgendaCard extends StatelessWidget {
                     ),
                   ),
                 ],
+                //  SizedBox(height: 6),
+                // Container(
+                //     padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                //     decoration: BoxDecoration(
+                //       color: (tagColor ?? AppColors.gold).withOpacity(0.2),
+                //       borderRadius: BorderRadius.circular(12),
+                //     ),
+                //     child: Text(
+                //       description,
+                //       style: TextStyle(
+                //         fontSize: 11,
+                //         fontWeight: FontWeight.w600,
+                //         color: tagColor ?? AppColors.gold,
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),

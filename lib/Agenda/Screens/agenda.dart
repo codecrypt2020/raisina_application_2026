@@ -14,6 +14,7 @@ class _AgendaState extends State<Agenda> {
   void initState() {
     // TODO: implement initState
     super.initState();
+     Provider.of<Agenda_data>(context, listen: false).event_start_date();
   }
 
   @override
