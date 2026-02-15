@@ -1,4 +1,3 @@
-
 import 'package:attendee_app/main.dart';
 import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +23,6 @@ class _LogingscreenState extends State<Loginscreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
-         
               Container(
                 height: 90,
                 width: 140,
@@ -114,29 +111,42 @@ class _LogingscreenState extends State<Loginscreen> {
                     ),
                   ),
                   onPressed: () {
-                    if (emailController.text.isNotEmpty &&
-                        passwordController.text.isNotEmpty) {
+                    if (emailController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please fill the Email ID',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      );
+                    } else if (passwordController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please fill the Password',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      );
+                    } else {
                       print("user email id check: ${emailController.text}");
                       print("user password check: ${passwordController.text}");
-                      //call the api for fetching the login details
+
                       Network_request.login_api(
-                          emailController.text, passwordController.text);
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                      );
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       Navigator.pushReplacement(
-                        //open new screen and remove login screen from stack
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const AttendeeHomePage(), //navigate to home page on submit (replace login screen
+                          builder: (context) => const AttendeeHomePage(),
                         ),
                       );
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text(
-                      'Please fill the credentials',
-                      style: TextStyle(
-                        fontSize: 10,
-                      ),
-                    )));
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
