@@ -1,6 +1,7 @@
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/utility.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -42,6 +43,7 @@ static Future login_api(username,password) async {
          
             headers: {
               "x-encrypted" : "1",
+              'Content-Type': 'application/json',
 
             },
             // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
@@ -58,14 +60,16 @@ static Future login_api(username,password) async {
 //Mjcc$012
             ///
             ///
-    print('this is the payload ${encryptPayload(
-          body,
-        )}');
+    // print('this is the payload ${encryptPayload(
+    //       body,
+    //     )}');
 
     Map<String, dynamic> jsonData = decryptResponse(response.body);
     if (response.statusCode == 200 && jsonData["success"] == true) {
       var res = decryptResponse(response.body);
-      print("this is the response ${res}");
+      Hive.box('LoginDetails').put("Profile_details",res["data"]);
+      
+      print("this is the response ${Hive.box('LoginDetails').get("Profile_details")}");
 
     }
 // RESPONSE

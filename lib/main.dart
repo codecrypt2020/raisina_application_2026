@@ -1,3 +1,6 @@
+
+import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
+import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
@@ -5,6 +8,9 @@ import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_dat
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'Dining/Provider/dining_data.dart';
@@ -25,7 +31,11 @@ class AppColors {
   static const red = Color(0xFFE05555);
 }
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  Directory directory = await getApplicationDocumentsDirectory();
+  await Hive.initFlutter(directory.path);
+  await Hive.openBox('LoginDetails');
   runApp(const AttendeeApp());
 }
 
@@ -95,8 +105,14 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => dining_data()),
         //define multiple providers
         ///agenda
+
         ///speaking engagement
         ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
+
+        ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+
+        ///speaking engagement
+
       ],
       child: Scaffold(
         appBar: AppBar(
