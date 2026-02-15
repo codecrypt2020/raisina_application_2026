@@ -1,3 +1,4 @@
+import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
@@ -93,11 +94,13 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-          ChangeNotifierProvider(create: (ctx) => dining_data()),
-          //define multiple providers
-          ///agenda
-          ///speaking engagement
-        ],
+        ChangeNotifierProvider(create: (ctx) => dining_data()),
+        //define multiple providers
+        ///agenda
+        ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+
+        ///speaking engagement
+      ],
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 72,
@@ -778,10 +781,9 @@ class _StatusRow extends StatelessWidget {
   }
 }
 
-
-
 class _ConnectionCard extends StatelessWidget {
-  const _ConnectionCard({required this.name, required this.role, required this.tags});
+  const _ConnectionCard(
+      {required this.name, required this.role, required this.tags});
 
   final String name;
   final String role;
@@ -807,28 +809,37 @@ class _ConnectionCard extends StatelessWidget {
           CircleAvatar(
             radius: 22,
             backgroundColor: AppColors.navySurface,
-            child: Text(name.substring(0, 1), style: const TextStyle(color: AppColors.textPrimary)),
+            child: Text(name.substring(0, 1),
+                style: const TextStyle(color: AppColors.textPrimary)),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                Text(name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary)),
                 const SizedBox(height: 4),
-                Text(role, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(role,
+                    style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 6,
                   children: tags
                       .map(
                         (tag) => Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: AppColors.navySurface,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(tag, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          child: Text(tag,
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textSecondary)),
                         ),
                       )
                       .toList(),
@@ -844,7 +855,8 @@ class _ConnectionCard extends StatelessWidget {
 }
 
 class _MeetupCard extends StatelessWidget {
-  const _MeetupCard({required this.title, required this.time, required this.members});
+  const _MeetupCard(
+      {required this.title, required this.time, required this.members});
 
   final String title;
   final String time;
@@ -870,16 +882,21 @@ class _MeetupCard extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: AppColors.navySurface,
-            child: const Icon(Icons.groups_outlined, color: AppColors.goldLight),
+            child:
+                const Icon(Icons.groups_outlined, color: AppColors.goldLight),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                Text(title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary)),
                 const SizedBox(height: 4),
-                Text(time, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(time,
+                    style: const TextStyle(color: AppColors.textSecondary)),
               ],
             ),
           ),
@@ -891,7 +908,8 @@ class _MeetupCard extends StatelessWidget {
             ),
             child: Text(
               '$members joined',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style:
+                  const TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ),
         ],
@@ -899,5 +917,3 @@ class _MeetupCard extends StatelessWidget {
     );
   }
 }
-
-
