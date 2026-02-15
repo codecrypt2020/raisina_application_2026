@@ -13,19 +13,36 @@ class dining_data with ChangeNotifier {
   try {
     var response = await http.post(
       Uri.parse(Constants.NODE_URL + Constants.eventStartDate),
-      headers: {},
-      body: jsonEncode(
-        encryptPayload(
+      headers: {
+            "x-encrypted" : "1",
+            //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+            // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+            'x-access-token': '581ba50d5a449325db6dcb5e4130af90',
+            'x-access-type': 'user',
+            
+            },
+      body: 
+      // jsonEncode(
+      //   encryptPayload(
           {
-            "eventId": ""
+            "eventId": "21"
             //payload
 // {
 //     "eventId": "21"
 // }
           },
-        ),
-      ),
+      //   ),
+      // ),
     );
+    print('this is the payload bhhbhfbhvb${encryptPayload(
+          {
+            "eventId": "21"
+            //payload
+// {
+//     "eventId": "21"
+// }
+          },
+        )}');
     var jsonData = decryptResponse(response.body);
     if (response.statusCode == 200 && jsonData["success"] == true) {
       var res = decryptResponse(response.body);

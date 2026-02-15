@@ -114,16 +114,29 @@ class _LogingscreenState extends State<Loginscreen> {
                     ),
                   ),
                   onPressed: () {
-                    print("user email id check: ${emailController.text}");
-                    print("user password check: ${passwordController.text}");
-                    //call the api for fetching the login details
-                    Network_request.login_api(emailController.text,passwordController.text);
-                    Navigator.pushReplacement( //open new screen and remove login screen from stack
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AttendeeHomePage(),//navigate to home page on submit (replace login screen
+                    if (emailController.text.isNotEmpty &&
+                        passwordController.text.isNotEmpty) {
+                      print("user email id check: ${emailController.text}");
+                      print("user password check: ${passwordController.text}");
+                      //call the api for fetching the login details
+                      Network_request.login_api(
+                          emailController.text, passwordController.text);
+                      Navigator.pushReplacement(
+                        //open new screen and remove login screen from stack
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const AttendeeHomePage(), //navigate to home page on submit (replace login screen
+                        ),
+                      );
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text(
+                      'Please fill the credentials',
+                      style: TextStyle(
+                        fontSize: 10,
                       ),
-                    );
+                    )));
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

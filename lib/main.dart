@@ -4,6 +4,10 @@ import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'Dining/Provider/dining_data.dart';
+import 'Dining/Screens/dining_main.dart';
 
 class AppColors {
   static const navy = Color(0xFFFFFFFF);
@@ -77,72 +81,82 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   final List<Widget> _pages = [ 
     // HomeDashboard(),
     AgendaMain(),
-    Dining(),
+    DiningMain(),
     SpeakingMain(),
     // NetworkingView(),
     ProfileView(),
   ];
 
+  
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 72,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text('Good morning, Dr. John Doe', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-            SizedBox(height: 4),
-            Text('Raisina Dialogue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+    return MultiProvider(
+      providers: [
+          ChangeNotifierProvider(create: (ctx) => dining_data()),
+          //define multiple providers
+          ///agenda
+          ///speaking engagement
+        ],
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 72,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text('Good morning, Dr. John Doe', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              SizedBox(height: 4),
+              Text('Raisina Dialogue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            ],
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.search, color: AppColors.textPrimary),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: AppColors.navySurface,
+                child: const Text('JD', style: TextStyle(color: AppColors.textPrimary)),
+              ),
+            ),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search, color: AppColors.textPrimary),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.navySurface,
-              child: const Text('JD', style: TextStyle(color: AppColors.textPrimary)),
+        body: _pages[_selectedIndex],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: const [
+            // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+            NavigationDestination(
+              icon: Icon(Icons.event_note_outlined),
+              label: 'Agenda',
             ),
-          ),
-        ],
-      ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: const [
-          // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.event_note_outlined),
-            label: 'Agenda',
-          ),
-          // NavigationDestination(
-          //   icon: Icon(Icons.connect_without_contact_outlined),
-          //   label: 'Network',
-          // ),
-          NavigationDestination(
-            icon: Icon(Icons.wine_bar_outlined),
-            label: 'Dining',
-          ),
-           NavigationDestination(
-            icon: Icon(Icons.school_outlined),
-            label: 'Speaking Eng',
-          ),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
+            // NavigationDestination(
+            //   icon: Icon(Icons.connect_without_contact_outlined),
+            //   label: 'Network',
+            // ),
+            NavigationDestination(
+              icon: Icon(Icons.wine_bar_outlined),
+              label: 'Dining',
+            ),
+             NavigationDestination(
+              icon: Icon(Icons.school_outlined),
+              label: 'Speaking Eng',
+            ),
+            NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          ],
+        ),
       ),
     );
   }
