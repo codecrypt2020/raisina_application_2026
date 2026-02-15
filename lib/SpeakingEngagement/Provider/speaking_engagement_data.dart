@@ -1,23 +1,47 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:attendee_app/constants.dart';
+import 'package:attendee_app/main.dart';
 import 'package:attendee_app/utility.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 class SpeakingEngagementData with ChangeNotifier {
-  Future assignedUserDetails() async {
+  //Data storing variables
+
+  List<SpeakingEngagementItem> _sessions_list = [];
+
+  get sessions_list {
+    return _sessions_list;
+  }
+
+  Future SpeakingDetails() async {
     try {
       var response = await http.post(
-        Uri.parse(Constants.NODE_URL + Constants.assignedUserDetails),
-        headers: {},
+        Uri.parse(Constants.NODE_URL + Constants.assignedUserspeakingDetails),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(
           encryptPayload(
+            //respose{
+            //"userId": "567"
+            //}
             {
-              "userId": "567"
-              //respose{
-              //"userId": "567"
-              //}
+              "userId":
+                  "${Hive.box('LoginDetails').get("Profile_details")['userId']}",
+              "userName":
+                  "${Hive.box('LoginDetails').get("Profile_details")['userName']}"
             },
           ),
         ),
@@ -25,6 +49,7 @@ class SpeakingEngagementData with ChangeNotifier {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
+        _sessions_list = mapSessionsToEngagements(res["data"]["sessions"]);
         {
           // "status": 200,
           // "success": true,
@@ -38,4 +63,47 @@ class SpeakingEngagementData with ChangeNotifier {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
+
+  List<SpeakingEngagementItem> mapSessionsToEngagements(
+      List<dynamic> sessions) {
+    return sessions.map((session) {
+      final date = session['date'];
+
+      final String formattedDate =
+          "${date['day']} ${date['month']} ${date['weekday']}";
+
+      return SpeakingEngagementItem(
+        time: formattedDate, // 14 FEB Sat
+        title: session['title'] ?? '',
+        location: session['location'] ?? '',
+        speaker: 'Session', // default
+        tag: 'Completed', // default
+        tagColor: AppColors.teal, // default
+        highlight: false,
+        isLive: false,
+      );
+    }).toList();
+  }
+}
+
+class SpeakingEngagementItem {
+  final String time;
+  final String title;
+  final String location;
+  final String speaker;
+  final String tag;
+  final Color tagColor;
+  final bool highlight;
+  final bool isLive;
+
+  SpeakingEngagementItem({
+    required this.time,
+    required this.title,
+    required this.location,
+    required this.speaker,
+    required this.tag,
+    required this.tagColor,
+    this.highlight = false,
+    this.isLive = false,
+  });
 }

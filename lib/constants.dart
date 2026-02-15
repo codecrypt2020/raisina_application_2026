@@ -17,4 +17,6 @@ class Constants {
   static const String eventStartDate = "registration/event-start-date";
   static const String getAgenda = "registration/get-agenda";
   static const String getdining = "registration/dining";
+  static const String assignedUserspeakingDetails = "speaking/assignedUserDetials";
+
 }

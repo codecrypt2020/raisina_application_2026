@@ -24,7 +24,7 @@ class _SpeakingEngagementState extends State<SpeakingEngagement> {
   Widget build(BuildContext context) {
     final fetch_data =
         Provider.of<SpeakingEngagementData>(context, listen: false)
-            .assignedUserDetails();
+            .SpeakingDetails();
     return FutureBuilder(
       //putting the materail call in the api for first time loading
 
