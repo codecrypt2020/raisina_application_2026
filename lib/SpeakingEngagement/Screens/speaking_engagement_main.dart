@@ -8,14 +8,6 @@ class SpeakingMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
-
-          //define multiple providers
-        ],
-        child: SpeakingEngagement(
-          
-        ));
+    return SpeakingEngagement();
   }
 }

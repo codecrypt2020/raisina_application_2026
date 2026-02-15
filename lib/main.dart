@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/loging_screen.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +64,8 @@ class AttendeeApp extends StatelessWidget {
           backgroundColor: AppColors.navyMid,
           indicatorColor: AppColors.goldDim,
           labelTextStyle: WidgetStatePropertyAll(
-            TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            TextStyle(
+                color: AppColors.textSecondary, fontWeight: FontWeight.w600),
           ),
         ),
         textTheme: const TextTheme(
@@ -72,11 +74,10 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
-      home:  const Loginscreen(),
+      home: const Loginscreen(),
     );
   }
 }
-
 
 class AttendeeHomePage extends StatefulWidget {
   const AttendeeHomePage({super.key});
@@ -88,7 +89,7 @@ class AttendeeHomePage extends StatefulWidget {
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [ 
+  final List<Widget> _pages = [
     // HomeDashboard(),
     AgendaMain(),
     DiningMain(),
@@ -97,8 +98,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     ProfileView(),
   ];
 
-  
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -106,9 +105,14 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => dining_data()),
         //define multiple providers
         ///agenda
+
+        ///speaking engagement
+        ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
+
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
 
         ///speaking engagement
+
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -116,9 +120,12 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
-              Text('Good morning, Dr. John Doe', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+              Text('Good morning, Dr. John Doe',
+                  style:
+                      TextStyle(fontSize: 13, color: AppColors.textSecondary)),
               SizedBox(height: 4),
-              Text('Raisina Dialogue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text('Raisina Dialogue',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ],
           ),
           actions: [
@@ -128,14 +135,16 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             ),
             IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
+              icon: const Icon(Icons.notifications_outlined,
+                  color: AppColors.textPrimary),
             ),
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.navySurface,
-                child: const Text('JD', style: TextStyle(color: AppColors.textPrimary)),
+                child: const Text('JD',
+                    style: TextStyle(color: AppColors.textPrimary)),
               ),
             ),
           ],
@@ -162,11 +171,12 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               icon: Icon(Icons.wine_bar_outlined),
               label: 'Dining',
             ),
-             NavigationDestination(
+            NavigationDestination(
               icon: Icon(Icons.school_outlined),
               label: 'Speaking Eng',
             ),
-            NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+            NavigationDestination(
+                icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ),
@@ -326,8 +336,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
 //   }
 // }
 
-
-
 // class NetworkingView extends StatelessWidget {
 //   const NetworkingView({super.key});
 
@@ -399,8 +407,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
 //   }
 // }
 
-
-
 class _EventHeroCard extends StatelessWidget {
   const _EventHeroCard();
 
@@ -426,14 +432,16 @@ class _EventHeroCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.goldDim,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
                   'Live · Day 2',
-                  style: TextStyle(color: AppColors.goldLight, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: AppColors.goldLight, fontWeight: FontWeight.w600),
                 ),
               ),
               const Spacer(),
@@ -512,10 +520,15 @@ class _HeroStat extends StatelessWidget {
         children: [
           Text(
             value,
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+          Text(label,
+              style: const TextStyle(
+                  color: AppColors.textSecondary, fontSize: 12)),
         ],
       ),
     );
@@ -562,9 +575,12 @@ class _ActionCard extends StatelessWidget {
               child: Icon(icon, color: color),
             ),
             const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            Text(title,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
             const SizedBox(height: 4),
-            Text(subtitle, style: const TextStyle(color: AppColors.textSecondary)),
+            Text(subtitle,
+                style: const TextStyle(color: AppColors.textSecondary)),
           ],
         ),
       ),
@@ -585,7 +601,10 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+          style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary),
         ),
         Text(action, style: const TextStyle(color: AppColors.goldLight)),
       ],
@@ -645,11 +664,13 @@ class _AgendaCard extends StatelessWidget {
               children: [
                 Text(
                   time.split(' ')[0],
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, color: AppColors.gold),
                 ),
                 Text(
                   time.split(' ')[1],
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  style:
+                      const TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -664,31 +685,40 @@ class _AgendaCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary),
                       ),
                     ),
                     if (isLive)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.red.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
                           'LIVE',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.red),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.red),
                         ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(location, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(location,
+                    style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 4),
-                Text(speaker, style: const TextStyle(color: AppColors.textMuted)),
+                Text(speaker,
+                    style: const TextStyle(color: AppColors.textMuted)),
                 if (tag != null) ...[
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: (tagColor ?? AppColors.gold).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -714,7 +744,8 @@ class _AgendaCard extends StatelessWidget {
 }
 
 class _SpeakerCard extends StatelessWidget {
-  const _SpeakerCard({required this.name, required this.role, required this.tag});
+  const _SpeakerCard(
+      {required this.name, required this.role, required this.tag});
 
   final String name;
   final String role;
@@ -743,12 +774,17 @@ class _SpeakerCard extends StatelessWidget {
           CircleAvatar(
             radius: 22,
             backgroundColor: AppColors.navySurface,
-            child: Text(name.substring(0, 1), style: const TextStyle(color: AppColors.goldLight)),
+            child: Text(name.substring(0, 1),
+                style: const TextStyle(color: AppColors.goldLight)),
           ),
           const SizedBox(height: 12),
-          Text(name, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          Text(name,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
           const SizedBox(height: 4),
-          Text(role, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          Text(role,
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.textSecondary)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -756,7 +792,9 @@ class _SpeakerCard extends StatelessWidget {
               color: AppColors.navySurface,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(tag, style: const TextStyle(color: AppColors.goldLight, fontSize: 11)),
+            child: Text(tag,
+                style:
+                    const TextStyle(color: AppColors.goldLight, fontSize: 11)),
           ),
         ],
       ),
@@ -765,7 +803,8 @@ class _SpeakerCard extends StatelessWidget {
 }
 
 class _StatusRow extends StatelessWidget {
-  const _StatusRow({required this.label, required this.status, required this.color});
+  const _StatusRow(
+      {required this.label, required this.status, required this.color});
 
   final String label;
   final String status;
@@ -776,14 +815,17 @@ class _StatusRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+        Text(label,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: color.withOpacity(0.15),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Text(status, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+          child: Text(status,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600)),
         ),
       ],
     );
