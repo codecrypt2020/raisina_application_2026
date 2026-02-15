@@ -1,4 +1,3 @@
-
 import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
@@ -31,7 +30,7 @@ class AppColors {
   static const red = Color(0xFFE05555);
 }
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory directory = await getApplicationDocumentsDirectory();
   await Hive.initFlutter(directory.path);
@@ -44,6 +43,8 @@ class AttendeeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var token = Hive.box('LoginDetails').get("token");
+    print('this is the token${token}');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Summit Attendee',
@@ -74,7 +75,7 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
-      home: const Loginscreen(),
+      home: (token != null) ? AttendeeHomePage() : Loginscreen(),
     );
   }
 }
@@ -112,7 +113,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
 
         ///speaking engagement
-
       ],
       child: Scaffold(
         appBar: AppBar(

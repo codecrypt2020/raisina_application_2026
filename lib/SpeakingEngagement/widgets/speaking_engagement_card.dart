@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 
 class SpeakingEngagementCard extends StatelessWidget {
   const SpeakingEngagementCard({
-    required this.time,
+    required this.date,
     required this.title,
     required this.location,
     required this.speaker,
+    required this.time,
     this.highlight = false,
     this.tag,
     this.tagColor,
     this.isLive = false,
   });
 
-  final String time;
+  final String date;
   final String title;
   final String location;
   final String speaker;
+  final String time;
   final bool highlight;
   final String? tag;
   final Color? tagColor;
@@ -52,12 +54,14 @@ class SpeakingEngagementCard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  time.split(' ')[0],
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
+                  date.split(' ')[0],
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, color: AppColors.gold),
                 ),
                 Text(
-                  time.split(' ')[1],
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  date.split(' ')[1],
+                  style:
+                      const TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -72,31 +76,43 @@ class SpeakingEngagementCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary),
                       ),
                     ),
                     if (isLive)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.red.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
                           'LIVE',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.red),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.red),
                         ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(location, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(time,
+                    style: const TextStyle(color: AppColors.textSecondary)),
+                const SizedBox(height: 6),
+                Text(location,
+                    style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 4),
-                Text(speaker, style: const TextStyle(color: AppColors.textMuted)),
+                Text(speaker,
+                    style: const TextStyle(color: AppColors.textMuted)),
                 if (tag != null) ...[
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: (tagColor ?? AppColors.gold).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -114,7 +130,8 @@ class SpeakingEngagementCard extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.bookmark_border, color: AppColors.goldLight),
+          //the bookmark icon at the end
+          // const Icon(Icons.bookmark_border, color: AppColors.goldLight),
         ],
       ),
     );

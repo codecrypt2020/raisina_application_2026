@@ -1,6 +1,7 @@
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Widgets/filter_chip_speaking_engagement.dart';
 import 'package:attendee_app/SpeakingEngagement/Widgets/speaking_engagement_card.dart';
+import 'package:attendee_app/SpeakingEngagement/widgets/session_count.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +30,16 @@ class SpeakingEngagementList extends StatelessWidget {
         }
 
         // Space after header
+        // if (index == 1) {
+        //   return const SizedBox(height: 20);
+        // }
+
+        //count banner to be added
         if (index == 1) {
-          return const SizedBox(height: 20);
+          return SpeakingSessionsBanner(
+            sessions: provider.session_count,
+            days: 3, // to be changed by the backend team.
+          );
         }
 
         final item = provider.sessions_list[index - 2];
@@ -38,10 +47,11 @@ class SpeakingEngagementList extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: SpeakingEngagementCard(
-            time: item.time,
+            date: item.date,
             title: item.title,
             location: item.location,
             speaker: item.speaker,
+            time: item.time,
             tag: item.tag,
             tagColor: item.tagColor,
             highlight: item.highlight,

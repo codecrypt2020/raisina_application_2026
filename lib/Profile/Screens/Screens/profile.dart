@@ -2,6 +2,7 @@ import 'package:attendee_app/Profile/Screens/widgets/profile_row.dart';
 import 'package:attendee_app/loging_screen.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -18,7 +19,8 @@ class ProfileView extends StatelessWidget {
               backgroundColor: AppColors.gold,
               child: Text(
                 'JD',
-                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                    color: AppColors.textPrimary, fontWeight: FontWeight.w700),
               ),
             ),
             SizedBox(width: 16),
@@ -27,10 +29,14 @@ class ProfileView extends StatelessWidget {
               children: [
                 Text(
                   'Dr. John Doe',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary),
                 ),
                 SizedBox(height: 4),
-                Text('Speaker · Strategic Track', style: TextStyle(color: AppColors.textSecondary)),
+                Text('Speaker · Strategic Track',
+                    style: TextStyle(color: AppColors.textSecondary)),
               ],
             ),
           ],
@@ -86,7 +92,10 @@ class ProfileView extends StatelessWidget {
             children: [
               const Text(
                 'Preparation checklist',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -107,31 +116,33 @@ class ProfileView extends StatelessWidget {
         ),
         const SizedBox(height: 30),
         SizedBox(
-        width: double.infinity,
-        height: 50,
-        child: OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: AppColors.red),
-      foregroundColor: AppColors.red,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-         ),
-       ),
-       onPressed: () {
-       Navigator.pushAndRemoveUntil( //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
-        context,
-         MaterialPageRoute(builder: (context) => const Loginscreen()),
-         (route) => false,
-        );      
-      },
-      icon: const Icon(Icons.logout),
-      label: const Text(
-          "Logout",
-          style: TextStyle(fontWeight: FontWeight.w600),
+          width: double.infinity,
+          height: 50,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.red),
+              foregroundColor: AppColors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            onPressed: () {
+              //deleting the locally stored token
+              Hive.box("LoginDetails").clear();
+              Navigator.pushAndRemoveUntil(
+                //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
+                context,
+                MaterialPageRoute(builder: (context) => const Loginscreen()),
+                (route) => false,
+              );
+            },
+            icon: const Icon(Icons.logout),
+            label: const Text(
+              "Logout",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
         ),
-     ),
-    ),
-
       ],
     );
   }

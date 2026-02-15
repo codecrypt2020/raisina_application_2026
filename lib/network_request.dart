@@ -27,51 +27,50 @@ import 'dart:convert';
 // }
 
 class Network_request {
- // login api
-static Future login_api(username,password) async {
-  try {
-    var body = {
+  // login api
+  static Future login_api(username, password) async {
+    try {
+      var body = {
         // 'username': username,
         // 'password': password
         "username": "$username",
-    "password": "$password"
+        "password": "$password"
       };
 
       ;
-    var response =
-        await http.post(Uri.parse(Constants.NODE_URL + Constants.login),
-         
-            headers: {
-              "x-encrypted" : "1",
-              'Content-Type': 'application/json',
+      var response = await http.post(
+          Uri.parse(Constants.NODE_URL + Constants.login),
+          headers: {
+            "x-encrypted": "1",
+            'Content-Type': 'application/json',
+          },
+          // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
+          body: jsonEncode(
+            encryptPayload(
+              body,
+            ),
+          )
+          //body
+          );
 
-            },
-            // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
-            body:
-            jsonEncode(
-        encryptPayload(
-            body,
-                ),
-                  )     
-            //body
-            );
-            ///mayurwabale1221@gmail.com
- 
+      ///mayurwabale1221@gmail.com
+
 //Mjcc$012
-            ///
-            ///
-    // print('this is the payload ${encryptPayload(
-    //       body,
-    //     )}');
+      ///
+      ///
+      // print('this is the payload ${encryptPayload(
+      //       body,
+      //     )}');
 
-    Map<String, dynamic> jsonData = decryptResponse(response.body);
-    if (response.statusCode == 200 && jsonData["success"] == true) {
-      var res = decryptResponse(response.body);
-      Hive.box('LoginDetails').put("Profile_details",res["data"]);
-      
-      print("this is the response ${Hive.box('LoginDetails').get("Profile_details")}");
+      Map<String, dynamic> jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
+        Hive.box('LoginDetails').put("Profile_details", res["data"]);
+        Hive.box("LoginDetails").put("token", res["data"]["token"]);
 
-    }
+        print(
+            "this is the response ${Hive.box('LoginDetails').get("Profile_details")}");
+      }
 // RESPONSE
 // {
 //     "success": true,
@@ -84,33 +83,31 @@ static Future login_api(username,password) async {
 //         "eventId": "21"
 //     }
 // }
-  } catch (e) {
-    print("this is the error in login_api ${e}");
+    } catch (e) {
+      print("this is the error in login_api ${e}");
+    }
   }
-}
 
-Future assignedUserDetails() async {
-  try {
-    var response = await http.post(
-      Uri.parse(Constants.NODE_URL + Constants.assignedUserDetails),
-      headers: {
-
-      },
-      body: jsonEncode(
-        encryptPayload(
-          {
-            "userId": "567"
+  Future assignedUserDetails() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.assignedUserDetails),
+        headers: {},
+        body: jsonEncode(
+          encryptPayload(
+            {
+              "userId": "567"
 //respose
 // {
 //     "userId": "567"
 // }
-          },
+            },
+          ),
         ),
-      ),
-    );
-    var jsonData = decryptResponse(response.body);
-    if (response.statusCode == 200 && jsonData["success"] == true) {
-      var res = decryptResponse(response.body);
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
 //       {
 //     "status": 200,
 //     "success": true,
@@ -119,32 +116,32 @@ Future assignedUserDetails() async {
 //         "speakingShow": false
 //     }
 // }
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
-  } catch (e) {
-    debugPrint("this is the error in assignedUserDetailsApi: $e");
   }
-}
 
-Future event_start_date() async {
-  try {
-    var response = await http.post(
-      Uri.parse(Constants.NODE_URL + Constants.eventStartDate),
-      headers: {},
-      body: jsonEncode(
-        encryptPayload(
-          {
-            "eventId": ""
-            //payload
+  Future event_start_date() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.eventStartDate),
+        headers: {},
+        body: jsonEncode(
+          encryptPayload(
+            {
+              "eventId": ""
+              //payload
 // {
 //     "eventId": "21"
 // }
-          },
+            },
+          ),
         ),
-      ),
-    );
-    var jsonData = decryptResponse(response.body);
-    if (response.statusCode == 200 && jsonData["success"] == true) {
-      var res = decryptResponse(response.body);
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
 // Response
 //       [
 //     {
@@ -156,33 +153,33 @@ Future event_start_date() async {
 //         "updated_at": "2026-02-13T06:41:11.000Z"
 //     }
 // ]
+      }
+    } catch (e) {
+      debugPrint("this is the error in eventStartDateAPI : $e");
     }
-  } catch (e) {
-    debugPrint("this is the error in eventStartDateAPI : $e");
   }
-}
 
-Future getAgenda() async {
-  try {
-    var response = await http.post(
-      Uri.parse(Constants.NODE_URL + Constants.getAgenda),
-      headers: {},
-      body: jsonEncode(
-        encryptPayload(
-          {
-            "day": "",
-            "eventId": ""
+  Future getAgenda() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.getAgenda),
+        headers: {},
+        body: jsonEncode(
+          encryptPayload(
+            {
+              "day": "",
+              "eventId": ""
 // {
 //     "day": 1,
 //     "eventId": "21"
 // }
-          },
+            },
+          ),
         ),
-      ),
-    );
-    var jsonData = decryptResponse(response.body);
-    if (response.statusCode == 200 && jsonData["success"] == true) {
-      var res = decryptResponse(response.body);
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
 //       [
 //     {
 //         "id": 5,
@@ -235,34 +232,34 @@ Future getAgenda() async {
 //         "speaker_ids": "567, 566"
 //     }
 // ]
+      }
+    } catch (e) {
+      debugPrint("this is the error in getAgendaApi: ${e}");
     }
-  } catch (e) {
-    debugPrint("this is the error in getAgendaApi: ${e}");
   }
-}
 
 //Dining APIs
-Future dining() async {
-  try {
-    var response = await http.post(
-      Uri.parse(Constants.NODE_URL + Constants.getdining),
-      headers: {},
-      body: jsonEncode(
-        encryptPayload(
-          {
-            "eventId": ""
-            //payload
+  Future dining() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.getdining),
+        headers: {},
+        body: jsonEncode(
+          encryptPayload(
+            {
+              "eventId": ""
+              //payload
 // {
 //     "day": 1,
 //     "userId": "567"
 // }
-          },
+            },
+          ),
         ),
-      ),
-    );
-    var jsonData = decryptResponse(response.body);
-    if (response.statusCode == 200 && jsonData["success"] == true) {
-      var res = decryptResponse(response.body);
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
 // Response
 // [
 //     {
@@ -303,12 +300,9 @@ Future dining() async {
 //         "lunchEndTime": "13:10:00"
 //     }
 // ]
+      }
+    } catch (e) {
+      debugPrint("this is the error in eventStartDateAPI : $e");
     }
-  } catch (e) {
-    debugPrint("this is the error in eventStartDateAPI : $e");
   }
 }
-
-}
-
-

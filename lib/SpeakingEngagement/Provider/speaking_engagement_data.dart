@@ -8,14 +8,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/retry.dart';
 
 class SpeakingEngagementData with ChangeNotifier {
   //Data storing variables
 
   List<SpeakingEngagementItem> _sessions_list = [];
+  int _sessions_count = 0;
 
   get sessions_list {
     return _sessions_list;
+  }
+
+  get session_count {
+    return _sessions_count;
   }
 
   Future SpeakingDetails() async {
@@ -50,6 +56,7 @@ class SpeakingEngagementData with ChangeNotifier {
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
         _sessions_list = mapSessionsToEngagements(res["data"]["sessions"]);
+        _sessions_count = res['data']["totalSessionsCount"];
         {
           // "status": 200,
           // "success": true,
@@ -73,21 +80,28 @@ class SpeakingEngagementData with ChangeNotifier {
           "${date['day']} ${date['month']} ${date['weekday']}";
 
       return SpeakingEngagementItem(
-        time: formattedDate, // 14 FEB Sat
-        title: session['title'] ?? '',
-        location: session['location'] ?? '',
-        speaker: 'Session', // default
-        tag: 'Completed', // default
-        tagColor: AppColors.teal, // default
-        highlight: false,
-        isLive: false,
-      );
+          date: formattedDate, // 14 FEB Sat
+          title: session['title'] ?? '',
+          location: session['location'] ?? '',
+          speaker: session["coSpeakers"]
+              .map((e) => e['name'] as String)
+              .join(', '), // default
+          tag: session["status"], // default
+          tagColor: AppColors.teal, // default
+          highlight: false,
+          isLive: false,
+          time: session["time"]);
     }).toList();
   }
 }
 
+final List<Map<String, dynamic>> attendees = [
+  {"initials": "MMW", "name": "Momentum Mayur Wabale (You)", "isYou": true},
+  {"initials": "RS", "name": "Rajendra Saini", "isYou": false}
+];
+
 class SpeakingEngagementItem {
-  final String time;
+  final String date;
   final String title;
   final String location;
   final String speaker;
@@ -95,15 +109,16 @@ class SpeakingEngagementItem {
   final Color tagColor;
   final bool highlight;
   final bool isLive;
+  final time;
 
-  SpeakingEngagementItem({
-    required this.time,
-    required this.title,
-    required this.location,
-    required this.speaker,
-    required this.tag,
-    required this.tagColor,
-    this.highlight = false,
-    this.isLive = false,
-  });
+  SpeakingEngagementItem(
+      {required this.date,
+      required this.title,
+      required this.location,
+      required this.speaker,
+      required this.tag,
+      required this.tagColor,
+      this.highlight = false,
+      this.isLive = false,
+      this.time});
 }
