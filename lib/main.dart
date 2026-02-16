@@ -2,6 +2,7 @@ import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
+import 'package:attendee_app/Maps/provider/map_data.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
@@ -114,6 +115,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
 
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+        ChangeNotifierProvider(create: (ctx) => MapData()),
 
         ///speaking engagement
       ],
