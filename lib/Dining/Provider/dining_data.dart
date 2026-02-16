@@ -11,13 +11,14 @@ import 'package:http/http.dart' as http;
 class dining_data with ChangeNotifier {
   List<DiningDataItem> _dining_list = [];
   var _selectedIndex = 0;
+  List<Map<String, String>> _days = [];
 
-  final List<Map<String, String>> _days = [
-    {"day": "Day 1", "date": "Feb 14"},
-    {"day": "Day 2", "date": "Feb 15"},
-    {"day": "Day 3", "date": "Feb 16"},
-    {"day": "Day 4", "date": "Feb 17"},
-  ];
+  // final List<Map<String, String>> _days = [
+  //   {"day": "Day 1", "date": "Feb 14"},
+  //   {"day": "Day 2", "date": "Feb 15"},
+  //   {"day": "Day 3", "date": "Feb 16"},
+  //   {"day": "Day 4", "date": "Feb 17"},
+  // ];
 
   get dining_list {
     return _dining_list;
@@ -68,16 +69,21 @@ class dining_data with ChangeNotifier {
       );
       print('this is the payload bhhbhfbhvb${encryptPayload(
         {
-          "eventId": "21"
-          //payload
-// {
-//     "eventId": "21"
-// }
+          "eventId":
+              "${Hive.box('LoginDetails').get("Profile_details")['eventId']}"
         },
       )}');
       var jsonData = decryptResponse(response.body);
-      if (response.statusCode == 200 && jsonData["success"] == true) {
+      if (response.statusCode == 200 && jsonData.length != 0) {
         var res = decryptResponse(response.body);
+        if (res != null && res.isNotEmpty) {
+          String startDateString = res[0]['start_date'];
+
+          DateTime startDate = DateTime.parse(startDateString).toLocal();
+
+          generateDays(startDate);
+          notifyListeners();
+        }
 // Response
 //       [
 //     {
@@ -93,6 +99,39 @@ class dining_data with ChangeNotifier {
     } catch (e) {
       debugPrint("this is the error in eventStartDateAPI : $e");
     }
+  }
+
+  void generateDays(DateTime startDate) {
+    _days.clear();
+
+    for (int i = 0; i < 4; i++) {
+      DateTime newDate = startDate.add(Duration(days: i));
+
+      String formattedDate = "${_getMonthName(newDate.month)} ${newDate.day}";
+
+      _days.add({
+        "day": "Day ${i + 1}",
+        "date": formattedDate,
+      });
+    }
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return months[month - 1];
   }
 
 //Dining APIs

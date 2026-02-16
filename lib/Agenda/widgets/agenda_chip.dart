@@ -52,18 +52,22 @@ class AgendaCard extends StatelessWidget {
           Column(
             children: [
               Container(
-                padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: highlight ? AppColors.navySurface : AppColors.navySurface,
+                  color:
+                      highlight ? AppColors.navySurface : AppColors.navySurface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   starttime,
-                  style:  TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, color: AppColors.gold),
                 ),
               ),
-              
-              SizedBox(height:20,),
+
+              SizedBox(
+                height: 20,
+              ),
 
               // Container(
               //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -76,7 +80,6 @@ class AgendaCard extends StatelessWidget {
               //     style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
               //   ),
               // ),
-
             ],
           ),
           const SizedBox(width: 12),
@@ -89,31 +92,40 @@ class AgendaCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary),
                       ),
                     ),
                     if (isLive)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.red.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
                           'LIVE',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.red),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.red),
                         ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(location, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(location,
+                    style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 4),
-                Text(speaker, style: const TextStyle(color: AppColors.textMuted)),
+                Text(speaker,
+                    style: const TextStyle(color: AppColors.textMuted)),
                 if (tag != null) ...[
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: (tagColor ?? AppColors.gold).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -147,7 +159,7 @@ class AgendaCard extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.bookmark_border, color: AppColors.goldLight),
+          // const Icon(Icons.bookmark_border, color: AppColors.goldLight),
         ],
       ),
     );

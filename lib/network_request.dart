@@ -130,7 +130,8 @@ class Network_request {
         body: jsonEncode(
           encryptPayload(
             {
-              "eventId": ""
+              "eventId":
+                  "${Hive.box('LoginDetails').get("Profile_details")['eventId']}"
               //payload
 // {
 //     "eventId": "21"
@@ -168,7 +169,8 @@ class Network_request {
           encryptPayload(
             {
               "day": "",
-              "eventId": ""
+              "eventId":
+                  "${Hive.box('LoginDetails').get("Profile_details")['eventId']}"
 // {
 //     "day": 1,
 //     "eventId": "21"
