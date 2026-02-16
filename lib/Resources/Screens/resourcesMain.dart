@@ -1,3 +1,4 @@
+import 'package:attendee_app/Resources/Screens/resources.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +7,6 @@ class Resourcesmain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Resources();
   }
 }

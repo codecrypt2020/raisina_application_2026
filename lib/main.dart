@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
+import 'package:attendee_app/Resources/provider/resources_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/constants.dart';
@@ -98,8 +100,10 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     AgendaMain(),
     DiningMain(),
     SpeakingMain(),
-    // NetworkingView(),
+    // NetworkingView(),|
+    Resourcesmain(),
     ProfileView(),
+    
   ];
 
   @override
@@ -114,6 +118,8 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
 
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+
+        ChangeNotifierProvider(create: (ctx) => ResourcesData()),
 
         ///speaking engagement
       ],
@@ -178,8 +184,13 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               icon: Icon(Icons.school_outlined),
               label: 'Speaking Eng',
             ),
+             NavigationDestination(
+              icon: Icon(Icons.insert_drive_file_outlined),
+              label: 'Resources',
+            ),
             NavigationDestination(
-                icon: Icon(Icons.person_outline), label: 'Profile'),
+              icon: Icon(Icons.person_outline),
+              label: 'Profile'),
           ],
         ),
       ),
