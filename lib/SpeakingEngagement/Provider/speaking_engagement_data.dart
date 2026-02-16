@@ -15,6 +15,7 @@ class SpeakingEngagementData with ChangeNotifier {
 
   List<SpeakingEngagementItem> _sessions_list = [];
   int _sessions_count = 0;
+  int _sessions_days = 0;
 
   get sessions_list {
     return _sessions_list;
@@ -22,6 +23,10 @@ class SpeakingEngagementData with ChangeNotifier {
 
   get session_count {
     return _sessions_count;
+  }
+
+  get sessions_days {
+    return _sessions_days;
   }
 
   Future SpeakingDetails() async {
@@ -57,6 +62,7 @@ class SpeakingEngagementData with ChangeNotifier {
         var res = decryptResponse(response.body);
         _sessions_list = mapSessionsToEngagements(res["data"]["sessions"]);
         _sessions_count = res['data']["totalSessionsCount"];
+        _sessions_days = res['data']['eventTotalDays'];
         {
           // "status": 200,
           // "success": true,

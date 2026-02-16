@@ -269,7 +269,7 @@ class Agenda_data with ChangeNotifier {
         description: agenda_data_map['description'] ?? '',
         start_time: period,
         end_time: endTimehour,
-        speaker: agenda_data_map['speaker_names'], // default
+        speaker: agenda_data_map['speaker_names'] ?? '', // default
         //gate_name:agenda_data_map['gate_name'],
         // speaker: 'Session', // default
         tag: 'Completed', // default

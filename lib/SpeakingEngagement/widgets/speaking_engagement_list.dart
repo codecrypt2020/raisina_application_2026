@@ -38,7 +38,7 @@ class SpeakingEngagementList extends StatelessWidget {
         if (index == 1) {
           return SpeakingSessionsBanner(
             sessions: provider.session_count,
-            days: 3, // to be changed by the backend team.
+            days: provider.sessions_days, // to be changed by the backend team.
           );
         }
 
