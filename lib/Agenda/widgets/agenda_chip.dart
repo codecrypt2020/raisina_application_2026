@@ -58,28 +58,24 @@ class AgendaCard extends StatelessWidget {
                       highlight ? AppColors.navySurface : AppColors.navySurface,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  starttime,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700, color: AppColors.gold),
+                child: Column(
+                  children: [
+                    Text(
+                      starttime.split(' ')[0],
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, color: AppColors.gold),
+                    ),
+                    Text(
+                      starttime.split(' ')[1],
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.textMuted),
+                    ),
+                  ],
                 ),
               ),
-
               SizedBox(
                 height: 20,
               ),
-
-              // Container(
-              //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              //   decoration: BoxDecoration(
-              //     color: highlight ? AppColors.navySurface : AppColors.navySurface,
-              //     borderRadius: BorderRadius.circular(12),
-              //   ),
-              //   child: Text(
-              //      endtime,
-              //     style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.gold),
-              //   ),
-              // ),
             ],
           ),
           const SizedBox(width: 12),
