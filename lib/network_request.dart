@@ -28,7 +28,8 @@ import 'dart:convert';
 
 class Network_request {
   // login api
-  static Future login_api(username, password) async {
+
+  static Future<Map<String, dynamic>> loginApi(username, password) async {
     try {
       var body = {
         // 'username': username,
@@ -39,52 +40,33 @@ class Network_request {
 
       ;
       var response = await http.post(
-          Uri.parse(Constants.NODE_URL + Constants.login),
-          headers: {
-            "x-encrypted": "1",
-            'Content-Type': 'application/json',
-          },
-          // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
-          body: jsonEncode(
-            encryptPayload(
-              body,
-            ),
-          )
-          //body
-          );
-
-      ///mayurwabale1221@gmail.com
-
-//Mjcc$012
-      ///
-      ///
-      // print('this is the payload ${encryptPayload(
-      //       body,
-      //     )}');
-
+        Uri.parse(Constants.NODE_URL + Constants.login),
+        headers: {
+          "x-encrypted": "1",
+          'Content-Type': 'application/json',
+        },
+        // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
+        body: jsonEncode(
+          encryptPayload(
+            body,
+          ),
+        ),
+      );
       Map<String, dynamic> jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
-
-        print(
-            "this is the response ${Hive.box('LoginDetails').get("Profile_details")}");
+        return {"success": true, "message": "Login successful"};
+      } else {
+        return {
+          "success": false,
+          "message": jsonData["message"] ?? "Login failed"
+        };
       }
-// RESPONSE
-// {
-//     "success": true,
-//     "message": "Login success",
-//     "data": {
-//         "userId": 567,
-//         "token": "581ba50d5a449325db6dcb5e4130af90",
-//         "name": "Momentum Mayur Wabale",
-//         "type": "user",
-//         "eventId": "21"
-//     }
-// }
     } catch (e) {
-      print("this is the error in login_api ${e}");
+      print("this is the error in loginApi ${e}");
+      return {"success": false, "message": "An error occurred during login."};
     }
   }
 

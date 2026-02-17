@@ -13,13 +13,13 @@ class ProfileView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Row(
+        Row(
           children: [
             CircleAvatar(
               radius: 30,
               backgroundColor: AppColors.gold,
               child: Text(
-                'JD',
+                "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
                 style: TextStyle(
                     color: AppColors.textPrimary, fontWeight: FontWeight.w700),
               ),
@@ -29,7 +29,7 @@ class ProfileView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dr. John Doe',
+                  "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -64,57 +64,57 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.badge_outlined,
                 color: AppColors.gold,
               ),
-              Divider(color: AppColors.navySurface),
-              ProfileRow(
-                title: 'Travel & logistics',
-                subtitle: 'Hotel car confirmed at 7:30 AM',
-                icon: Icons.flight_takeoff_outlined,
-                color: AppColors.teal,
-              ),
-              Divider(color: AppColors.navySurface),
-              ProfileRow(
-                title: 'Speaker kit',
-                subtitle: 'Slides due in 2 days',
-                icon: Icons.shield_outlined,
-                color: AppColors.goldLight,
-              ),
+              // Divider(color: AppColors.navySurface),
+              // ProfileRow(
+              //   title: 'Travel & logistics',
+              //   subtitle: 'Hotel car confirmed at 7:30 AM',
+              //   icon: Icons.flight_takeoff_outlined,
+              //   color: AppColors.teal,
+              // ),
+              // Divider(color: AppColors.navySurface),
+              // ProfileRow(
+              //   title: 'Speaker kit',
+              //   subtitle: 'Slides due in 2 days',
+              //   icon: Icons.shield_outlined,
+              //   color: AppColors.goldLight,
+              // ),
             ],
           ),
         ),
         const SizedBox(height: 30),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.navySurface,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Preparation checklist',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Upload slides · Confirm co-speakers · Rehearsal notes.',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () {},
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Review checklist'),
-              ),
-            ],
-          ),
-        ),
+        // Container(
+        //   padding: const EdgeInsets.all(18),
+        //   decoration: BoxDecoration(
+        //     color: AppColors.navySurface,
+        //     borderRadius: BorderRadius.circular(20),
+        //   ),
+        //   child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       const Text(
+        //         'Preparation checklist',
+        //         style: TextStyle(
+        //             fontSize: 16,
+        //             fontWeight: FontWeight.w700,
+        //             color: AppColors.textPrimary),
+        //       ),
+        //       const SizedBox(height: 8),
+        //       const Text(
+        //         'Upload slides · Confirm co-speakers · Rehearsal notes.',
+        //         style: TextStyle(color: AppColors.textSecondary),
+        //       ),
+        //       const SizedBox(height: 12),
+        //       FilledButton(
+        //         onPressed: () {},
+        //         style: FilledButton.styleFrom(
+        //           backgroundColor: AppColors.gold,
+        //           foregroundColor: Colors.white,
+        //         ),
+        //         child: const Text('Review checklist'),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         const SizedBox(height: 30),
         SizedBox(
           width: double.infinity,

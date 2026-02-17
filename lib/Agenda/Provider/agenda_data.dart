@@ -179,58 +179,6 @@ class Agenda_data with ChangeNotifier {
         var res = decryptResponse(response.body);
         _agenda_list = mapSessionsToEngagements(res);
         notifyListeners();
-//       [
-//     {
-//         "id": 5,
-//         "event_ref_id": 21,
-//         "gate_ref_id": 26,
-//         "day_number": 1,
-//         "session_date": "2026-02-14T00:00:00.000Z",
-//         "start_time": "08:00:00",
-//         "end_time": "09:00:00",
-//         "title": "Day 1 Breakfast Agenda",
-//         "description": "This Agenda is for Discussion on climate change",
-//         "category_ref_id": 2,
-//         "tags": [
-//             "Climate"
-//         ],
-//         "expected_attendance": 15,
-//         "is_live": 0,
-//         "is_active": 1,
-//         "sort_order": 0,
-//         "created_at": "2026-02-13T07:15:33.000Z",
-//         "updated_at": "2026-02-13T07:15:33.000Z",
-//         "created_by": null,
-//         "gate_name": "Test Gate 1",
-//         "speaker_names": "Momentum Mayur Wabale, Rajendra Saini",
-//         "speaker_ids": "567, 566"
-//     },
-//     {
-//         "id": 6,
-//         "event_ref_id": 21,
-//         "gate_ref_id": 27,
-//         "day_number": 1,
-//         "session_date": "2026-02-14T00:00:00.000Z",
-//         "start_time": "12:06:00",
-//         "end_time": "13:10:00",
-//         "title": "Day 1 Lunch ",
-//         "description": "Lunch agenda_data_map on cyber security",
-//         "category_ref_id": 3,
-//         "tags": [
-//             "Cybersecurity"
-//         ],
-//         "expected_attendance": 25,
-//         "is_live": 0,
-//         "is_active": 1,
-//         "sort_order": 0,
-//         "created_at": "2026-02-13T07:25:12.000Z",
-//         "updated_at": "2026-02-13T07:25:12.000Z",
-//         "created_by": null,
-//         "gate_name": "Jawahar Gate",
-//         "speaker_names": "Momentum Mayur Wabale, Rajendra Saini",
-//         "speaker_ids": "567, 566"
-//     }
-// ]
       }
     } catch (e) {
       debugPrint("this is the error in getAgendaApi: ${e}");
@@ -272,12 +220,57 @@ class Agenda_data with ChangeNotifier {
         speaker: agenda_data_map['speaker_names'] ?? '', // default
         //gate_name:agenda_data_map['gate_name'],
         // speaker: 'Session', // default
-        tag: 'Completed', // default
+        tag: getSessionStatus(
+            endTime: agenda_data_map['end_time'],
+            sessionDate: agenda_data_map['session_date'],
+            startTime: agenda_data_map['start_time']),
         tagColor: AppColors.teal, // default
         highlight: false,
         isLive: false,
       );
     }).toList();
+  }
+
+  String getSessionStatus({
+    required String sessionDate,
+    required String startTime,
+    required String endTime,
+  }) {
+    final date = DateTime.parse(sessionDate);
+
+    final year = date.year;
+    final month = date.month;
+    final day = date.day;
+
+    final startParts = startTime.split(":");
+    final startDateTime = DateTime(
+      year,
+      month,
+      day,
+      int.parse(startParts[0]),
+      int.parse(startParts[1]),
+      int.parse(startParts[2]),
+    );
+
+    final endParts = endTime.split(":");
+    final endDateTime = DateTime(
+      year,
+      month,
+      day,
+      int.parse(endParts[0]),
+      int.parse(endParts[1]),
+      int.parse(endParts[2]),
+    );
+
+    final now = DateTime.now();
+
+    if (now.isAfter(endDateTime)) {
+      return "Completed";
+    } else if (now.isBefore(startDateTime)) {
+      return "Upcoming";
+    } else {
+      return "Live";
+    }
   }
 }
 
