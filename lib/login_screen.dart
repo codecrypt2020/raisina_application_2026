@@ -171,27 +171,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        height: 78,
-                        width: 78,
-                        decoration: BoxDecoration(
-                          color: AppColors.navyMid,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.image_outlined,
-                          size: 30,
-                          color: AppColors.gold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Logo placeholder',
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                      SizedBox(
+                        height: 110,
+                        child: Image.asset(
+                          'assets/images/raisina_logo_transparent.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 18),
