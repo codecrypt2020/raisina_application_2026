@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
         usernameController.text.trim(),
         passwordController.text.trim(),
       );
-      debugger();
+      // debugger();
       if (!mounted) {
         return;
       }
