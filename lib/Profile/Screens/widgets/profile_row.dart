@@ -29,10 +29,12 @@ class ProfileRow extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(color: AppColors.textSecondary)),
+              Text(subtitle,
+                  style: const TextStyle(color: AppColors.textSecondary)),
             ],
           ),
         ),

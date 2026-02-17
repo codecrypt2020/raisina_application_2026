@@ -1,4 +1,5 @@
 import 'package:attendee_app/Profile/Screens/widgets/profile_row.dart';
+import 'package:attendee_app/Profile/Screens/Screens/digital_badge_screen.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/login_screen.dart';
 import 'package:attendee_app/main.dart';
@@ -56,13 +57,23 @@ class ProfileView extends StatelessWidget {
               ),
             ],
           ),
-          child: const Column(
+          child: Column(
             children: [
-              ProfileRow(
-                title: 'Digital badge',
-                subtitle: 'Speaker pass · updated 5 mins ago',
-                icon: Icons.badge_outlined,
-                color: AppColors.gold,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DigitalBadgeScreen(),
+                    ),
+                  );
+                },
+                child: const ProfileRow(
+                  title: 'Digital badge',
+                  subtitle: 'Speaker pass · updated 5 mins ago',
+                  icon: Icons.badge_outlined,
+                  color: AppColors.gold,
+                ),
               ),
               // Divider(color: AppColors.navySurface),
               // ProfileRow(

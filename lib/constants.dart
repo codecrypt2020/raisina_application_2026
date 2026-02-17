@@ -22,4 +22,5 @@ class Constants {
   static const String assignedUserspeakingDetails =
       "speaking/assignedUserDetials";
   static const String allresourcesapi = "qr/resources/all-resources";
+  static const String get_user_qr = "qr/user_list";
 }
