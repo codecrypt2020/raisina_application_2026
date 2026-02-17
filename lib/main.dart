@@ -131,31 +131,40 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
           toolbarHeight: 72,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('Good morning, Dr. John Doe',
-                  style:
-                      TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+            children: [
+              Row(
+                children: [
+                  const Text('Welcome, ',
+                      style: TextStyle(
+                          fontSize: 13, color: AppColors.textSecondary)),
+                  Text(
+                      "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
+                      style: TextStyle(
+                          fontSize: 13, color: AppColors.textSecondary)),
+                ],
+              ),
               SizedBox(height: 4),
               Text('Raisina Dialogue',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ],
           ),
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.search, color: AppColors.textPrimary),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_outlined,
-                  color: AppColors.textPrimary),
-            ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(Icons.search, color: AppColors.textPrimary),
+            // ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(Icons.notifications_outlined,
+            //       color: AppColors.textPrimary),
+            // ),
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.navySurface,
-                child: const Text('JD',
+                child: Text(
+                    "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
                     style: TextStyle(color: AppColors.textPrimary)),
               ),
             ),
