@@ -170,50 +170,50 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             ),
           ],
         ),
-        drawer: Drawer(
-          backgroundColor: AppColors.navyElevated,
-          child: SafeArea(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
-                  color: AppColors.navyMid,
-                  child: const Text(
-                    'Quick Access',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.folder_outlined,
-                    color: AppColors.textPrimary,
-                  ),
-                  title: const Text(
-                    'Resources',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  onTap: () => _openPanelPage(const ResourcesMain()),
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.map_outlined,
-                    color: AppColors.textPrimary,
-                  ),
-                  title: const Text(
-                    'Maps',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  onTap: () => _openPanelPage(const Mapmain()),
-                ),
-              ],
-            ),
-          ),
-        ),
+        // drawer: Drawer(
+        //   backgroundColor: AppColors.navyElevated,
+        //   child: SafeArea(
+        //     child: ListView(
+        //       padding: EdgeInsets.zero,
+        //       children: [
+        //         Container(
+        //           padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+        //           color: AppColors.navyMid,
+        //           child: const Text(
+        //             'Quick Access',
+        //             style: TextStyle(
+        //               fontSize: 18,
+        //               fontWeight: FontWeight.w700,
+        //               color: AppColors.textPrimary,
+        //             ),
+        //           ),
+        //         ),
+        //         ListTile(
+        //           leading: const Icon(
+        //             Icons.folder_outlined,
+        //             color: AppColors.textPrimary,
+        //           ),
+        //           title: const Text(
+        //             'Resources',
+        //             style: TextStyle(color: AppColors.textPrimary),
+        //           ),
+        //           onTap: () => _openPanelPage(const ResourcesMain()),
+        //         ),
+        //         ListTile(
+        //           leading: const Icon(
+        //             Icons.map_outlined,
+        //             color: AppColors.textPrimary,
+        //           ),
+        //           title: const Text(
+        //             'Maps',
+        //             style: TextStyle(color: AppColors.textPrimary),
+        //           ),
+        //           onTap: () => _openPanelPage(const Mapmain()),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
         body: _pages[_selectedIndex],
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,

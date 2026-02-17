@@ -5,6 +5,8 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/retry.dart';
+
 // default skeleton
 // Future skeletonApi() async {
 //   try {
@@ -287,6 +289,46 @@ class Network_request {
       }
     } catch (e) {
       debugPrint("this is the error in eventStartDateAPI : $e");
+    }
+  }
+
+  Future get_user_qr() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.get_user_qr),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload(
+              //respose{
+              //"userId": "567"
+              //}
+              {"searchText": "Nehemiah Hamid", "sortby": "id", "page": 1}),
+        ),
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
+        return res["data"][0]["user_qr_img"];
+        {
+          // "status": 200,
+          // "success": true,
+          // "message": "Fetched Successfully",
+          // "data": {
+          //     "speakingShow": false
+          // }
+        }
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
 }
