@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
+import 'package:attendee_app/Maps/Screens/mapMain.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +95,13 @@ class AttendeeHomePage extends StatefulWidget {
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
   int _selectedIndex = 0;
 
+  void _openPanelPage(Widget page) {
+    Navigator.of(context).pop();
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => page),
+    );
+  }
+
   final List<Widget> _pages = [
     // HomeDashboard(),
     AgendaMain(),
@@ -152,6 +161,50 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             ),
           ],
         ),
+        drawer: Drawer(
+          backgroundColor: AppColors.navyElevated,
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+                  color: AppColors.navyMid,
+                  child: const Text(
+                    'Quick Access',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.folder_outlined,
+                    color: AppColors.textPrimary,
+                  ),
+                  title: const Text(
+                    'Resources',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ),
+                  onTap: () => _openPanelPage(const ResourcesMain()),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.map_outlined,
+                    color: AppColors.textPrimary,
+                  ),
+                  title: const Text(
+                    'Maps',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ),
+                  onTap: () => _openPanelPage(const Mapmain()),
+                ),
+              ],
+            ),
+          ),
+        ),
         body: _pages[_selectedIndex],
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
@@ -161,15 +214,10 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             });
           },
           destinations: const [
-            // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
             NavigationDestination(
               icon: Icon(Icons.event_note_outlined),
               label: 'Agenda',
             ),
-            // NavigationDestination(
-            //   icon: Icon(Icons.connect_without_contact_outlined),
-            //   label: 'Network',
-            // ),
             NavigationDestination(
               icon: Icon(Icons.wine_bar_outlined),
               label: 'Dining',
