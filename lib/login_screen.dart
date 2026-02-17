@@ -195,21 +195,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.image_outlined,
-                            size: 30,
-                            color: AppColors.gold,
+                          child: Image.asset(
+                            'assets/images/raisina_logo_transparent.png',
+                            fit: BoxFit.contain,
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          'Logo placeholder',
-                          style: TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                         const SizedBox(height: 18),
                         const Text(
                           'Welcome',

@@ -13,6 +13,7 @@
 !DEPLOYMENT.md
 !setup-github.sh
 !setup-github.bat
-
+!assets/
+!assets/**
 # FVM Version Cache
 .fvm/
