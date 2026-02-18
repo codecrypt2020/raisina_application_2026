@@ -50,7 +50,8 @@ class AttendeeApp extends StatelessWidget {
     print('this is the token${token}');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Summit Attendee',
+      // title: 'Summit Attendee',
+      title: "Raisina",
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
