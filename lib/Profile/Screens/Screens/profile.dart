@@ -172,7 +172,7 @@ class ProfileView extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const LoginScreen(
-                          signUpUrl: Constants.registraionUrlDev),
+                          signUpUrl: Constants.registraionUrl),
                     ),
                     (route) => false,
                   );

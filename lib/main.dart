@@ -80,7 +80,7 @@ class AttendeeApp extends StatelessWidget {
       ),
       home: (token != null)
           ? const AttendeeHomePage()
-          : const LoginScreen(signUpUrl: Constants.registraionUrlDev),
+          : const LoginScreen(signUpUrl: Constants.registraionUrl),
     );
   }
 }

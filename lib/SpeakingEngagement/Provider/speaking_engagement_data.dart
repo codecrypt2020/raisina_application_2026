@@ -52,7 +52,7 @@ class SpeakingEngagementData with ChangeNotifier {
               "userId":
                   "${Hive.box('LoginDetails').get("Profile_details")['userId']}",
               "userName":
-                  "${Hive.box('LoginDetails').get("Profile_details")['userName']}"
+                  "${Hive.box('LoginDetails').get("Profile_details")['name']}"
             },
           ),
         ),

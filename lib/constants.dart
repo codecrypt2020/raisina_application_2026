@@ -7,12 +7,16 @@ class Constants {
   // static const String env = "Production";
 
 //DEV
-  static const String NODE_URL = 'https://devapi.raisina-orfonline.com/';
-  // static const String IMG_BASE_N_URL = 'https://api.devmisafeadmin.in/';
-  // static String NODE_URL_FORGOT_PASSWORD = "https://devmisafeadmin.in";
-  static const String registraionUrlDev =
-      "https://dev.raisina-orfonline.com/new-registration";
-  static const String env = "Development";
+  // static const String NODE_URL = 'https://devapi.raisina-orfonline.com/';
+  // static const String registraionUrl =
+  //     "https://dev.raisina-orfonline.com/new-registration";
+  // static const String env = "Development";
+
+//Prod
+  static const String NODE_URL = "https://raisina-orfonline.com:3000/";
+  static const String registraionUrl =
+      "https://raisina-orfonline.com/#/new-registration";
+  static const String env = "Production";
 
   static const String login = "users/login";
   static const String assignedUserDetails = "qr/assignedUserDetials";

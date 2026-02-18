@@ -311,9 +311,16 @@ class Network_request {
               //respose{
               //"userId": "567"
               //}
-              {"searchText": "Nehemiah Hamid", "sortby": "id", "page": 1}),
+              {
+                "searchText":
+                    "${Hive.box('LoginDetails').get("Profile_details")['name']}",
+                "sortby": "id",
+                "page": 1
+              }),
         ),
       );
+      print(
+          'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
