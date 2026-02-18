@@ -36,7 +36,7 @@ class AgendaView extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  alignment: WrapAlignment.center,
+                  alignment: WrapAlignment.start,
                   children: List.generate(provider.days.length, (index) {
                     bool isSelected = provider.selectedIndex == index;
 
