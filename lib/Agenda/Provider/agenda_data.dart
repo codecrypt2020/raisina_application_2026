@@ -114,7 +114,7 @@ class Agenda_data with ChangeNotifier {
   void generateDays(DateTime startDate) {
     _days.clear();
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
       DateTime newDate = startDate.add(Duration(days: i));
 
       String formattedDate = "${_getMonthName(newDate.month)} ${newDate.day}";
