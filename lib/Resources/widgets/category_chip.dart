@@ -12,10 +12,11 @@ class CategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
-        color: item.isSelected ? AppColors.goldDim : AppColors.navyElevated,
+        color:
+            item.isSelected ? AppColors.goldDim : AppColors.elevatedOf(context),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: item.isSelected ? AppColors.gold : AppColors.navySurface,
+          color: item.isSelected ? AppColors.gold : AppColors.borderOf(context),
         ),
       ),
       child: Row(
@@ -24,7 +25,9 @@ class CategoryChip extends StatelessWidget {
           Text(
             item.label,
             style: TextStyle(
-              color: item.isSelected ? AppColors.gold : AppColors.textSecondary,
+              color: item.isSelected
+                  ? AppColors.gold
+                  : AppColors.textSecondaryOf(context),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -32,13 +35,13 @@ class CategoryChip extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.navySurface,
+              color: AppColors.surfaceSoftOf(context),
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
               '${item.count}',
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: AppColors.textSecondaryOf(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),

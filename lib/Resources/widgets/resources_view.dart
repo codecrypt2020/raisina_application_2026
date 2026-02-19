@@ -15,15 +15,22 @@ class Resources_view extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppColors.isDark(context);
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFF8FAFD),
-            Color(0xFFF2F6FC),
-          ],
+          colors: isDark
+              ? const [
+                  Color(0xFF0C1220),
+                  Color(0xFF10192B),
+                ]
+              : const [
+                  Color(0xFFF8FAFD),
+                  Color(0xFFF2F6FC),
+                ],
         ),
       ),
       child: ListView(
@@ -32,17 +39,17 @@ class Resources_view extends StatelessWidget {
           Container(
             height: 52,
             decoration: BoxDecoration(
-              color: AppColors.navyElevated,
+              color: AppColors.elevatedOf(context),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.navySurface),
+              border: Border.all(color: AppColors.borderOf(context)),
             ),
-            child: const TextField(
+            child: TextField(
               decoration: InputDecoration(
                 hintText: 'Search resources...',
-                hintStyle: TextStyle(color: AppColors.textMuted),
+                hintStyle: TextStyle(color: AppColors.textMutedOf(context)),
                 prefixIcon: Icon(
                   Icons.search,
-                  color: AppColors.textMuted,
+                  color: AppColors.textMutedOf(context),
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 14),
