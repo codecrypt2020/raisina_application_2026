@@ -268,25 +268,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: _handleForgotPassword,
-                            style: TextButton.styleFrom(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              minimumSize: const Size(0, 32),
-                            ),
-                            child: const Text(
-                              'Forgot password?',
-                              style: TextStyle(
-                                color: AppColors.goldLight,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Align(
+                        //   alignment: Alignment.centerRight,
+                        //   child: TextButton(
+                        //     onPressed: _handleForgotPassword,
+                        //     style: TextButton.styleFrom(
+                        //       padding:
+                        //           const EdgeInsets.symmetric(horizontal: 2),
+                        //       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        //       minimumSize: const Size(0, 32),
+                        //     ),
+                        //     child: const Text(
+                        //       'Forgot password?',
+                        //       style: TextStyle(
+                        //         color: AppColors.goldLight,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         const SizedBox(height: 8),
                         SizedBox(
                           width: double.infinity,

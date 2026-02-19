@@ -29,6 +29,11 @@ class SpeakingEngagementData with ChangeNotifier {
     return _sessions_days;
   }
 
+  String capitalizeFirst(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   Future SpeakingDetails() async {
     try {
       var response = await http.post(
@@ -92,7 +97,7 @@ class SpeakingEngagementData with ChangeNotifier {
           speaker: session["coSpeakers"]
               .map((e) => e['name'] as String)
               .join(', '), // default
-          tag: session["status"], // default
+          tag: capitalizeFirst(session["status"].toString()), // default
           tagColor: AppColors.teal, // default
           highlight: false,
           isLive: false,
