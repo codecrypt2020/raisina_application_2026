@@ -1,28 +1,54 @@
 import 'package:attendee_app/Resources/Model/resource_category_datatype.dart';
+import 'package:attendee_app/Resources/provider/resources_data.dart';
 import 'package:attendee_app/Resources/widgets/resources_view.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class Resources extends StatelessWidget {
+class Resources extends StatefulWidget {
   const Resources({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    const List<ResourceCategory> categories = [
-      ResourceCategory(label: 'All', count: 2, isSelected: true),
-      ResourceCategory(label: 'For You', count: 1),
-      ResourceCategory(label: 'Event Info', count: 0),
-      ResourceCategory(label: 'Sessions', count: 1),
-      ResourceCategory(label: 'Media Kit', count: 0),
-    ];
+  State<Resources> createState() => _ResourcesState();
+}
 
+class _ResourcesState extends State<Resources> {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fetch_data =
+        Provider.of<ResourcesData>(context, listen: false).fetchResources();
     return Scaffold(
       backgroundColor: AppColors.navy,
       appBar: AppBar(
         title: const Text('Resources'),
         centerTitle: false,
       ),
-      body: Resources_view(categories: categories),
+      body: FutureBuilder(
+        //putting the materail call in the api for first time loading
+
+        future: fetch_data,
+        builder: (ctx, dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (dataSnapshot.error != null) {
+            {
+              //do error handling
+              return Center(
+                child: SingleChildScrollView(child: Text("An error occured")),
+              );
+            }
+          } else {
+            return Resources_view();
+          }
+        },
+      ),
     );
   }
 }

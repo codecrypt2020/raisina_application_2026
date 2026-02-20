@@ -4,6 +4,7 @@ import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
 import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
+import 'package:attendee_app/Resources/provider/resources_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
 import 'package:attendee_app/Maps/Screens/mapMain.dart';
@@ -110,138 +111,140 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     SpeakingMain(),
     // NetworkingView(),
     ProfileView(),
+    ResourcesMain()
   ];
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (ctx) => dining_data()),
-        //define multiple providers
-        ///agenda
+        providers: [
+          ChangeNotifierProvider(create: (ctx) => dining_data()),
+          //define multiple providers
+          ///agenda
 
-        ///speaking engagement
-        ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
+          ///speaking engagement
+          ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
 
-        ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+          ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+          ChangeNotifierProvider(create: (ctx) => ResourcesData()),
 
-        ///speaking engagement
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 72,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Text('Welcome, ',
-                      style: TextStyle(
-                          fontSize: 13, color: AppColors.textSecondary)),
-                  Text(
-                      "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
-                      style: TextStyle(
-                          fontSize: 13, color: AppColors.textSecondary)),
-                ],
+          ///speaking engagement
+        ],
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 72,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text('Welcome, ',
+                        style: TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary)),
+                    Text(
+                        "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
+                        style: TextStyle(
+                            fontSize: 13, color: AppColors.textSecondary)),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Text('Raisina Dialogue',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              ],
+            ),
+            actions: [
+              // IconButton(
+              //   onPressed: () {},
+              //   icon: const Icon(Icons.search, color: AppColors.textPrimary),
+              // ),
+              // IconButton(
+              //   onPressed: () {},
+              //   icon: const Icon(Icons.notifications_outlined,
+              //       color: AppColors.textPrimary),
+              // ),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.navySurface,
+                  child: Text(
+                      "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
+                      style: TextStyle(color: AppColors.textPrimary)),
+                ),
               ),
-              SizedBox(height: 4),
-              Text('Raisina Dialogue',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ],
           ),
-          actions: [
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: const Icon(Icons.search, color: AppColors.textPrimary),
-            // ),
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: const Icon(Icons.notifications_outlined,
-            //       color: AppColors.textPrimary),
-            // ),
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.navySurface,
-                child: Text(
-                    "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
-                    style: TextStyle(color: AppColors.textPrimary)),
+          drawer: Drawer(
+            backgroundColor: AppColors.navyElevated,
+            child: SafeArea(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+                    color: AppColors.navyMid,
+                    child: const Text(
+                      'Quick Access',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.folder_outlined,
+                      color: AppColors.textPrimary,
+                    ),
+                    title: const Text(
+                      'Resources',
+                      style: TextStyle(color: AppColors.textPrimary),
+                    ),
+                    onTap: () => _openPanelPage(const ResourcesMain()),
+                  ),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.map_outlined,
+                      color: AppColors.textPrimary,
+                    ),
+                    title: const Text(
+                      'Maps',
+                      style: TextStyle(color: AppColors.textPrimary),
+                    ),
+                    onTap: () => _openPanelPage(const Mapmain()),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        // drawer: Drawer(
-        //   backgroundColor: AppColors.navyElevated,
-        //   child: SafeArea(
-        //     child: ListView(
-        //       padding: EdgeInsets.zero,
-        //       children: [
-        //         Container(
-        //           padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
-        //           color: AppColors.navyMid,
-        //           child: const Text(
-        //             'Quick Access',
-        //             style: TextStyle(
-        //               fontSize: 18,
-        //               fontWeight: FontWeight.w700,
-        //               color: AppColors.textPrimary,
-        //             ),
-        //           ),
-        //         ),
-        //         ListTile(
-        //           leading: const Icon(
-        //             Icons.folder_outlined,
-        //             color: AppColors.textPrimary,
-        //           ),
-        //           title: const Text(
-        //             'Resources',
-        //             style: TextStyle(color: AppColors.textPrimary),
-        //           ),
-        //           onTap: () => _openPanelPage(const ResourcesMain()),
-        //         ),
-        //         ListTile(
-        //           leading: const Icon(
-        //             Icons.map_outlined,
-        //             color: AppColors.textPrimary,
-        //           ),
-        //           title: const Text(
-        //             'Maps',
-        //             style: TextStyle(color: AppColors.textPrimary),
-        //           ),
-        //           onTap: () => _openPanelPage(const Mapmain()),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
-        body: _pages[_selectedIndex],
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.event_note_outlined),
-              label: 'Agenda',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.wine_bar_outlined),
-              label: 'Dining',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.school_outlined),
-              label: 'Speaking Eng',
-            ),
-            NavigationDestination(
-                icon: Icon(Icons.person_outline), label: 'Profile'),
-          ],
-        ),
-      ),
-    );
+          ),
+          body: _pages[_selectedIndex],
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.event_note_outlined),
+                label: 'Agenda',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.wine_bar_outlined),
+                label: 'Dining',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.school_outlined),
+                label: 'Speaking Eng',
+              ),
+              NavigationDestination(
+                  icon: Icon(Icons.person_outline), label: 'Profile'),
+            ],
+          ),
+        ));
   }
 }
 

@@ -1,20 +1,51 @@
 import 'package:attendee_app/Resources/Model/resource_category_datatype.dart';
+import 'package:attendee_app/Resources/provider/resources_data.dart';
+import 'package:attendee_app/Resources/widgets/allData.dart';
 import 'package:attendee_app/Resources/widgets/category_chip.dart';
+import 'package:attendee_app/Resources/widgets/eventInfo.dart';
+import 'package:attendee_app/Resources/widgets/general.dart';
+import 'package:attendee_app/Resources/widgets/mediaKit.dart';
 import 'package:attendee_app/Resources/widgets/resource_card.dart';
 import 'package:attendee_app/Resources/widgets/section_header.dart';
+import 'package:attendee_app/Resources/widgets/sessions.dart';
+import 'package:attendee_app/Resources/widgets/speaker.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Resources_view extends StatelessWidget {
   const Resources_view({
     super.key,
-    required this.categories,
   });
-
-  final List<ResourceCategory> categories;
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ResourcesData>(context);
+    List<Widget> widgetss = [
+      if (provider.selectedCategoryIndex == 0)
+        Alldata()
+      else if (provider.selectedCategoryIndex == 1)
+        Eventinfo()
+      else if (provider.selectedCategoryIndex == 2)
+        Sessions()
+      else if (provider.selectedCategoryIndex == 3)
+        Mediakit()
+      else if (provider.selectedCategoryIndex == 4)
+        Speaker()
+      else if (provider.selectedCategoryIndex == 5)
+        General()
+      else
+        const SizedBox(
+          height: 120,
+          child: Center(
+            child: Text(
+              'No resources found for this category',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+        )
+    ];
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -26,66 +57,88 @@ class Resources_view extends StatelessWidget {
           ],
         ),
       ),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+      child: Column(
+        // padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
         children: [
-          Container(
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.navyElevated,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.navySurface),
-            ),
-            child: const TextField(
-              decoration: InputDecoration(
-                hintText: 'Search resources...',
-                hintStyle: TextStyle(color: AppColors.textMuted),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: AppColors.textMuted,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                color: AppColors.navyElevated,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.navySurface),
+              ),
+              child: const TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search resources...',
+                  hintStyle: TextStyle(color: AppColors.textMuted),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: AppColors.textMuted,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14),
               ),
             ),
           ),
           const SizedBox(height: 14),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: categories
-                  .map((item) => Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: CategoryChip(item: item),
-                      ))
-                  .toList(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: provider.categories
+                    .map<Widget>((item) => Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: CategoryChip(
+                              item: item,
+                              index: provider.categories.indexOf(item)),
+                        ))
+                    .toList(),
+              ),
             ),
           ),
-          const SizedBox(height: 18),
-          const SectionHeader(title: 'Speaker Kit', count: 1),
-          const SizedBox(height: 10),
-          const ResourceCard(
-            icon: Icons.image_outlined,
-            iconColor: Color(0xFF9A58DC),
-            title: 'Speaker resource 1',
-            subtitle: 'Speaker resource 1',
-            type: 'IMAGE',
-            date: 'Feb 16, 2026',
-            size: '497.3 KB',
-            badgeText: 'FOR YOU',
-          ),
-          const SizedBox(height: 18),
-          const SectionHeader(title: 'Session Materials', count: 1),
-          const SizedBox(height: 10),
-          const ResourceCard(
-            icon: Icons.description_outlined,
-            iconColor: Color(0xFFE35C5C),
-            title: 'Session Material testing Doc',
-            subtitle: 'Session Material testing Doc',
-            type: 'PDF',
-            date: 'Feb 16, 2026',
-            size: '131.1 KB',
-          ),
+          Expanded(
+            child: widgetss[0],
+          )
+
+          // const SizedBox(height: 14),
+          // if (provider.selectedCategoryIndex == 0)
+          //   Alldata(
+          //     categories: provider.categories,
+          //   )
+          // else if (provider.selectedCategoryIndex == 1)
+          //   Eventinfo(
+          //     categories: provider.categories,
+          //   )
+          // else if (provider.selectedCategoryIndex == 2)
+          //   Sessions(
+          //     categories: provider.categories,
+          //   )
+          // else if (provider.selectedCategoryIndex == 3)
+          //   Mediakit(
+          //     categories: provider.categories,
+          //   )
+          // else if (provider.selectedCategoryIndex == 4)
+          //   Speaker(
+          //     categories: provider.categories,
+          //   )
+          // else if (provider.selectedCategoryIndex == 5)
+          //   General(
+          //     categories: provider.categories,
+          //   )
+          // else
+          //   const SizedBox(
+          //     height: 120,
+          //     child: Center(
+          //       child: Text(
+          //         'No resources found for this category',
+          //         style: TextStyle(color: AppColors.textSecondary),
+          //       ),
+          //     ),
+          //   )
         ],
       ),
     );

@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 class ResourcesMain extends StatelessWidget {
   const ResourcesMain({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
