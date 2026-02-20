@@ -11,6 +11,8 @@ class Constants {
   static const String registraionUrl =
       "https://dev.raisina-orfonline.com/new-registration";
   static const String env = "Development";
+  static const String forgetPassUrl =
+      "https://dev.raisina-orfonline.com/forgot-pass";
 
 //Prod
   // static const String NODE_URL = "https://raisina-orfonline.com:3000/";
@@ -27,4 +29,5 @@ class Constants {
       "speaking/assignedUserDetials";
   static const String allresourcesapi = "qr/resources/all-resources";
   static const String get_user_qr = "qr/user_list";
+  static const String userProfileApi = "userinfo/profile";
 }

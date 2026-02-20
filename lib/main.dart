@@ -2,7 +2,9 @@ import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
-import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+import 'package:attendee_app/Profile/Screens/profile.dart';
+import 'package:attendee_app/Profile/Screens/profile_main.dart';
+import 'package:attendee_app/Profile/provider/profile_data.dart';
 import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
@@ -160,7 +162,9 @@ class _AttendeeAppState extends State<AttendeeApp> {
       themeMode: _themeMode,
       home: (token != null)
           ? const AttendeeHomePage()
-          : const LoginScreen(signUpUrl: Constants.registraionUrl),
+          : const LoginScreen(
+              signUpUrl: Constants.forgetPassUrl,
+              forgetPasswordUrl: Constants.forgetPassUrl),
     );
   }
 }
@@ -188,7 +192,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     DiningMain(),
     SpeakingMain(),
     // NetworkingView(),
-    ProfileView(),
+    ProfileMain(),
   ];
 
   @override
@@ -203,6 +207,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
 
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+        ChangeNotifierProvider(create: (ctx) => ProfileData()),
 
         ///speaking engagement
       ],

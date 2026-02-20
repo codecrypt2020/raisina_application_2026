@@ -10,9 +10,11 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
     required this.signUpUrl,
+    required this.forgetPasswordUrl,
   });
 
   final String signUpUrl;
+  final String forgetPasswordUrl;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -44,6 +46,26 @@ class _LoginScreenState extends State<LoginScreen> {
         const SnackBar(
           content: Text(
             "Couldn't open signup link. Please try again.",
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _openForgetPassLink() async {
+    final Uri forgetPasswordUri = Uri.parse(widget.forgetPasswordUrl);
+    final bool launched = await launchUrl(
+      forgetPasswordUri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Couldn't open forget password link. Please try again.",
             style: TextStyle(fontSize: 14),
           ),
         ),
@@ -268,25 +290,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        // Align(
-                        //   alignment: Alignment.centerRight,
-                        //   child: TextButton(
-                        //     onPressed: _handleForgotPassword,
-                        //     style: TextButton.styleFrom(
-                        //       padding:
-                        //           const EdgeInsets.symmetric(horizontal: 2),
-                        //       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        //       minimumSize: const Size(0, 32),
-                        //     ),
-                        //     child: const Text(
-                        //       'Forgot password?',
-                        //       style: TextStyle(
-                        //         color: AppColors.goldLight,
-                        //         fontWeight: FontWeight.w600,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: _openForgetPassLink,
+                            style: TextButton.styleFrom(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              minimumSize: const Size(0, 32),
+                            ),
+                            child: const Text(
+                              'Forgot password?',
+                              style: TextStyle(
+                                color: AppColors.goldLight,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         SizedBox(
                           width: double.infinity,
