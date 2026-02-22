@@ -57,8 +57,11 @@ class Network_request {
       Map<String, dynamic> jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
+        res["data"]["email"] = username;
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
+        print(
+            'this is the profile details ${Hive.box("LoginDetails").get("Profile_details")}');
         return {"success": true, "message": "Login successful"};
       } else {
         return {

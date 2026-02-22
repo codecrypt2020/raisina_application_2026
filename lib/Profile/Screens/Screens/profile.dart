@@ -135,42 +135,94 @@ class ProfileView extends StatelessWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(18),
               onTap: () async {
+                final Map profileDetails =
+                    Hive.box("LoginDetails").get("Profile_details");
+                final String registeredEmail =
+                    profileDetails["email"].toString().trim();
+                String emailError = "";
+                String enteredEmail = "";
+
                 final bool? shouldDelete = await showDialog<bool>(
                   context: context,
                   builder: (dialogContext) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      title: const Text('Delete Account'),
-                      content: const Text(
-                        'Are you sure you want to delete your account?',
-                        style: TextStyle(color: AppColors.textSecondary),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogContext, false),
-                          child: const Text('No'),
-                        ),
-                        FilledButton(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.red,
-                            foregroundColor: Colors.white,
+                    return StatefulBuilder(
+                      builder: (context, setDialogState) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          onPressed: () => Navigator.pop(dialogContext, true),
-                          child: const Text('Yes'),
-                        ),
-                      ],
+                          title: const Text('Delete Account'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Are you sure you want to delete account?',
+                                style:
+                                    TextStyle(color: AppColors.textSecondary),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'To confirm, please enter your Email ID: $registeredEmail',
+                                style: const TextStyle(
+                                    color: AppColors.textSecondary),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                keyboardType: TextInputType.emailAddress,
+                                onChanged: (value) {
+                                  enteredEmail = value.trim();
+                                  if (emailError.isNotEmpty) {
+                                    setDialogState(() {
+                                      emailError = "";
+                                    });
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Enter Email ID',
+                                  errorText:
+                                      emailError.isEmpty ? null : emailError,
+                                  border: const OutlineInputBorder(),
+                                  isDense: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () =>
+                                  Navigator.pop(dialogContext, false),
+                              child: const Text('Cancel'),
+                            ),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () {
+                                if (enteredEmail.toLowerCase() !=
+                                    registeredEmail.toLowerCase()) {
+                                  setDialogState(() {
+                                    emailError =
+                                        "Email ID entered doesn't match.";
+                                  });
+                                  return;
+                                }
+                                Navigator.pop(dialogContext, true);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 );
 
                 if (shouldDelete == true) {
-                  final Map profileDetails =
-                      Hive.box("LoginDetails").get("Profile_details");
                   final deleteResponse = await Network_request.deleteAccount(
                     profileDetails["userId"],
-                    profileDetails["email"].toString().trim(),
+                    registeredEmail,
                   );
                   if (!context.mounted) return;
 
