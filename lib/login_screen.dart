@@ -31,11 +31,32 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // Future<void> _openSignupLink() async {
+  //   final Uri signUpUri = Uri.parse(widget.signUpUrl);
+  //   final bool launched = await launchUrl(
+  //     signUpUri,
+  //     mode: LaunchMode.externalApplication,
+  //   );
+
+  //   if (!launched && mounted) {
+  //     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text(
+  //           "Couldn't open signup link. Please try again.",
+  //           style: TextStyle(fontSize: 14),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
+
   Future<void> _openSignupLink() async {
     final Uri signUpUri = Uri.parse(widget.signUpUrl);
+
     final bool launched = await launchUrl(
       signUpUri,
-      mode: LaunchMode.externalApplication,
+      mode: LaunchMode.inAppBrowserView, // Uses Safari View Controller on iOS
     );
 
     if (!launched && mounted) {

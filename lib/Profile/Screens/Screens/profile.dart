@@ -3,6 +3,7 @@ import 'package:attendee_app/Profile/Screens/Screens/digital_badge_screen.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/login_screen.dart';
 import 'package:attendee_app/main.dart';
+import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
@@ -127,6 +128,119 @@ class ProfileView extends StatelessWidget {
         //   ),
         // ),
         const SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () async {
+                final bool? shouldDelete = await showDialog<bool>(
+                  context: context,
+                  builder: (dialogContext) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      title: const Text('Delete Account'),
+                      content: const Text(
+                        'Are you sure you want to delete your account?',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          child: const Text('No'),
+                        ),
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.red,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => Navigator.pop(dialogContext, true),
+                          child: const Text('Yes'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                if (shouldDelete == true) {
+                  final Map profileDetails =
+                      Hive.box("LoginDetails").get("Profile_details");
+                  final deleteResponse = await Network_request.deleteAccount(
+                    profileDetails["userId"],
+                    profileDetails["email"].toString().trim(),
+                  );
+                  if (!context.mounted) return;
+
+                  if (deleteResponse["success"] == true) {
+                    Hive.box("LoginDetails").clear();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(
+                            signUpUrl: Constants.registraionUrl),
+                      ),
+                      (route) => false,
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          deleteResponse["message"] ??
+                              "Failed to delete account",
+                        ),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.navyMid,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.navySurface),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.red.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.delete_forever_rounded,
+                        color: AppColors.red,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Text(
+                        "Delete Account",
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textMuted,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: Material(
