@@ -23,7 +23,7 @@ class Resources_view extends StatelessWidget {
     final provider = Provider.of<ResourcesData>(context);
     List<Widget> widgetss = [
       if (provider.selectedCategoryIndex == 0)
-        Alldata()
+        Alldata(data: provider.data)
       else if (provider.selectedCategoryIndex == 1)
         Eventinfo()
       else if (provider.selectedCategoryIndex == 2)
@@ -103,42 +103,6 @@ class Resources_view extends StatelessWidget {
           Expanded(
             child: widgetss[0],
           )
-
-          // const SizedBox(height: 14),
-          // if (provider.selectedCategoryIndex == 0)
-          //   Alldata(
-          //     categories: provider.categories,
-          //   )
-          // else if (provider.selectedCategoryIndex == 1)
-          //   Eventinfo(
-          //     categories: provider.categories,
-          //   )
-          // else if (provider.selectedCategoryIndex == 2)
-          //   Sessions(
-          //     categories: provider.categories,
-          //   )
-          // else if (provider.selectedCategoryIndex == 3)
-          //   Mediakit(
-          //     categories: provider.categories,
-          //   )
-          // else if (provider.selectedCategoryIndex == 4)
-          //   Speaker(
-          //     categories: provider.categories,
-          //   )
-          // else if (provider.selectedCategoryIndex == 5)
-          //   General(
-          //     categories: provider.categories,
-          //   )
-          // else
-          //   const SizedBox(
-          //     height: 120,
-          //     child: Center(
-          //       child: Text(
-          //         'No resources found for this category',
-          //         style: TextStyle(color: AppColors.textSecondary),
-          //       ),
-          //     ),
-          //   )
         ],
       ),
     );

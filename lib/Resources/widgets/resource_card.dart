@@ -64,13 +64,23 @@ class ResourceCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 15,
+                if (subtitle != "") ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
+                ],
+                // Text(
+                //   subtitle,
+                //   style: const TextStyle(
+                //     color: AppColors.textSecondary,
+                //     fontSize: 15,
+                //   ),
+                // ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -142,7 +152,11 @@ class ResourceCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Downloading $title')),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.goldDim,
                         foregroundColor: AppColors.gold,
