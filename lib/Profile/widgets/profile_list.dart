@@ -4,6 +4,8 @@ import 'package:attendee_app/Profile/widgets/digital_badge_screen.dart';
 import 'package:attendee_app/Profile/widgets/info_card.dart';
 import 'package:attendee_app/Profile/widgets/info_line.dart';
 import 'package:attendee_app/Profile/widgets/profile_row.dart';
+import 'package:attendee_app/Profile/Screens/change_password_screen.dart';
+import 'package:attendee_app/Profile/Screens/edit_profile_screen.dart';
 import 'package:attendee_app/Profile/widgets/session_tile.dart';
 import 'package:attendee_app/Profile/widgets/stat_card.dart';
 import 'package:attendee_app/Profile/widgets/tag_chip.dart';
@@ -20,6 +22,8 @@ class ProfileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var data = Provider.of<ProfileData>(context, listen: true).data;
+    var totalUniqueDays =
+        Provider.of<ProfileData>(context, listen: true).totalUniqueDays;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -142,7 +146,7 @@ class ProfileList extends StatelessWidget {
             SizedBox(width: 10),
             Expanded(
               child: StatCard(
-                value: '1',
+                value: "${totalUniqueDays}",
                 label: 'CONFERENCE DAYS',
               ),
             ),
@@ -172,7 +176,8 @@ class ProfileList extends StatelessWidget {
             final String email =
                 "${data['profile']["primary_email"] ?? "not available"}";
             final String phone =
-                "${data['profile']["primary_phone"] ?? "not available"}";
+                "${data['profile']["country_code"] ?? ""} ${data['profile']["primary_phone"] ?? "not available"}";
+            //     "${data['profile']["primary_phone"] ?? "not available"}";
             final String organization =
                 "${data['profile']["organization"] ?? "not available"}";
             final Widget leftColumn = Column(
@@ -310,6 +315,126 @@ class ProfileList extends StatelessWidget {
         //   ),
         // ),
         const SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditProfileScreen(
+                      profile: data['profile'] ?? {},
+                    ),
+                  ),
+                );
+              },
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceOf(context),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderOf(context)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.goldDim,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        color: AppColors.gold,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Edit Profile",
+                        style: TextStyle(
+                          color: AppColors.textPrimaryOf(context),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textMutedOf(context),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangePasswordScreen(
+                      profile: data['profile'] ?? {},
+                    ),
+                  ),
+                );
+              },
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceOf(context),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderOf(context)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.goldDim,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.lock_outline_rounded,
+                        color: AppColors.gold,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Change Password",
+                        style: TextStyle(
+                          color: AppColors.textPrimaryOf(context),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textMutedOf(context),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: Material(

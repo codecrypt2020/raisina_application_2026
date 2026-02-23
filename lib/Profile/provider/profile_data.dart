@@ -16,6 +16,8 @@ import 'package:hive/hive.dart';
 class ProfileData with ChangeNotifier {
   var _data;
   get data => _data;
+  var _totalUniqueDays;
+  get totalUniqueDays => _totalUniqueDays;
   Future<void> fetchUserProfile() async {
     try {
       var profileDetails = Hive.box('LoginDetails').get("Profile_details");
@@ -43,6 +45,11 @@ class ProfileData with ChangeNotifier {
       if (response.statusCode == 200 && jsonData['success'] == true) {
         var res = decryptResponse(response.body);
         _data = res['data'];
+        //fetch day of conference
+        List<Map<String, dynamic>> confernace_days_value =
+            List<Map<String, dynamic>>.from(_data['sessions']);
+        _totalUniqueDays =
+            confernace_days_value.map((e) => e['day_number']).toSet().length;
         print("Profile data fetched: $data");
         print({data['profile']?['bio']});
         // notifyListeners();
