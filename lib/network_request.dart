@@ -57,8 +57,11 @@ class Network_request {
       Map<String, dynamic> jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
+        res["data"]["email"] = username;
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
+        print(
+            'this is the profile details ${Hive.box("LoginDetails").get("Profile_details")}');
         return {"success": true, "message": "Login successful"};
       } else {
         return {
@@ -103,6 +106,44 @@ class Network_request {
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteAccount(userID, email) async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.delete_account),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({"empId": userID, "email": email}),
+        ),
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        return {
+          "success": true,
+          "message": jsonData["message"] ?? "Account deleted successfully"
+        };
+      }
+      return {
+        "success": false,
+        "message": jsonData["message"] ?? "Failed to delete account"
+      };
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
+      return {
+        "success": false,
+        "message": "Unable to delete account. Please try again."
+      };
     }
   }
 
