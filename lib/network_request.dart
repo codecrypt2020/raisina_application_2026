@@ -59,6 +59,7 @@ class Network_request {
         var res = decryptResponse(response.body);
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
+        Hive.box("LoginDetails").put("roleId", res["data"]["role_id"]);
         return {"success": true, "message": "Login successful"};
       } else {
         return {

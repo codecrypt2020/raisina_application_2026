@@ -1,3 +1,5 @@
+// import 'dart:developer';
+
 import 'package:attendee_app/Resources/Model/resource_category_datatype.dart';
 import 'package:flutter/foundation.dart';
 import 'package:attendee_app/constants.dart';
@@ -20,12 +22,13 @@ class ResourcesData with ChangeNotifier {
   var _data;
 
   List<ResourceCategory> _categories = [
-    const ResourceCategory(label: 'All', count: 2, isSelected: true, index: 0),
+    ResourceCategory(label: 'All', count: 2, isSelected: true, index: 0),
     ResourceCategory(label: 'Event Info', count: 0, index: 1),
     ResourceCategory(label: 'Sessions', count: 1, index: 2),
     ResourceCategory(label: 'Media Kit', count: 0, index: 3),
     ResourceCategory(label: 'Speaker', count: 0, index: 4),
     ResourceCategory(label: 'General', count: 0, index: 5),
+    ResourceCategory(label: 'For you', count: 0, index: 6),
   ];
 
   get data {
@@ -66,7 +69,9 @@ class ResourcesData with ChangeNotifier {
       // && jsonData["success"] == true
       if (response.statusCode == 200 && jsonData.length != 0) {
         var data = decryptResponse(response.body);
+        await loadUserRoleFromHive();
         _data = data;
+        // debugger();
         processAndGroupData();
         notifyListeners();
         print("this is the data in resources : $_data");
@@ -150,25 +155,156 @@ class ResourcesData with ChangeNotifier {
   List<dynamic> get mediaList => _mediaList;
   List<dynamic> get speakerList => _speakerList;
   List<dynamic> get generalList => _generalList;
+  // void processAndGroupData() {
+  //   final rawData = _data?["data"];
+
+  //   if (rawData is! List) return;
+
+  //   _allList = rawData;
+
+  //   _eventInfoList =
+  //       rawData.where((e) => e["category_code"] == "event_info").toList();
+
+  //   _sessionsList =
+  //       rawData.where((e) => e["category_code"] == "sessions").toList();
+
+  //   _mediaList = rawData.where((e) => e["category_code"] == "media").toList();
+
+  //   _speakerList =
+  //       rawData.where((e) => e["category_code"] == "speaker").toList();
+
+  //   _generalList =
+  //       rawData.where((e) => e["category_code"] == "general").toList();
+
+  //   _featuredList = rawData.where((e) => e["is_featured"] == 1).toList();
+  // }
   void processAndGroupData() {
     final rawData = _data?["data"];
 
     if (rawData is! List) return;
 
-    _allList = rawData;
+    // 🔥 ROLE FILTER FIRST
+    final roleFilteredList = rawData.where((item) {
+      final List<dynamic>? roles = item["target_roles"];
 
-    _eventInfoList =
-        rawData.where((e) => e["category_code"] == "event_info").toList();
+      if (_currentUserRole.isEmpty) {
+        return true; // fallback if role missing
+      }
 
-    _sessionsList =
-        rawData.where((e) => e["category_code"] == "sessions").toList();
+      if (roles == null) return false;
 
-    _mediaList = rawData.where((e) => e["category_code"] == "media").toList();
+      return roles.contains(_currentUserRole);
+    }).toList();
+
+    // 🔥 GROUP ONLY FILTERED DATA
+    _allList = roleFilteredList;
+
+    _eventInfoList = roleFilteredList
+        .where((e) => e["category_code"] == "event_info")
+        .toList();
+
+    _sessionsList = roleFilteredList
+        .where((e) => e["category_code"] == "sessions")
+        .toList();
+
+    _mediaList =
+        roleFilteredList.where((e) => e["category_code"] == "media").toList();
 
     _speakerList =
-        rawData.where((e) => e["category_code"] == "speaker").toList();
+        roleFilteredList.where((e) => e["category_code"] == "speaker").toList();
 
     _generalList =
-        rawData.where((e) => e["category_code"] == "general").toList();
+        roleFilteredList.where((e) => e["category_code"] == "general").toList();
+
+    _featuredList =
+        roleFilteredList.where((e) => e["is_featured"] == 1).toList();
+  }
+
+  int get allCount => _allList.length;
+  int get eventInfoCount => _eventInfoList.length;
+  int get sessionsCount => _sessionsList.length;
+  int get mediaCount => _mediaList.length;
+  int get speakerCount => _speakerList.length;
+  int get generalCount => _generalList.length;
+  int getCountByIndex(int index) {
+    switch (index) {
+      case 0:
+        return _allList.length;
+
+      case 1:
+        return _eventInfoList.length;
+
+      case 2:
+        return _sessionsList.length;
+
+      case 3:
+        return _mediaList.length;
+
+      case 4:
+        return _speakerList.length;
+
+      case 5:
+        return _generalList.length;
+      case 6:
+        return _featuredList.length;
+
+      default:
+        return 0;
+    }
+  }
+
+  List<dynamic> _featuredList = [];
+
+  List<dynamic> get featuredList => _featuredList;
+
+  Map<String, List<dynamic>> get groupedFeaturedData {
+    Map<String, List<dynamic>> grouped = {};
+
+    for (var item in _featuredList) {
+      final category = item['category_code'] ?? 'unknown';
+
+      if (!grouped.containsKey(category)) {
+        grouped[category] = [];
+      }
+
+      grouped[category]!.add(item);
+    }
+
+    return grouped;
+  }
+
+  String _currentUserRole = '';
+
+  String get currentUserRole => _currentUserRole;
+
+  void setUserRoleFromLogin(int roleId) {
+    switch (roleId) {
+      case 1:
+        _currentUserRole = 'speaker';
+        break;
+      case 2:
+        _currentUserRole = 'delegate';
+        break;
+      case 3:
+        _currentUserRole = 'afgg';
+        break;
+      case 4:
+        _currentUserRole = 'participant';
+        break;
+      case 5:
+        _currentUserRole = 'media';
+        break;
+      default:
+        _currentUserRole = '';
+    }
+  }
+
+  Future<void> loadUserRoleFromHive() async {
+    final box = Hive.box("LoginDetails");
+    final roleId = box.get("roleId");
+
+    if (roleId != null) {
+      setUserRoleFromLogin(roleId);
+    }
   }
 }

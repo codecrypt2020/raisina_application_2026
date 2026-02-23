@@ -12,35 +12,67 @@ class Alldata extends StatelessWidget {
     super.key,
     required this.data,
   });
+
   final dynamic data;
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
-    return ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-        itemCount: data["data"].length,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              const SizedBox(height: 18),
-              SectionHeader(
-                  title: provider
-                      .getCategoryLabel(data["data"][index]['category_code']),
-                  count: 1),
-              const SizedBox(height: 10),
-              ResourceCard(
-                icon: Icons.image_outlined,
-                iconColor: const Color(0xFF9A58DC),
-                title: data["data"][index]['title'],
-                subtitle: data["data"][index]['description'] ?? '',
-                type: data["data"][index]['file_type'] ?? 'Unknown',
-                date: provider.formatDate(data["data"][index]['created_at']),
-                size: provider.formatFileSize(data["data"][index]['file_size']),
-                badgeText: data["data"][index]['badgeText'],
-              ),
-            ],
-          );
-        });
+
+    final List<dynamic> rawList = data["data"] ?? [];
+
+    // Step 1: Group by category_code
+    final Map<String, List<dynamic>> groupedData = {};
+
+    for (var item in rawList) {
+      final category = item['category_code'] ?? 'unknown';
+
+      if (!groupedData.containsKey(category)) {
+        groupedData[category] = [];
+      }
+
+      groupedData[category]!.add(item);
+    }
+
+    // Step 2: Build UI
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+      children: groupedData.entries.map((entry) {
+        final categoryCode = entry.key;
+        final items = entry.value;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 18),
+
+            // Section Header (ONLY ONCE)
+            SectionHeader(
+              title: provider.getCategoryLabel(categoryCode),
+              count: items.length,
+            ),
+
+            const SizedBox(height: 10),
+
+            // Cards under this category
+            ...items.map((item) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 18),
+                child: ResourceCard(
+                  icon: Icons.image_outlined,
+                  iconColor: const Color(0xFF9A58DC),
+                  title: item['title'],
+                  subtitle: item['description'] ?? "",
+                  type: item['file_type'] ?? 'Unknown',
+                  date: provider.formatDate(item['created_at']),
+                  size: provider.formatFileSize(item['file_size']),
+                  badgeText: item['is_featured'] == 1 ? "FOR YOU" : null,
+                ),
+              );
+            }).toList(),
+          ],
+        );
+      }).toList(),
+    );
   }
 }

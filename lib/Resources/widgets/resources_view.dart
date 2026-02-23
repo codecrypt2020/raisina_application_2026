@@ -3,6 +3,7 @@ import 'package:attendee_app/Resources/provider/resources_data.dart';
 import 'package:attendee_app/Resources/widgets/allData.dart';
 import 'package:attendee_app/Resources/widgets/category_chip.dart';
 import 'package:attendee_app/Resources/widgets/eventInfo.dart';
+import 'package:attendee_app/Resources/widgets/forYou.dart';
 import 'package:attendee_app/Resources/widgets/general.dart';
 import 'package:attendee_app/Resources/widgets/mediaKit.dart';
 import 'package:attendee_app/Resources/widgets/resource_card.dart';
@@ -34,6 +35,8 @@ class Resources_view extends StatelessWidget {
         Speaker()
       else if (provider.selectedCategoryIndex == 5)
         General()
+      else if (provider.selectedCategoryIndex == 6)
+        ForYou()
       else
         const SizedBox(
           height: 120,

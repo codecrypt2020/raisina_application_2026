@@ -11,30 +11,57 @@ class Speaker extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
     final filteredList = provider.speakerList;
-    return ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-        itemCount: filteredList.length,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              const SizedBox(height: 18),
-              SectionHeader(
-                  title: provider
-                      .getCategoryLabel(filteredList[index]['category_code']),
-                  count: filteredList.length),
-              const SizedBox(height: 10),
-              ResourceCard(
-                icon: Icons.image_outlined,
-                iconColor: const Color(0xFF9A58DC),
-                title: filteredList[index]['title'],
-                subtitle: filteredList[index]['description'] ?? '',
-                type: filteredList[index]['file_type'] ?? 'Unknown',
-                date: provider.formatDate(filteredList[index]['created_at']),
-                size: provider.formatFileSize(filteredList[index]['file_size']),
-                badgeText: filteredList[index]['badgeText'],
-              ),
-            ],
-          );
-        });
+
+    if (filteredList.isEmpty) {
+      return const Center(
+        child: Text(
+          'No resources found',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 18),
+
+        // Header only once
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SectionHeader(
+            title: provider.getCategoryLabel('speaker'),
+            count: filteredList.length,
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Cards list
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+            itemCount: filteredList.length,
+            itemBuilder: (context, index) {
+              final item = filteredList[index];
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 18),
+                child: ResourceCard(
+                  icon: Icons.image_outlined,
+                  iconColor: const Color(0xFF9A58DC),
+                  title: item['title'],
+                  subtitle: item['description'],
+                  type: item['file_type'] ?? 'Unknown',
+                  date: provider.formatDate(item['created_at']),
+                  size: provider.formatFileSize(item['file_size']),
+                  badgeText: item['is_featured'] == 1 ? "FOR YOU" : null,
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

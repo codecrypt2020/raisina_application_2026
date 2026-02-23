@@ -50,7 +50,7 @@ class CategoryChip extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                '${item.count}',
+                '${provider.getCountByIndex(item.index)}',
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,
