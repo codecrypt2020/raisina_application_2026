@@ -200,6 +200,12 @@ class ProfileView extends StatelessWidget {
                                 foregroundColor: Colors.white,
                               ),
                               onPressed: () {
+                                if (enteredEmail.trim() == "") {
+                                  setDialogState(() {
+                                    emailError = "Please enter Email ID";
+                                  });
+                                  return;
+                                }
                                 if (enteredEmail.toLowerCase() !=
                                     registeredEmail.toLowerCase()) {
                                   setDialogState(() {
