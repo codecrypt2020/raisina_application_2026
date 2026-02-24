@@ -14,10 +14,41 @@ import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Resources_view extends StatelessWidget {
+class Resources_view extends StatefulWidget {
   const Resources_view({
     super.key,
   });
+
+  @override
+  State<Resources_view> createState() => _Resources_viewState();
+}
+
+class _Resources_viewState extends State<Resources_view> {
+  List<GlobalKey> _chipKeys = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final categoriesLength =
+        Provider.of<ResourcesData>(context, listen: false).categories.length;
+    if (_chipKeys.length != categoriesLength) {
+      _chipKeys = List.generate(categoriesLength, (_) => GlobalKey());
+    }
+  }
+
+  void _scrollToChip(int index) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || index >= _chipKeys.length) return;
+      final chipContext = _chipKeys[index].currentContext;
+      if (chipContext == null) return;
+      Scrollable.ensureVisible(
+        chipContext,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeInOut,
+        alignment: 0.5,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,14 +123,25 @@ class Resources_view extends StatelessWidget {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: provider.categories
-                    .map<Widget>((item) => Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: CategoryChip(
-                              item: item,
-                              index: provider.categories.indexOf(item)),
-                        ))
-                    .toList(),
+                children:
+                    provider.categories.asMap().entries.map<Widget>((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: KeyedSubtree(
+                      key: _chipKeys[index],
+                      child: CategoryChip(
+                        item: item,
+                        index: index,
+                        onTap: () {
+                          provider.setSelectedCategoryIndex(index);
+                          _scrollToChip(index);
+                        },
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
           ),

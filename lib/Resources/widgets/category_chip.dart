@@ -5,18 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CategoryChip extends StatelessWidget {
-  const CategoryChip({required this.item, required this.index});
+  const CategoryChip({required this.item, required this.index, this.onTap});
   final int index;
   final ResourceCategory item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context, listen: true);
     return GestureDetector(
-      onTap: () {
-        provider.setSelectedCategoryIndex(index);
-        print("Selected category index: $index");
-      },
+      onTap: onTap ??
+          () {
+            provider.setSelectedCategoryIndex(index);
+            print("Selected category index: $index");
+          },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(

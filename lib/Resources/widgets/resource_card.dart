@@ -1,3 +1,4 @@
+import 'package:attendee_app/Resources/utils/resource_file_actions.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class ResourceCard extends StatelessWidget {
     required this.type,
     required this.date,
     required this.size,
+    required this.file_url,
     this.badgeText,
   });
 
@@ -20,10 +22,12 @@ class ResourceCard extends StatelessWidget {
   final String type;
   final String date;
   final String size;
+  final String file_url;
   final String? badgeText;
 
   @override
   Widget build(BuildContext context) {
+    final hasValidUrl = file_url.trim().isNotEmpty;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -137,7 +141,10 @@ class ResourceCard extends StatelessWidget {
                 Row(
                   children: [
                     OutlinedButton(
-                      onPressed: () {},
+                      onPressed: hasValidUrl
+                          ? () => ResourceFileActions.previewFile(
+                              context, file_url, title)
+                          : null,
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.navySurface),
                         foregroundColor: AppColors.textSecondary,
@@ -152,11 +159,7 @@ class ResourceCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Downloading $title')),
-                        );
-                      },
+                      onPressed: null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.goldDim,
                         foregroundColor: AppColors.gold,

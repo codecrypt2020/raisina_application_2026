@@ -56,6 +56,7 @@ class General extends StatelessWidget {
                   type: item['file_type'] ?? 'Unknown',
                   date: provider.formatDate(item['created_at']),
                   size: provider.formatFileSize(item['file_size']),
+                  file_url: item['file_url'],
                   badgeText: item['is_featured'] == 1 ? "FOR YOU" : null,
                 ),
               );
