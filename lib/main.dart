@@ -247,18 +247,22 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                       style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondaryOf(context))),
-                  ValueListenableBuilder(
-                    valueListenable: Hive.box('LoginDetails')
-                        .listenable(keys: const ['Profile_details']),
-                    builder: (context, box, _) {
-                      return Text(
-                        _currentProfileName(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondaryOf(context),
-                        ),
-                      );
-                    },
+                  Expanded(
+                    child: ValueListenableBuilder(
+                      valueListenable: Hive.box('LoginDetails')
+                          .listenable(keys: const ['Profile_details']),
+                      builder: (context, box, _) {
+                        return Text(
+                          _currentProfileName(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondaryOf(context),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -311,6 +315,9 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                   builder: (context, box, _) {
                     return Text(
                       _profileInitials(_currentProfileName()),
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      softWrap: false,
                       style: TextStyle(
                         color: AppColors.textPrimaryOf(context),
                       ),

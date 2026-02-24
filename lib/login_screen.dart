@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final Uri forgetPasswordUri = Uri.parse(widget.forgetPasswordUrl);
     final bool launched = await launchUrl(
       forgetPasswordUri,
-      mode: LaunchMode.externalApplication,
+      mode: LaunchMode.inAppWebView,
     );
 
     if (!launched && mounted) {

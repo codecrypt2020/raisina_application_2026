@@ -59,8 +59,11 @@ class Network_request {
       Map<String, dynamic> jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
+        res["data"]["qr_name"] = res["data"]["name"];
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
+        print(
+            'this is the hbb ${Hive.box('LoginDetails').get("Profile_details")}');
         return {"success": true, "message": "Login successful"};
       } else {
         return {
@@ -315,7 +318,7 @@ class Network_request {
               //}
               {
                 "searchText":
-                    "${Hive.box('LoginDetails').get("Profile_details")['name']}",
+                    "${Hive.box('LoginDetails').get("Profile_details")['qr_name']}",
                 "sortby": "id",
                 "page": 1
               }),
@@ -340,10 +343,6 @@ class Network_request {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
-
-
-
-
 
   //   Future Profile_edit_save() async {
   //   try {
@@ -382,7 +381,7 @@ class Network_request {
   //     if (response.statusCode == 200 && jsonData["success"] == true) {
   //       // var res = decryptResponse(response.body);
   //       // return res["data"][0]["user_qr_img"];
-     
+
   //     }
   //   } catch (e) {
   //     debugPrint("this is the error in assignedUserDetailsApi: $e");
@@ -415,7 +414,7 @@ class Network_request {
 
       if (response.statusCode == 200 && jsonData['success'] == true) {
         var res = decryptResponse(response.body);
-    //    _data = res['data'];
+        //    _data = res['data'];
         //fetch day of conference
         // List<Map<String, dynamic>> confernace_days_value =
         //     List<Map<String, dynamic>>.from(_data['sessions']);
@@ -423,9 +422,8 @@ class Network_request {
         //     confernace_days_value.map((e) => e['day_number']).toSet().length;
 
         // //logo short name
-        // _logo_short_name = "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}" "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";        
-       
-       
+        // _logo_short_name = "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}" "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";
+
         // print("Profile data fetched: $data");
         // print({data['profile']?['bio']});
         // notifyListeners();
@@ -435,7 +433,4 @@ class Network_request {
       debugger();
     }
   }
-
-
-
 }
