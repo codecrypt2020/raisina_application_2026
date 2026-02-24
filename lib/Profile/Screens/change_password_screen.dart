@@ -5,6 +5,7 @@ import 'package:attendee_app/utility.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({
     super.key,
@@ -24,7 +25,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   var old_password;
-  var tosattext; 
+  var tosattext;
 
   bool _hideOldPassword = true;
   bool _hideNewPassword = true;
@@ -47,6 +48,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }) {
     return InputDecoration(
       hintText: hintText,
+      hintStyle: TextStyle(
+        fontSize: 13,
+        color: AppColors.textMutedOf(context),
+      ),
       suffixIcon: suffixIcon,
       filled: true,
       fillColor: AppColors.elevatedOf(context),
@@ -81,31 +86,41 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
+  Widget _readOnlyProfileText(BuildContext context, String value) {
+    return Text(
+      value,
+      style: TextStyle(
+        fontSize: 14,
+        color: AppColors.textPrimaryOf(context),
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
 
-void _updatePassword() async {
-  if (!_passwordFormKey.currentState!.validate()) return;
+  void _updatePassword() async {
+    if (!_passwordFormKey.currentState!.validate()) return;
 
-  // Loader show
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => const Center(
-      child: CircularProgressIndicator(),
-    ),
-  );
+    // Loader show
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
 
-  await password_change(); // API call
+    await password_change(); // API call
 
-  Navigator.pop(context); // Loader close
+    Navigator.pop(context); // Loader close
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(tosattext)),
-  );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(tosattext)),
+    );
 
-  Navigator.pop(context, true); // Back screen
-}
+    Navigator.pop(context, true); // Back screen
+  }
 
-   @override
+  @override
   void initState() {
     // TODO: implement initState
     Fetch_emp_profile();
@@ -207,12 +222,8 @@ void _updatePassword() async {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _label(context, 'NAME'),
-                                  TextFormField(
-                                    initialValue: displayName,
-                                    readOnly: true,
-                                    decoration: _fieldDecoration(context),
-                                  ),
+                                  _label(context, 'Name'),
+                                  _readOnlyProfileText(context, displayName),
                                 ],
                               ),
                             ),
@@ -221,32 +232,21 @@ void _updatePassword() async {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _label(context, 'EMAIL'),
-                                  TextFormField(
-                                    initialValue:
-                                        email.isEmpty ? 'Not available' : email,
-                                    readOnly: true,
-                                    decoration: _fieldDecoration(context),
-                                  ),
+                                  _label(context, 'Email'),
+                                  _readOnlyProfileText(context,
+                                      email.isEmpty ? 'Not available' : email),
                                 ],
                               ),
                             ),
                           ],
                         )
                       else ...[
-                        _label(context, 'NAME'),
-                        TextFormField(
-                          initialValue: displayName,
-                          readOnly: true,
-                          decoration: _fieldDecoration(context),
-                        ),
+                        _label(context, 'Name'),
+                        _readOnlyProfileText(context, displayName),
                         const SizedBox(height: 14),
-                        _label(context, 'EMAIL'),
-                        TextFormField(
-                          initialValue: email.isEmpty ? 'Not available' : email,
-                          readOnly: true,
-                          decoration: _fieldDecoration(context),
-                        ),
+                        _label(context, 'Email'),
+                        _readOnlyProfileText(
+                            context, email.isEmpty ? 'Not available' : email),
                       ],
                       const SizedBox(height: 16),
                       Center(
@@ -306,7 +306,7 @@ void _updatePassword() async {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _label(context, 'OLD PASSWORD'),
+                                    _label(context, 'Old Password'),
                                     TextFormField(
                                       controller: _oldPasswordController,
                                       obscureText: _hideOldPassword,
@@ -343,7 +343,7 @@ void _updatePassword() async {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _label(context, 'NEW PASSWORD'),
+                                    _label(context, 'New Password'),
                                     TextFormField(
                                       controller: _newPasswordController,
                                       obscureText: _hideNewPassword,
@@ -372,7 +372,7 @@ void _updatePassword() async {
                                         // if (value.length < 8) {
                                         //   return 'Use at least 8 characters';
                                         // }
-                                       // return null;
+                                        // return null;
                                       },
                                     ),
                                   ],
@@ -383,7 +383,7 @@ void _updatePassword() async {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _label(context, 'CONFIRM PASSWORD'),
+                                    _label(context, 'Confirm Password'),
                                     TextFormField(
                                       controller: _confirmPasswordController,
                                       obscureText: _hideConfirmPassword,
@@ -422,7 +422,7 @@ void _updatePassword() async {
                             ],
                           )
                         else ...[
-                          _label(context, 'OLD PASSWORD'),
+                          _label(context, 'Old Password'),
                           TextFormField(
                             controller: _oldPasswordController,
                             obscureText: _hideOldPassword,
@@ -450,7 +450,7 @@ void _updatePassword() async {
                             },
                           ),
                           const SizedBox(height: 14),
-                          _label(context, 'NEW PASSWORD'),
+                          _label(context, 'New Password'),
                           TextFormField(
                             controller: _newPasswordController,
                             obscureText: _hideNewPassword,
@@ -477,11 +477,11 @@ void _updatePassword() async {
                               // if (value.length < 8) {
                               //   return 'Use at least 8 characters';
                               // }
-                             // return null;
+                              // return null;
                             },
                           ),
                           const SizedBox(height: 14),
-                          _label(context, 'CONFIRM PASSWORD'),
+                          _label(context, 'Confirm Password'),
                           TextFormField(
                             controller: _confirmPasswordController,
                             obscureText: _hideConfirmPassword,
@@ -548,8 +548,8 @@ void _updatePassword() async {
       ),
     );
   }
+
   Future Fetch_emp_profile() async {
- 
     try {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.emp_profile),
@@ -565,29 +565,25 @@ void _updatePassword() async {
         },
         body: jsonEncode(
           encryptPayload(
-            {             
-                 "empId": null
-          },
-              ),
+            {"empId": null},
+          ),
         ),
       );
       print(
           'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
-        old_password =jsonData['data'][0]['password'];
+        old_password = jsonData['data'][0]['password'];
         print("password test:${old_password}");
         // var res = decryptResponse(response.body);
         // return res["data"][0]["user_qr_img"];
-    
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
 
-   Future password_change() async {
-     
+  Future password_change() async {
     try {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.Change_password),
@@ -603,13 +599,15 @@ void _updatePassword() async {
         },
         body: jsonEncode(
           encryptPayload(
-            {             
-    "oldPassword": "${_oldPasswordController.text}",
-    "newPassword": "${_newPasswordController.text }",//!= old_password ?_newPasswordController.text :old_password}",
-    "confirmNewPassword": "${_confirmPasswordController.text }", //!= old_password ?_confirmPasswordController.text :old_password}",
-    "email": "${widget.profile['primary_email']}"
-          },
-              ),
+            {
+              "oldPassword": "${_oldPasswordController.text}",
+              "newPassword":
+                  "${_newPasswordController.text}", //!= old_password ?_newPasswordController.text :old_password}",
+              "confirmNewPassword":
+                  "${_confirmPasswordController.text}", //!= old_password ?_confirmPasswordController.text :old_password}",
+              "email": "${widget.profile['primary_email']}"
+            },
+          ),
         ),
       );
       print(
@@ -617,9 +615,7 @@ void _updatePassword() async {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         tosattext = jsonData['message'];
-             setState(() {
-               
-             });     
+        setState(() {});
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
