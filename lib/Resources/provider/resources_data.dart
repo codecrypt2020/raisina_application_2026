@@ -23,12 +23,13 @@ class ResourcesData with ChangeNotifier {
 
   List<ResourceCategory> _categories = [
     ResourceCategory(label: 'All', count: 2, isSelected: true, index: 0),
+    ResourceCategory(label: 'For you', count: 0, index: 6),
     ResourceCategory(label: 'Event Info', count: 0, index: 1),
     ResourceCategory(label: 'Sessions', count: 1, index: 2),
     ResourceCategory(label: 'Media Kit', count: 0, index: 3),
     ResourceCategory(label: 'Speaker', count: 0, index: 4),
     ResourceCategory(label: 'General', count: 0, index: 5),
-    ResourceCategory(label: 'For you', count: 0, index: 6),
+    // ResourceCategory(label: 'For you', count: 0, index: 6),
   ];
 
   get data {
