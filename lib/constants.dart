@@ -28,4 +28,5 @@ class Constants {
   static const String allresourcesapi = "qr/resources/all-resources";
   static const String get_user_qr = "qr/user_list";
   static const String delete_account = "emp/delete-user";
+  static const String mapsApi = "qr/maps/floorwise/maps";
 }
