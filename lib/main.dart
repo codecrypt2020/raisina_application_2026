@@ -179,6 +179,30 @@ class AttendeeHomePage extends StatefulWidget {
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
   int _selectedIndex = 0;
 
+  String _currentProfileName() {
+    final profile = Hive.box('LoginDetails').get("Profile_details");
+    if (profile is Map && profile['name'] != null) {
+      return profile['name'].toString().trim();
+    }
+    return "";
+  }
+
+  String _profileInitials(String name) {
+    final normalized = name.trim();
+    if (normalized.isEmpty) return "US";
+    final parts = normalized
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      return "${parts[0][0]}${parts[1][0]}".toUpperCase();
+    }
+    if (normalized.length >= 2) {
+      return normalized.substring(0, 2).toUpperCase();
+    }
+    return normalized.substring(0, 1).toUpperCase();
+  }
+
   void _openPanelPage(Widget page) {
     Navigator.of(context).pop();
     Navigator.of(context).push(
@@ -223,11 +247,19 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                       style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondaryOf(context))),
-                  Text(
-                      "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
-                      style: TextStyle(
+                  ValueListenableBuilder(
+                    valueListenable: Hive.box('LoginDetails')
+                        .listenable(keys: const ['Profile_details']),
+                    builder: (context, box, _) {
+                      return Text(
+                        _currentProfileName(),
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondaryOf(context))),
+                          color: AppColors.textSecondaryOf(context),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
               SizedBox(height: 4),
@@ -273,9 +305,18 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.surfaceSoftOf(context),
-                child: Text(
-                    "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
-                    style: TextStyle(color: AppColors.textPrimaryOf(context))),
+                child: ValueListenableBuilder(
+                  valueListenable: Hive.box('LoginDetails')
+                      .listenable(keys: const ['Profile_details']),
+                  builder: (context, box, _) {
+                    return Text(
+                      _profileInitials(_currentProfileName()),
+                      style: TextStyle(
+                        color: AppColors.textPrimaryOf(context),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],

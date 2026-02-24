@@ -22,6 +22,7 @@ class ProfileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProfileData>(context, listen: true);
+    const roleChipColor = Color(0xFF0C72A3);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -37,61 +38,74 @@ class ProfileList extends StatelessWidget {
                     fontWeight: FontWeight.w700),
               ),
             ),
-            SizedBox(width: 16),
-            Column(
+            const SizedBox(width: 16),
+            Expanded(
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   // "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
-                        // "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
-                     "${provider.data["profile"]["name"]}",
+                  // "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
+                  "${provider.data["profile"]["name"]}",
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimaryOf(context)),
                 ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: provider.data['profile']['designation'] ?? " ",
-                            style: TextStyle(
-                              color: AppColors.textSecondaryOf(context),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' · ',
-                            style: TextStyle(
-                              color: AppColors.textSecondaryOf(context),
-                            ),
-                          ),
-                          TextSpan(
-                            text: provider.data['profile']['organization'] ?? " ",
-                            style: TextStyle(
-                              color: AppColors.textSecondaryOf(context),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                const SizedBox(height: 4),
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: provider.data['profile']['designation'] ?? " ",
+                        style: TextStyle(
+                          color: AppColors.textSecondaryOf(context),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                      TextSpan(
+                        text: ' · ',
+                        style: TextStyle(
+                          color: AppColors.textSecondaryOf(context),
+                        ),
+                      ),
+                      TextSpan(
+                        text: provider.data['profile']['organization'] ?? " ",
+                        style: TextStyle(
+                          color: AppColors.textSecondaryOf(context),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  softWrap: true,
                 ),
-                 SizedBox(height: 4),
-                 Text(
-                       "${provider.userRole_name}",
-                        style: const TextStyle(
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 20,
-                     ),
+                const SizedBox(height: 4),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: roleChipColor, width: 1.4),
+                  ),
+                  child: Text(
+                    (provider.userRole_name?.toString().trim().isNotEmpty ==
+                                true
+                            ? provider.userRole_name.toString()
+                            : 'Speaker')
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      color: roleChipColor,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.0,
+                      // fontSize: 18,
+                    ),
+                  ),
                 ),
               ],
-            )
+            ))
           ],
         ),
         const SizedBox(height: 24),
@@ -149,7 +163,7 @@ class ProfileList extends StatelessWidget {
             Expanded(
               child: StatCard(
                 value: "${provider.data['sessions']?.length ?? 0}",
-                label: 'SPEAKING SESSIONS',
+                label: 'SPEAKING SESSION',
               ),
             ),
             SizedBox(width: 10),
@@ -162,11 +176,12 @@ class ProfileList extends StatelessWidget {
             SizedBox(width: 10),
             Expanded(
               child: StatCard(
-                value:
-                    (provider.data['profile']['dining_invites']?.toString().isNotEmpty ==
-                            true)
-                        ? provider.data['profile']['dining_invites'].toString()
-                        : "0",
+                value: (provider.data['profile']['dining_invites']
+                            ?.toString()
+                            .isNotEmpty ==
+                        true)
+                    ? provider.data['profile']['dining_invites'].toString()
+                    : "0",
                 label: 'DINING INVITES',
               ),
             ),
@@ -194,7 +209,7 @@ class ProfileList extends StatelessWidget {
                 InfoCard(
                   title: 'Biography',
                   child: Text(
-                    '${provider.data['profile']['bio'] !="" ? provider.data['profile']['bio']:"No biography provided."}',
+                    '${provider.data['profile']['bio'] != "" ? provider.data['profile']['bio'] : "No biography provided."}',
                     style: TextStyle(
                         color: AppColors.textSecondaryOf(context), height: 1.4),
                   ),
@@ -212,7 +227,8 @@ class ProfileList extends StatelessWidget {
                     runSpacing: 8,
                     children: [
                       TagChip(
-                          label: provider.data['profile']['area_of_expertise'] ??
+                          label: provider.data['profile']
+                                  ['area_of_expertise'] ??
                               "Not specified"),
                     ],
                   ),
@@ -244,7 +260,8 @@ class ProfileList extends StatelessWidget {
                 InfoCard(
                   title: 'Conference Details',
                   child: DetailsTable(
-                      status: provider.data['profile']['status'] ?? "Not available",
+                      status:
+                          provider.data['profile']['status'] ?? "Not available",
                       dietaryPreference: provider.data['profile']
                               ['dietary_requirements'] ??
                           "Not available"),
@@ -254,7 +271,8 @@ class ProfileList extends StatelessWidget {
                   title: 'Social Connect',
                   child: Text(
                     (() {
-                      final twitter = provider.data['profile']['social']?['twitter'];
+                      final twitter =
+                          provider.data['profile']['social']?['twitter'];
                       return (twitter == null ||
                               twitter.toString().trim().isEmpty)
                           ? "Not available"
@@ -339,8 +357,8 @@ class ProfileList extends StatelessWidget {
                     ),
                   ),
                 ).then((value) {
-                      provider.fetchUserProfile();//after profile edit call api 
-               });
+                  provider.fetchUserProfile(); //after profile edit call api
+                });
               },
               child: Ink(
                 padding:
