@@ -9,6 +9,7 @@ import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main
 import 'package:attendee_app/Maps/Screens/mapMain.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/login_screen.dart';
+import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -94,6 +95,15 @@ class AttendeeHomePage extends StatefulWidget {
 }
 
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
+  bool isSpeakingEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isSpeakingEnabled =
+        Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+  }
+
   int _selectedIndex = 0;
 
   void _openPanelPage(Widget page) {
@@ -103,14 +113,28 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     );
   }
 
-  final List<Widget> _pages = [
-    // HomeDashboard(),
-    AgendaMain(),
-    DiningMain(),
-    SpeakingMain(),
-    // NetworkingView(),
-    ProfileView(),
-  ];
+  // final List<Widget> _pages = [
+  //   // HomeDashboard(),
+  //   AgendaMain(),
+  //   DiningMain(),
+  //   SpeakingMain(),
+  //   // NetworkingView(),
+  //   ProfileView(),
+  // ];
+  List<Widget> get _pages {
+    final pages = [
+      AgendaMain(),
+      DiningMain(),
+    ];
+
+    if (isSpeakingEnabled) {
+      pages.add(SpeakingMain());
+    }
+
+    pages.add(ProfileView());
+
+    return pages;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -218,26 +242,32 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         body: _pages[_selectedIndex],
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
-          onDestinationSelected: (index) {
+          onDestinationSelected: (index) async {
+            await Network_request.assignedUserDetails();
+            isSpeakingEnabled =
+                Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
             setState(() {
               _selectedIndex = index;
             });
           },
-          destinations: const [
-            NavigationDestination(
+          destinations: [
+            const NavigationDestination(
               icon: Icon(Icons.event_note_outlined),
               label: 'Agenda',
             ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.wine_bar_outlined),
               label: 'Dining',
             ),
-            NavigationDestination(
-              icon: Icon(Icons.school_outlined),
-              label: 'Speaking Eng',
+            if (isSpeakingEnabled)
+              const NavigationDestination(
+                icon: Icon(Icons.school_outlined),
+                label: 'Speaking Eng',
+              ),
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              label: 'Profile',
             ),
-            NavigationDestination(
-                icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ),
