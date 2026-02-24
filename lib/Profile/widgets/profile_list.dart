@@ -21,9 +21,7 @@ class ProfileList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var data = Provider.of<ProfileData>(context, listen: true).data;
-    var totalUniqueDays =
-        Provider.of<ProfileData>(context, listen: true).totalUniqueDays;
+    final provider = Provider.of<ProfileData>(context, listen: true);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -33,7 +31,7 @@ class ProfileList extends StatelessWidget {
               radius: 30,
               backgroundColor: AppColors.gold,
               child: Text(
-                "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
+                "${provider.logo_short_name}",
                 style: TextStyle(
                     color: AppColors.textPrimaryOf(context),
                     fontWeight: FontWeight.w700),
@@ -44,7 +42,9 @@ class ProfileList extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
+                  // "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
+                        // "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
+                     "${provider.data["profile"]["name"]}",
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -57,7 +57,7 @@ class ProfileList extends StatelessWidget {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: data['profile']['designation'] ?? " ",
+                            text: provider.data['profile']['designation'] ?? " ",
                             style: TextStyle(
                               color: AppColors.textSecondaryOf(context),
                               fontWeight: FontWeight.w600,
@@ -70,7 +70,7 @@ class ProfileList extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: data['profile']['organization'] ?? " ",
+                            text: provider.data['profile']['organization'] ?? " ",
                             style: TextStyle(
                               color: AppColors.textSecondaryOf(context),
                               fontWeight: FontWeight.w600,
@@ -80,6 +80,15 @@ class ProfileList extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                 SizedBox(height: 4),
+                 Text(
+                       "${provider.userRole_name}",
+                        style: const TextStyle(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                     ),
                 ),
               ],
             )
@@ -139,14 +148,14 @@ class ProfileList extends StatelessWidget {
           children: [
             Expanded(
               child: StatCard(
-                value: "${data['sessions']?.length ?? 0}",
+                value: "${provider.data['sessions']?.length ?? 0}",
                 label: 'SPEAKING SESSIONS',
               ),
             ),
             SizedBox(width: 10),
             Expanded(
               child: StatCard(
-                value: "${totalUniqueDays}",
+                value: "${provider.totalUniqueDays}",
                 label: 'CONFERENCE DAYS',
               ),
             ),
@@ -154,9 +163,9 @@ class ProfileList extends StatelessWidget {
             Expanded(
               child: StatCard(
                 value:
-                    (data['profile']['dining_invites']?.toString().isNotEmpty ==
+                    (provider.data['profile']['dining_invites']?.toString().isNotEmpty ==
                             true)
-                        ? data['profile']['dining_invites'].toString()
+                        ? provider.data['profile']['dining_invites'].toString()
                         : "0",
                 label: 'DINING INVITES',
               ),
@@ -166,26 +175,26 @@ class ProfileList extends StatelessWidget {
         const SizedBox(height: 16),
         // Provider.of<ProfileData>(context, listen: false)
         //     .buildProfileDetailsGrid(
-        //   Provider.of<ProfileData>(context, listen: false).data,
+        //   Provider.of<ProfileData>(context, listen: false).provider.data,
         // ),
-        // Widget buildProfileDetailsGrid(Map data) {
+        // Widget buildProfileDetailsGrid(Map provider.data) {
 
         LayoutBuilder(
           builder: (context, constraints) {
             final bool isWide = constraints.maxWidth > 860;
             final String email =
-                "${data['profile']["primary_email"] ?? "not available"}";
+                "${provider.data['profile']["primary_email"] ?? "not available"}";
             final String phone =
-                "${data['profile']["country_code"] ?? ""} ${data['profile']["primary_phone"] ?? "not available"}";
-            //     "${data['profile']["primary_phone"] ?? "not available"}";
+                "${provider.data['profile']["country_code"] ?? ""} ${provider.data['profile']["primary_phone"] ?? "not available"}";
+            //     "${provider.data['profile']["primary_phone"] ?? "not available"}";
             final String organization =
-                "${data['profile']["organization"] ?? "not available"}";
+                "${provider.data['profile']["organization"] ?? "not available"}";
             final Widget leftColumn = Column(
               children: [
                 InfoCard(
                   title: 'Biography',
                   child: Text(
-                    '${data['profile']['bio'] ?? "No biography available."}',
+                    '${provider.data['profile']['bio'] !="" ? provider.data['profile']['bio']:"No biography provided."}',
                     style: TextStyle(
                         color: AppColors.textSecondaryOf(context), height: 1.4),
                   ),
@@ -193,7 +202,7 @@ class ProfileList extends StatelessWidget {
                 SizedBox(height: 12),
                 InfoCard(
                   title: 'Speaking Sessions',
-                  child: SessionTile(sessions: data['sessions'] ?? []),
+                  child: SessionTile(sessions: provider.data['sessions'] ?? []),
                 ),
                 SizedBox(height: 12),
                 InfoCard(
@@ -203,7 +212,7 @@ class ProfileList extends StatelessWidget {
                     runSpacing: 8,
                     children: [
                       TagChip(
-                          label: data['profile']['area_of_expertise'] ??
+                          label: provider.data['profile']['area_of_expertise'] ??
                               "Not specified"),
                     ],
                   ),
@@ -235,8 +244,8 @@ class ProfileList extends StatelessWidget {
                 InfoCard(
                   title: 'Conference Details',
                   child: DetailsTable(
-                      status: data['profile']['status'] ?? "Not available",
-                      dietaryPreference: data['profile']
+                      status: provider.data['profile']['status'] ?? "Not available",
+                      dietaryPreference: provider.data['profile']
                               ['dietary_requirements'] ??
                           "Not available"),
                 ),
@@ -245,7 +254,7 @@ class ProfileList extends StatelessWidget {
                   title: 'Social Connect',
                   child: Text(
                     (() {
-                      final twitter = data['profile']['social']?['twitter'];
+                      final twitter = provider.data['profile']['social']?['twitter'];
                       return (twitter == null ||
                               twitter.toString().trim().isEmpty)
                           ? "Not available"
@@ -326,10 +335,12 @@ class ProfileList extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) => EditProfileScreen(
-                      profile: data['profile'] ?? {},
+                      profile: provider.data['profile'] ?? {},
                     ),
                   ),
-                );
+                ).then((value) {
+                      provider.fetchUserProfile();//after profile edit call api 
+               });
               },
               child: Ink(
                 padding:
@@ -386,7 +397,7 @@ class ProfileList extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) => ChangePasswordScreen(
-                      profile: data['profile'] ?? {},
+                      profile: provider.data['profile'] ?? {},
                     ),
                   ),
                 );

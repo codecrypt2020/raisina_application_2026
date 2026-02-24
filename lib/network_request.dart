@@ -340,4 +340,102 @@ class Network_request {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
+
+
+
+
+
+  //   Future Profile_edit_save() async {
+  //   try {
+  //     var response = await http.post(
+  //       Uri.parse(Constants.NODE_URL + Constants.profile_edit),
+  //       headers: {
+  //         "x-encrypted": "1",
+  //         //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+  //         // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+  //         'x-access-token':
+  //             '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+  //         'x-access-type':
+  //             '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+  //         'Content-Type': 'application/json',
+  //       },
+  //       // body: jsonEncode(
+  //       //   encryptPayload(
+  //       //         //  "title": "Mr",
+  //       //         //  "firstName": "harshit",
+  //       //         //  "lastName": "microsftIDa",
+  //       //         //  "countryCode": "+109",
+  //       //         //  "phone": "1234567890",
+  //       //         //  "bio": "bio changes test",
+  //       //         // "twitter_handle": "",
+  //       //         // "linkedin_url": "",
+  //       //         // "website_url": "",
+  //       //         // "dietary_preference": "Vegetarian",
+  //       //         // "id": 38,
+  //       //         // "email": "harshit.b@momentumindia.in"
+  //       //       ),
+  //       // ),
+  //     );
+  //     print(
+  //         'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
+  //     var jsonData = decryptResponse(response.body);
+  //     if (response.statusCode == 200 && jsonData["success"] == true) {
+  //       // var res = decryptResponse(response.body);
+  //       // return res["data"][0]["user_qr_img"];
+     
+  //     }
+  //   } catch (e) {
+  //     debugPrint("this is the error in assignedUserDetailsApi: $e");
+  //   }
+  // }
+
+  dynamic fetchUserProfile() async {
+    try {
+      var profileDetails = Hive.box('LoginDetails').get("Profile_details");
+
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.userProfileApi),
+        headers: {
+          "x-encrypted": "1",
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({
+            "email": "${profileDetails['email']}",
+            "userId": "${profileDetails['userId']}"
+          }),
+        ),
+      );
+
+      var jsonData = decryptResponse(response.body);
+
+      if (response.statusCode == 200 && jsonData['success'] == true) {
+        var res = decryptResponse(response.body);
+    //    _data = res['data'];
+        //fetch day of conference
+        // List<Map<String, dynamic>> confernace_days_value =
+        //     List<Map<String, dynamic>>.from(_data['sessions']);
+        // _totalUniqueDays =
+        //     confernace_days_value.map((e) => e['day_number']).toSet().length;
+
+        // //logo short name
+        // _logo_short_name = "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}" "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";        
+       
+       
+        // print("Profile data fetched: $data");
+        // print({data['profile']?['bio']});
+        // notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error in fetchUserProfile: $e");
+      debugger();
+    }
+  }
+
+
+
 }

@@ -30,4 +30,7 @@ class Constants {
   static const String allresourcesapi = "qr/resources/all-resources";
   static const String get_user_qr = "qr/user_list";
   static const String userProfileApi = "userinfo/profile";
+  static const String profile_edit = "userinfo/profile/update";
+  static const String Change_password= "emp/profile/password";
+  static const String emp_profile ="emp/profile";
 }

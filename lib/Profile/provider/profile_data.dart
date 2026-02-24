@@ -14,11 +14,45 @@ import '../../utility.dart';
 import 'package:hive/hive.dart';
 
 class ProfileData with ChangeNotifier {
-  var _data;
-  get data => _data;
+  
+  //varible
+  var _data;  
   var _totalUniqueDays;
+  var _logo_short_name;
+  var _userRole_name;
+
+  //geter
+  get data => _data;
   get totalUniqueDays => _totalUniqueDays;
+  get logo_short_name => _logo_short_name;
+  get userRole_name  => _userRole_name;
+
+ 
+  fetch_userRolde(){
+      var userRole =  Hive.box('LoginDetails').get("Profile_details")['userRole'];
+      if(userRole == 1){
+        _userRole_name ="SPEAKER";
+      }
+      else if(userRole == 2){
+        _userRole_name ="DELEGATE";
+      }
+      else if(userRole == 3){
+        _userRole_name = "AFGG";
+      } 
+      else if(userRole == 4){
+        _userRole_name = "PARTICIPANTS";
+      }
+      else if(userRole == 5){
+       _userRole_name = "MEDIA";
+      }
+      else{
+       _userRole_name = "-NA-";
+      }
+  }
+
+
   Future<void> fetchUserProfile() async {
+    fetch_userRolde();
     try {
       var profileDetails = Hive.box('LoginDetails').get("Profile_details");
 
@@ -50,9 +84,17 @@ class ProfileData with ChangeNotifier {
             List<Map<String, dynamic>>.from(_data['sessions']);
         _totalUniqueDays =
             confernace_days_value.map((e) => e['day_number']).toSet().length;
+
+        //logo short name
+        _logo_short_name = "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}" "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";        
+             
+        var profile = Map<String, dynamic>.from(Hive.box('LoginDetails').get("Profile_details"));
+        profile['name'] = _data['profile']['name'];
+        Hive.box('LoginDetails').put("Profile_details", profile);
+
         print("Profile data fetched: $data");
         print({data['profile']?['bio']});
-        // notifyListeners();
+        notifyListeners();
       }
     } catch (e) {
       debugPrint("Error in fetchUserProfile: $e");

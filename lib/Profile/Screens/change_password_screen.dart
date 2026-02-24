@@ -1,6 +1,10 @@
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
-
+import 'package:attendee_app/constants.dart';
+import 'package:attendee_app/utility.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({
     super.key,
@@ -19,6 +23,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  var old_password;
+  var tosattext; 
 
   bool _hideOldPassword = true;
   bool _hideNewPassword = true;
@@ -75,13 +81,35 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
-  void _updatePassword() {
-    if (!_passwordFormKey.currentState!.validate()) {
-      return;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Update password UI ready')),
-    );
+
+void _updatePassword() async {
+  if (!_passwordFormKey.currentState!.validate()) return;
+
+  // Loader show
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  await password_change(); // API call
+
+  Navigator.pop(context); // Loader close
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(tosattext)),
+  );
+
+  Navigator.pop(context, true); // Back screen
+}
+
+   @override
+  void initState() {
+    // TODO: implement initState
+    Fetch_emp_profile();
+    super.initState();
   }
 
   @override
@@ -341,10 +369,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                             value.trim().isEmpty) {
                                           return 'Enter new password';
                                         }
-                                        if (value.length < 8) {
-                                          return 'Use at least 8 characters';
-                                        }
-                                        return null;
+                                        // if (value.length < 8) {
+                                        //   return 'Use at least 8 characters';
+                                        // }
+                                       // return null;
                                       },
                                     ),
                                   ],
@@ -446,10 +474,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               if (value == null || value.trim().isEmpty) {
                                 return 'Enter new password';
                               }
-                              if (value.length < 8) {
-                                return 'Use at least 8 characters';
-                              }
-                              return null;
+                              // if (value.length < 8) {
+                              //   return 'Use at least 8 characters';
+                              // }
+                             // return null;
                             },
                           ),
                           const SizedBox(height: 14),
@@ -519,5 +547,82 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ),
       ),
     );
+  }
+  Future Fetch_emp_profile() async {
+ 
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.emp_profile),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload(
+            {             
+                 "empId": null
+          },
+              ),
+        ),
+      );
+      print(
+          'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        old_password =jsonData['data'][0]['password'];
+        print("password test:${old_password}");
+        // var res = decryptResponse(response.body);
+        // return res["data"][0]["user_qr_img"];
+    
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
+    }
+  }
+
+   Future password_change() async {
+     
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.Change_password),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload(
+            {             
+    "oldPassword": "${_oldPasswordController.text}",
+    "newPassword": "${_newPasswordController.text }",//!= old_password ?_newPasswordController.text :old_password}",
+    "confirmNewPassword": "${_confirmPasswordController.text }", //!= old_password ?_confirmPasswordController.text :old_password}",
+    "email": "${widget.profile['primary_email']}"
+          },
+              ),
+        ),
+      );
+      print(
+          'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        tosattext = jsonData['message'];
+             setState(() {
+               
+             });     
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
+    }
   }
 }

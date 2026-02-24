@@ -1,5 +1,11 @@
+import 'dart:convert';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:country_code_picker/country_code_picker.dart';
+import 'package:attendee_app/constants.dart';
+import 'package:attendee_app/utility.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -20,9 +26,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController _lastNameController;
   late final TextEditingController _phoneController;
   late final TextEditingController _bioController;
-  late final TextEditingController _dietaryController;
+  //late final TextEditingController _dietaryController;
+  var _selectedDietary;
+  var _primary_email;
+  var _id;
+  String _selectedCountryCode = "+91";
 
-  final List<String> _titles = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
+  // final List<String> _titles = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
+  final List<String> _titles = [
+  'Mr.',
+  'Ms.',
+  'Mrs.',
+  'Dr.',
+  'Prof.',
+  'Shri',
+  'Smt.',
+  'Amb.',
+  'Senator',
+  'Brig',
+  'Maj. Gen.',
+  'Lt. Gen.',
+  'Air Mshl',
+  'AVM',
+  'VADM',
+  'H.E. Mr.',
+  'H.E. Ms.',
+  'H.E. Amb.',
+  'H.E. Dr.'
+];
   String _selectedTitle = 'Mr.';
 
   @override
@@ -46,9 +77,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         TextEditingController(text: _asString(widget.profile['primary_phone']));
     _bioController =
         TextEditingController(text: _asString(widget.profile['bio']));
-    _dietaryController = TextEditingController(
-      text: _asString(widget.profile['dietary_requirements']),
-    );
+    // _dietaryController = TextEditingController(
+    //   text: _asString(widget.profile['dietary_requirements']),
+    // );
+    _selectedDietary = _asString(widget.profile['dietary_requirements']);
+    _primary_email = _asString(widget.profile['primary_email']);
+    _id = _asString(widget.profile['id']);
   }
 
   @override
@@ -57,7 +91,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _lastNameController.dispose();
     _phoneController.dispose();
     _bioController.dispose();
-    _dietaryController.dispose();
+   // _dietaryController.dispose();
+   // _selectedDietary.dispose();
     super.dispose();
   }
 
@@ -105,16 +140,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  void _saveProfile() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    Navigator.pop(context);
+  bool _validateRequiredFields() {
+  if (_firstNameController.text.trim().isEmpty ||
+      _lastNameController.text.trim().isEmpty ||
+      _phoneController.text.trim().isEmpty ||
+     // _dietaryController.text.trim().isEmpty
+       _selectedDietary == null
+      ) {
+     
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile update UI ready')),
+      const SnackBar(
+        content: Text("Please fill in all required fields"),
+        duration: Duration(seconds: 2),
+      ),
     );
+
+    return false;
   }
+
+  return true;
+  }
+
+  void _saveProfile() {
+
+  if (!_validateRequiredFields()) {
+    return;
+  }
+
+
+  if (!_formKey.currentState!.validate()) {
+    return;
+  }
+
+  Profile_edit_save();
+
+  Navigator.pop(context, true);
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Profile updated successfully')),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -264,12 +329,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ],
                         const SizedBox(height: 16),
+                        // _label(context, 'PRIMARY PHONE'),
+                        // TextFormField(
+                        //   controller: _phoneController,
+                        //   keyboardType: TextInputType.phone,
+                        //   decoration: _fieldDecoration(context),
+                        // ),
                         _label(context, 'PRIMARY PHONE'),
-                        TextFormField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: _fieldDecoration(context),
-                        ),
+
+                    TextFormField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: _fieldDecoration(context).copyWith(
+                        prefixIcon: CountryCodePicker(
+                          onChanged: (country) {
+                            _selectedCountryCode = country.dialCode ?? "+91";
+                          },
+                            initialSelection: widget.profile["country_code"] ?? 'IN',
+                          // favorite: const ['+91', 'US', 'GB'],
+                          showCountryOnly: false,
+                          showOnlyCountryWhenClosed: false,
+                            showFlag: true,
+                            alignLeft: false,
+                            padding: EdgeInsets.zero,
+                          ),
+                       ),
+                    ),
                         const SizedBox(height: 16),
                         _label(context, 'BIO (Not more than 50 Words)'),
                         TextFormField(
@@ -292,11 +377,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        _label(context, 'DIETARY PREFERENCE'),
-                        TextFormField(
-                          controller: _dietaryController,
-                          decoration: _fieldDecoration(context),
-                        ),
+                      //   _label(context, 'DIETARY PREFERENCE'),
+                      //   TextFormField(
+                      //     controller: _dietaryController,
+                      //     decoration: _fieldDecoration(context),
+                      //  ),
+                     
+
+_label(context, 'DIETARY PREFERENCE'),
+
+DropdownButtonFormField<String>(
+  value: _selectedDietary,
+  decoration: _fieldDecoration(context),
+  items: const [
+    DropdownMenuItem(value: 'Vegetarian', child: Text('Vegetarian')),
+    DropdownMenuItem(value: 'Non-Vegetarian', child: Text('Non-Vegetarian')),
+    DropdownMenuItem(value: 'Vegan', child: Text('Vegan')),
+    DropdownMenuItem(value: 'Other', child: Text('Other')),
+  ],
+  onChanged: (value) {
+    setState(() {
+      _selectedDietary = value!;
+    });
+  },
+),
                       ],
                     ),
                   ),
@@ -361,5 +465,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
+  }
+    Future Profile_edit_save() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.profile_edit),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({             
+                 "title": "${_selectedTitle}",//
+                 "firstName": "${_firstNameController.text}",
+                 "lastName": "${_lastNameController.text}",
+                 "countryCode": "${_selectedCountryCode}",
+                 "phone": "${_phoneController.text}",
+                 "bio": "${_bioController.text}",
+                "twitter_handle": "",
+                "linkedin_url": "",
+                "website_url": "",
+                "dietary_preference": "${_selectedDietary}",
+                "id": "${_id}",//
+                "email": '${_primary_email}',//
+          },
+              ),
+        ),
+      );
+      print(
+          'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
+    }
   }
 }
