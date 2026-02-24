@@ -25,6 +25,13 @@ class Resources_view extends StatefulWidget {
 
 class _Resources_viewState extends State<Resources_view> {
   List<GlobalKey> _chipKeys = [];
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -55,17 +62,17 @@ class _Resources_viewState extends State<Resources_view> {
     final provider = Provider.of<ResourcesData>(context);
     List<Widget> widgetss = [
       if (provider.selectedCategoryIndex == 0)
-        Alldata(data: provider.data)
+        const Alldata()
       else if (provider.selectedCategoryIndex == 1)
-        ForYou()
+        const ForYou()
       else if (provider.selectedCategoryIndex == 2)
-        Eventinfo()
+        const Eventinfo()
       else if (provider.selectedCategoryIndex == 3)
-        Sessions()
+        const Sessions()
       else if (provider.selectedCategoryIndex == 4)
         Mediakit()
       else if (provider.selectedCategoryIndex == 5)
-        Speaker()
+        const Speaker()
       else if (provider.selectedCategoryIndex == 6)
         General()
       else
@@ -80,75 +87,93 @@ class _Resources_viewState extends State<Resources_view> {
         )
     ];
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFF8FAFD),
-            Color(0xFFF2F6FC),
-          ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF8FAFD),
+              Color(0xFFF2F6FC),
+            ],
+          ),
         ),
-      ),
-      child: Column(
-        // padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            child: Container(
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppColors.navyElevated,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.navySurface),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search resources...',
-                  hintStyle: TextStyle(color: AppColors.textMuted),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: AppColors.textMuted,
+        child: Column(
+          // padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.navyElevated,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.navySurface),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: provider.setSearchQuery,
+                  decoration: InputDecoration(
+                    hintText: 'Search resources...',
+                    hintStyle: TextStyle(color: AppColors.textMuted),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: AppColors.textMuted,
+                    ),
+                    suffixIcon: provider.searchQuery.isNotEmpty
+                        ? IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              provider.setSearchQuery('');
+                            },
+                            icon: const Icon(
+                              Icons.close,
+                              color: AppColors.textMuted,
+                            ),
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 14),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    provider.categories.asMap().entries.map<Widget>((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: KeyedSubtree(
-                      key: _chipKeys[index],
-                      child: CategoryChip(
-                        item: item,
-                        index: index,
-                        onTap: () {
-                          provider.setSelectedCategoryIndex(index);
-                          _scrollToChip(index);
-                        },
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children:
+                      provider.categories.asMap().entries.map<Widget>((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: KeyedSubtree(
+                        key: _chipKeys[index],
+                        child: CategoryChip(
+                          item: item,
+                          index: index,
+                          onTap: () {
+                            provider.setSelectedCategoryIndex(index);
+                            _scrollToChip(index);
+                          },
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: widgetss[0],
-          )
-        ],
+            Expanded(
+              child: widgetss[0],
+            )
+          ],
+        ),
       ),
     );
   }

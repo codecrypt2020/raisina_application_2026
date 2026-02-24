@@ -11,7 +11,7 @@ class Mediakit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
-    final filteredList = provider.mediaList;
+    final filteredList = provider.searchedMediaList;
 
     if (filteredList.isEmpty) {
       return const Center(

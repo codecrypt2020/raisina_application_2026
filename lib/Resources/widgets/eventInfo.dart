@@ -12,7 +12,7 @@ class Eventinfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
-    final filteredData = provider.eventInfoList;
+    final filteredData = provider.searchedEventInfoList;
 
     if (filteredData.isEmpty) {
       return const Center(

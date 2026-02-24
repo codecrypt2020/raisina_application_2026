@@ -11,11 +11,18 @@ import 'package:intl/intl.dart';
 
 class ResourcesData with ChangeNotifier {
   int _selectedCategoryIndex = 0;
+  String _searchQuery = '';
 
   int get selectedCategoryIndex => _selectedCategoryIndex;
+  String get searchQuery => _searchQuery;
 
   void setSelectedCategoryIndex(int index) {
     _selectedCategoryIndex = index;
+    notifyListeners();
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query.trim();
     notifyListeners();
   }
 
@@ -258,10 +265,46 @@ class ResourcesData with ChangeNotifier {
 
   List<dynamic> get featuredList => _featuredList;
 
+  bool _matchesSearch(dynamic item) {
+    if (_searchQuery.isEmpty) return true;
+    final needle = _searchQuery.toLowerCase();
+    final title = (item['title'] ?? '').toString().toLowerCase();
+    final description = (item['description'] ?? '').toString().toLowerCase();
+    final type = (item['file_type'] ?? '').toString().toLowerCase();
+    final category = getCategoryLabel(item['category_code']).toLowerCase();
+    return title.contains(needle) ||
+        description.contains(needle) ||
+        type.contains(needle) ||
+        category.contains(needle);
+  }
+
+  List<dynamic> _applySearch(List<dynamic> source) {
+    if (_searchQuery.isEmpty) return source;
+    return source.where(_matchesSearch).toList();
+  }
+
+  List<dynamic> get searchedAllList => _applySearch(_allList);
+  List<dynamic> get searchedEventInfoList => _applySearch(_eventInfoList);
+  List<dynamic> get searchedSessionsList => _applySearch(_sessionsList);
+  List<dynamic> get searchedMediaList => _applySearch(_mediaList);
+  List<dynamic> get searchedSpeakerList => _applySearch(_speakerList);
+  List<dynamic> get searchedGeneralList => _applySearch(_generalList);
+  List<dynamic> get searchedFeaturedList => _applySearch(_featuredList);
+
+  Map<String, List<dynamic>> get groupedSearchedAllData {
+    final Map<String, List<dynamic>> grouped = {};
+    for (final item in searchedAllList) {
+      final category = item['category_code'] ?? 'unknown';
+      grouped.putIfAbsent(category, () => <dynamic>[]);
+      grouped[category]!.add(item);
+    }
+    return grouped;
+  }
+
   Map<String, List<dynamic>> get groupedFeaturedData {
     Map<String, List<dynamic>> grouped = {};
 
-    for (var item in _featuredList) {
+    for (var item in searchedFeaturedList) {
       final category = item['category_code'] ?? 'unknown';
 
       if (!grouped.containsKey(category)) {

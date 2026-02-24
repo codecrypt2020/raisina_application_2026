@@ -11,7 +11,7 @@ class Sessions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
-    final filteredList = provider.sessionsList;
+    final filteredList = provider.searchedSessionsList;
 
     if (filteredList.isEmpty) {
       return const Center(

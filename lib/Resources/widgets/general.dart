@@ -11,7 +11,7 @@ class General extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
-    final filteredList = provider.generalList;
+    final filteredList = provider.searchedGeneralList;
 
     if (filteredList.isEmpty) {
       return const Center(

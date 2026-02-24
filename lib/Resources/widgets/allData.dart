@@ -8,30 +8,20 @@ import 'package:attendee_app/Resources/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
 class Alldata extends StatelessWidget {
-  const Alldata({
-    super.key,
-    required this.data,
-  });
-
-  final dynamic data;
+  const Alldata({super.key});
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
+    final groupedData = provider.groupedSearchedAllData;
 
-    final List<dynamic> rawList = data["data"] ?? [];
-
-    // Step 1: Group by category_code
-    final Map<String, List<dynamic>> groupedData = {};
-
-    for (var item in rawList) {
-      final category = item['category_code'] ?? 'unknown';
-
-      if (!groupedData.containsKey(category)) {
-        groupedData[category] = [];
-      }
-
-      groupedData[category]!.add(item);
+    if (groupedData.isEmpty) {
+      return const Center(
+        child: Text(
+          'No resources found',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
     }
 
     // Step 2: Build UI

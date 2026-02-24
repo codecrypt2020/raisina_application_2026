@@ -10,7 +10,7 @@ class Speaker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
-    final filteredList = provider.speakerList;
+    final filteredList = provider.searchedSpeakerList;
 
     if (filteredList.isEmpty) {
       return const Center(
