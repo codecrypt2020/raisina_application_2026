@@ -35,4 +35,6 @@ class Constants {
   static const String profile_edit = "userinfo/profile/update";
   static const String Change_password = "emp/profile/password";
   static const String emp_profile = "emp/profile";
+  static const String emp_profile_save_photo = "emp/profile/save";
+  static const String profile_image = "public-upload/public-upload-profile-pic";
 }

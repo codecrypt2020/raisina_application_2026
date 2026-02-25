@@ -1,10 +1,16 @@
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/utility.dart';
 import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+
 import 'dart:convert';
+
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({
@@ -26,6 +32,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       TextEditingController();
   var old_password;
   var tosattext;
+  var profile_picture;
+  var profileimageurl;
+  File? _selectedImage;
+
+
+final ImagePicker _picker = ImagePicker();
 
   bool _hideOldPassword = true;
   bool _hideNewPassword = true;
@@ -70,6 +82,68 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
     );
   }
+
+
+Future<void> _pickImage(ImageSource source) async {
+  final XFile? pickedFile =
+      await _picker.pickImage(source: source);
+
+  if (pickedFile != null) {
+    setState(() {
+      _selectedImage = File(pickedFile.path);
+    });
+    print("test check image:${_selectedImage}");
+  }
+}
+
+Future<bool> _requestPermissions(ImageSource source) async {
+  if (source == ImageSource.camera) {
+    var status = await Permission.camera.request();
+    return status.isGranted;
+  } else {
+    if (await Permission.photos.isGranted ||
+        await Permission.storage.isGranted) {
+      return true;
+    }
+
+    if (await Permission.photos.request().isGranted) {
+      return true;
+    }
+
+    if (await Permission.storage.request().isGranted) {
+      return true;
+    }
+
+    return false;
+  }
+}
+void _showImagePickerOptions() {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text("Choose from Gallery"),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.gallery);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text("Take Photo"),
+            onTap: () {
+              Navigator.pop(context);
+              _pickImage(ImageSource.camera);
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 
   Widget _label(BuildContext context, String text) {
     return Padding(
@@ -180,40 +254,55 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            CircleAvatar(
-                              radius: 56,
-                              backgroundColor: AppColors.goldDim,
-                              child: Text(
-                                initials.isEmpty ? 'U' : initials,
-                                style: TextStyle(
-                                  color: AppColors.textPrimaryOf(context),
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: -2,
-                              bottom: -2,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.elevatedOf(context),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: AppColors.borderOf(context),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.edit_outlined,
-                                  size: 18,
-                                  color: AppColors.gold,
-                                ),
-                              ),
-                            ),
+              CircleAvatar(
+            radius: 56,
+            backgroundColor: AppColors.goldDim,
+            backgroundImage: _selectedImage != null
+                ? FileImage(_selectedImage!) as ImageProvider
+                : (profile_picture != null &&
+              profile_picture['emp_profilepic'] != null &&
+              profile_picture['emp_profilepic'].toString().isNotEmpty)
+          ? NetworkImage(profile_picture['emp_profilepic']) as ImageProvider
+          : null,
+            child: (_selectedImage == null &&
+              (profile_picture == null ||
+              profile_picture['emp_profilepic'] == null ||
+              profile_picture['emp_profilepic'].toString().isEmpty))
+                ? Text(
+                    initials.isEmpty ? 'U' : initials,
+                    style: TextStyle(
+                      color: AppColors.textPrimaryOf(context),
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  )
+                : null,
+            ),
+            Positioned(
+            right: -2,
+            bottom: -2,
+            child: GestureDetector(
+            onTap: _showImagePickerOptions, 
+            child: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+            color: AppColors.elevatedOf(context),
+            shape: BoxShape.circle,
+            border: Border.all(
+            color: AppColors.borderOf(context),
+           ),
+        ),
+        child: const Icon(
+        Icons.edit_outlined,
+        size: 18,
+        color: AppColors.gold,
+      ),
+    ),
+  ),
+),
                           ],
                         ),
-                      ),
+                      ),  
                       const SizedBox(height: 20),
                       if (isWide)
                         Row(
@@ -253,23 +342,57 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         child: SizedBox(
                           width: 210,
                           height: 48,
-                          child: FilledButton(
-                            onPressed: () {},
-                            style: FilledButton.styleFrom(
-                              backgroundColor: primaryButtonBg,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
+                          child:
+                          // FilledButton(
+                          //   onPressed: () {
+                          //   if(_selectedImage !=null){
+                          //      profileImageUpload(_selectedImage!).then((value) {
+                          //      Fetch_emp_profile();
+                          //      Navigator.pop(context, true);
+                          //      });
+                          //   }                            
+                          //   },
+                          //   style: FilledButton.styleFrom(
+                          //     backgroundColor: primaryButtonBg,
+                          //     foregroundColor: Colors.white,
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(8),
+                          //     ),
+                          //   ),
+                          //   child: const Text(
+                          //     'Save Changes',
+                          //     style: TextStyle(
+                          //       fontWeight: FontWeight.w700,
+                          //       fontSize: 16,
+                          //     ),
+                          //   ),
+                          // ),
+                          FilledButton(
+                         onPressed: _selectedImage == null
+                        ? null
+                        : () async {
+                            await profileImageUpload(_selectedImage!).then((value) {
+                               Fetch_emp_profile();
+                               Navigator.pop(context, true);
+                               });
+                          },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: primaryButtonBg,
+                      disabledBackgroundColor: Colors.grey,  
+                      disabledForegroundColor: Colors.white70,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Save Changes',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                     ),
+                    ),
+                  ),
                         ),
                       ),
                     ],
@@ -565,7 +688,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         },
         body: jsonEncode(
           encryptPayload(
-            {"empId": null},
+            {"empId":null },
           ),
         ),
       );
@@ -574,7 +697,120 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         old_password = jsonData['data'][0]['password'];
-        print("password test:${old_password}");
+        profile_picture =  jsonData['emp_profilepic'][0];
+        setState(() {          
+        });
+        print("password test:${profile_picture}");
+        var res = decryptResponse(response.body);
+        return res["data"][0]["user_qr_img"];
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApidvgdfgghgfjgghgdfdshjffdsffsds : $e");
+    }
+  }
+
+
+Future<void> profileImageUpload(File _selectedImage) async {
+  try {
+    var request = http.MultipartRequest(
+      "POST",
+      Uri.parse(Constants.NODE_URL + Constants.profile_image),
+    );
+
+    // Headers
+    request.headers.addAll({
+      "x-encrypted": "1",
+      'x-access-token':
+          '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+      'x-access-type':
+          '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+    });
+
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        "images", 
+        _selectedImage.path,
+      ),
+    );
+
+
+    // Send request
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonData =decryptResponse(response.body); 
+      profileimageurl = jsonData['image']['url'];
+      emp_profile_save_photo();
+      // Hive.box("LoginDetails")
+      //     .put("Profile_details", jsonData["data"]);
+       print("image url test done:${profileimageurl}");
+      if (mounted) {
+        setState(() {});
+      }
+    } else {
+      print("Upload failed: ${response.statusCode}");
+    }
+
+  } catch (e) {
+    print("This is the error $e");
+  }
+}
+
+//////////////////////////
+///emp_profile_save_photo
+  Future emp_profile_save_photo() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.emp_profile_save_photo),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload(
+   {
+    "name": "${Hive.box('LoginDetails').get("imagsave")['profile']['name']}",
+    "first_name": "${Hive.box('LoginDetails').get("imagsave")['profile']['first_name']}",
+    "last_name": "${Hive.box('LoginDetails').get("imagsave")['profile']['last_name']}",
+    "designation": "${Hive.box('LoginDetails').get("imagsave")['profile']['designation']}",
+    "organization": "${Hive.box('LoginDetails').get("imagsave")['profile']['organization']}",
+    "primary_phone": "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_phone']}",
+    "country_code": "${Hive.box('LoginDetails').get("imagsave")['profile']['country_code']}",
+    "primary_email": "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_email']}",
+    "bio": "${Hive.box('LoginDetails').get("imagsave")['profile']['bio']}",
+    "area_of_expertise": "${Hive.box('LoginDetails').get("imagsave")['profile']['area_of_expertise']}",
+    "social": {
+        "twitter": "${Hive.box('LoginDetails').get("imagsave")['profile']['social']['twitter']}"
+    },
+    "id":  "${Hive.box('LoginDetails').get("imagsave")['profile']['id']}",
+    "qr_internal_id":  "${Hive.box('LoginDetails').get("imagsave")['profile']['qr_internal_id']}",
+    "status":  "${Hive.box('LoginDetails').get("imagsave")['profile']['status']}",
+    "title":  "${Hive.box('LoginDetails').get("imagsave")['profile']['title']}",
+    "dietary_requirements":  "${Hive.box('LoginDetails').get("imagsave")['profile']['dietary_requirements']}",
+    "dining_invites":  "${Hive.box('LoginDetails').get("imagsave")['profile']['dining_invites']}",
+    "email": "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_email']}",
+    "emp_profilepic":"${profileimageurl}",
+
+           },
+          ),
+        ),
+      );
+      print(
+          'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        old_password = jsonData['data'][0]['password'];
+        profile_picture =  jsonData['emp_profilepic'][0];
+        setState(() {          
+        });
+       
         // var res = decryptResponse(response.body);
         // return res["data"][0]["user_qr_img"];
       }

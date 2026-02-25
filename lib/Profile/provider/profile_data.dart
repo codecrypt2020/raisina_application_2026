@@ -20,12 +20,14 @@ class ProfileData with ChangeNotifier {
   var _totalUniqueDays;
   var _logo_short_name;
   var _userRole_name;
+  var _rd_numebr;
 
   //geter
   get data => _data;
   get totalUniqueDays => _totalUniqueDays;
   get logo_short_name => _logo_short_name;
   get userRole_name  => _userRole_name;
+  get rd_number => _rd_numebr;
 
  
   fetch_userRolde(){
@@ -78,7 +80,11 @@ class ProfileData with ChangeNotifier {
 
       if (response.statusCode == 200 && jsonData['success'] == true) {
         var res = decryptResponse(response.body);
-        _data = res['data'];
+         _data = res['data'];
+        Hive.box('LoginDetails').put("imagsave", _data);
+       
+        //fetch rd numebr
+        _rd_numebr = _data['profile']['qr_internal_id'];
         //fetch day of conference
         List<Map<String, dynamic>> confernace_days_value =
             List<Map<String, dynamic>>.from(_data['sessions']);
@@ -98,7 +104,7 @@ class ProfileData with ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error in fetchUserProfile: $e");
-      debugger();
+      // debugger();
     }
   }
 }
