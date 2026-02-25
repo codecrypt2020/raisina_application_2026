@@ -109,6 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
         usernameController.text.trim(),
         passwordController.text.trim(),
       );
+      await Network_request.assignedUserDetails();
       // debugger();
       if (!mounted) {
         return;
