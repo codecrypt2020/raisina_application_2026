@@ -9,17 +9,20 @@ class FilterChip_dining extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color surfaceColor = AppColors.surfaceSoftOf(context);
+    final Color borderColor = AppColors.elevatedOf(context);
+    final Color textColor = AppColors.textSecondaryOf(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: selected ? AppColors.goldDim : AppColors.navySurface,
+        color: selected ? AppColors.goldDim : surfaceColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: selected ? AppColors.gold : AppColors.navyElevated),
+        border: Border.all(color: selected ? AppColors.gold : borderColor),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: selected ? AppColors.gold : AppColors.textSecondary,
+          color: selected ? AppColors.gold : textColor,
           fontWeight: FontWeight.w600,
         ),
       ),
