@@ -28,23 +28,24 @@ class ResourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasValidUrl = file_url.trim().isNotEmpty;
-    final Color cardColor = AppColors.elevatedOf(context);
-    final Color borderColor = AppColors.borderOf(context);
+    final Color cardColor = AppColors.surfaceOf(context);
     final Color titleColor = AppColors.textPrimaryOf(context);
     final Color secondaryColor = AppColors.textSecondaryOf(context);
     final Color mutedColor = AppColors.textMutedOf(context);
+    final double sharedTextSize =
+        DefaultTextStyle.of(context).style.fontSize ?? 14;
     final bool isDarkMode = AppColors.isDark(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: Colors.transparent),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -80,7 +81,6 @@ class ResourceCard extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       color: secondaryColor,
-                      fontSize: 15,
                     ),
                   ),
                 ],
@@ -128,14 +128,16 @@ class ResourceCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.goldDim,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       badgeText!,
                       style: const TextStyle(
+                        fontSize: 11,
+                        // fontSize: sharedTextSize,
                         color: AppColors.gold,
                         fontWeight: FontWeight.w800,
                       ),
@@ -151,7 +153,7 @@ class ResourceCard extends StatelessWidget {
                               context, file_url, title)
                           : null,
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: borderColor),
+                        side: BorderSide(color: AppColors.elevatedOf(context)),
                         foregroundColor: secondaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),

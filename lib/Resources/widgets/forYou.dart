@@ -17,14 +17,21 @@ class ForYou extends StatelessWidget {
     final groupedData = provider.groupedFeaturedData;
 
     if (groupedData.isEmpty) {
-      return Center(
-        child: Text(
-          'No resources found',
-          style: TextStyle(color: AppColors.textSecondaryOf(context)),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 120),
+          Center(
+            child: Text(
+              'No resources found',
+              style: TextStyle(color: AppColors.textSecondaryOf(context)),
+            ),
+          ),
+        ],
       );
     }
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
       children: groupedData.entries.map((entry) {
         final categoryCode = entry.key;

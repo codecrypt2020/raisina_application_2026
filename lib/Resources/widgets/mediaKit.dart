@@ -15,11 +15,17 @@ class Mediakit extends StatelessWidget {
     final filteredList = provider.searchedMediaList;
 
     if (filteredList.isEmpty) {
-      return Center(
-        child: Text(
-          'No resources found',
-          style: TextStyle(color: AppColors.textSecondaryOf(context)),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 120),
+          Center(
+            child: Text(
+              'No resources found',
+              style: TextStyle(color: AppColors.textSecondaryOf(context)),
+            ),
+          ),
+        ],
       );
     }
 
@@ -42,6 +48,7 @@ class Mediakit extends StatelessWidget {
         // Resource cards
         Expanded(
           child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
             itemCount: filteredList.length,
             itemBuilder: (context, index) {

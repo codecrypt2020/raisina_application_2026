@@ -13,10 +13,10 @@ class CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context, listen: true);
-    final Color cardColor = AppColors.elevatedOf(context);
-    final Color borderColor = AppColors.borderOf(context);
+    final Color surfaceColor = AppColors.surfaceSoftOf(context);
+    final Color borderColor = AppColors.elevatedOf(context);
     final Color textColor = AppColors.textSecondaryOf(context);
-    final Color counterBgColor = AppColors.surfaceSoftOf(context);
+    final Color counterBgColor = AppColors.elevatedOf(context);
     return GestureDetector(
       onTap: onTap ??
           () {
@@ -24,12 +24,12 @@ class CategoryChip extends StatelessWidget {
             print("Selected category index: $index");
           },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: index == provider.selectedCategoryIndex
               ? AppColors.goldDim
-              : cardColor,
-          borderRadius: BorderRadius.circular(14),
+              : surfaceColor,
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: index == provider.selectedCategoryIndex
                 ? AppColors.gold
@@ -45,7 +45,7 @@ class CategoryChip extends StatelessWidget {
                 color: index == provider.selectedCategoryIndex
                     ? AppColors.gold
                     : textColor,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(width: 8),

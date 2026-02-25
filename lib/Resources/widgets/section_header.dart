@@ -18,9 +18,8 @@ class SectionHeader extends StatelessWidget {
           title,
           style: TextStyle(
             color: titleColor,
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            fontFamily: 'serif',
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(width: 10),

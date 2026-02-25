@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -38,14 +39,31 @@ class ResourceFileActions {
     final messenger = ScaffoldMessenger.of(context);
     final rawUrl = fileUrl.trim();
     final uri = Uri.tryParse(rawUrl);
+    final fileType = getFileTypeFromUrl(rawUrl);
 
     if (uri == null || rawUrl.isEmpty) {
       _showMessage(messenger, 'Invalid file URL for $title');
       return;
     }
 
+    if (fileType == ResourceFileType.image) {
+      final isHttp = uri.hasScheme &&
+          (uri.scheme.toLowerCase() == 'http' ||
+              uri.scheme.toLowerCase() == 'https');
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => _ResourceImagePreviewScreen(
+            imageSource: rawUrl,
+            title: title,
+            isHttp: isHttp,
+          ),
+        ),
+      );
+      return;
+    }
+
     final launched = await launchUrl(
-      uri,
+      _buildPreviewUri(rawUrl),
       mode: LaunchMode.externalApplication,
     );
 
@@ -109,7 +127,6 @@ class ResourceFileActions {
 
     _showMessage(messenger, 'Downloading $fileName...');
     final client = http.Client();
-
     try {
       final request = http.Request('GET', uri);
       final response = await client.send(request);
@@ -188,5 +205,60 @@ class ResourceFileActions {
       case ResourceFileType.other:
         return '';
     }
+  }
+}
+
+class _ResourceImagePreviewScreen extends StatelessWidget {
+  const _ResourceImagePreviewScreen({
+    required this.imageSource,
+    required this.title,
+    required this.isHttp,
+  });
+
+  final String imageSource;
+  final String title;
+  final bool isHttp;
+
+  @override
+  Widget build(BuildContext context) {
+    final titleText = title.trim().isEmpty ? 'Image Preview' : title.trim();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(titleText),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.black,
+        alignment: Alignment.center,
+        child: InteractiveViewer(
+          minScale: 0.5,
+          maxScale: 4,
+          child: isHttp
+              ? CachedNetworkImage(
+                  imageUrl: imageSource,
+                  fit: BoxFit.contain,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      SizedBox(
+                    width: 180,
+                    child: LinearProgressIndicator(
+                      value: downloadProgress.progress,
+                      valueColor: AlwaysStoppedAnimation(
+                        Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Text(
+                    'Bad Network',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+              : Image.file(
+                  File(imageSource),
+                  fit: BoxFit.contain,
+                ),
+        ),
+      ),
+    );
   }
 }

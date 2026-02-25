@@ -302,8 +302,8 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               Text(
                 'Raisina Dialogue',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.textPrimaryOf(context),
                 ),
               ),

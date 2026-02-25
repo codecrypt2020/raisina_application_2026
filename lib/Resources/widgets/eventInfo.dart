@@ -16,11 +16,17 @@ class Eventinfo extends StatelessWidget {
     final filteredData = provider.searchedEventInfoList;
 
     if (filteredData.isEmpty) {
-      return Center(
-        child: Text(
-          'No resources found',
-          style: TextStyle(color: AppColors.textSecondaryOf(context)),
-        ),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 120),
+          Center(
+            child: Text(
+              'No resources found',
+              style: TextStyle(color: AppColors.textSecondaryOf(context)),
+            ),
+          ),
+        ],
       );
     }
 
@@ -43,6 +49,7 @@ class Eventinfo extends StatelessWidget {
         // Cards
         Expanded(
           child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
             itemCount: filteredData.length,
             itemBuilder: (context, index) {
