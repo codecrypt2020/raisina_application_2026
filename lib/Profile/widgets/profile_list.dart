@@ -20,9 +20,25 @@ import 'package:provider/provider.dart';
 class ProfileList extends StatelessWidget {
   const ProfileList({super.key});
 
+  List<String> _parseExpertise(dynamic rawValue) {
+    final String rawText = (rawValue ?? '').toString().trim();
+    if (rawText.isEmpty || rawText.toLowerCase() == 'null') {
+      return const [];
+    }
+
+    return rawText
+        .split(',')
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .map((item) => item.toUpperCase())
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProfileData>(context, listen: true);
+    final List<String> expertiseItems =
+        _parseExpertise(provider.data['profile']['area_of_expertise']);
     const roleChipColor = Color(0xFF0C72A3);
     final Color secondaryTextColor = AppColors.textSecondaryOf(context);
     final Color deleteSurfaceColor = AppColors.surfaceOf(context);
@@ -112,21 +128,22 @@ class ProfileList extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Container(
-                     padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                 decoration: BoxDecoration(
-                 borderRadius: BorderRadius.circular(10), 
-                 border: Border.all(color: roleChipColor, width: 1.4),
-                 ),
-                  child: Text("RD-${ (provider.rd_number.toString()).toUpperCase()}",               
-                style: const TextStyle(
-                  color: roleChipColor,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 2.0,
-                  fontSize: 10,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: roleChipColor, width: 1.4),
+                  ),
+                  child: Text(
+                    "RD-${(provider.rd_number.toString()).toUpperCase()}",
+                    style: const TextStyle(
+                      color: roleChipColor,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 2.0,
+                      fontSize: 10,
+                    ),
+                  ),
                 ),
-              ),
-              ),                 
               ],
             ))
           ],
@@ -160,7 +177,8 @@ class ProfileList extends StatelessWidget {
                   title: 'Digital badge',
                   icon: Icons.badge_outlined,
                   color: AppColors.gold,
-                     ),),
+                ),
+              ),
               // Divider(color: AppColors.navySurface),
               // ProfileRow(
               //   title: 'Travel & logistics',
@@ -246,12 +264,13 @@ class ProfileList extends StatelessWidget {
                   child: Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: [
-                      TagChip(
-                          label: provider.data['profile']
-                                  ['area_of_expertise'] ??
-                              "Not specified"),
-                    ],
+                    children: expertiseItems.isEmpty
+                        ? const [
+                            TagChip(label: 'NOT SPECIFIED'),
+                          ]
+                        : expertiseItems
+                            .map((item) => TagChip(label: item))
+                            .toList(),
                   ),
                 ),
               ],
@@ -281,11 +300,14 @@ class ProfileList extends StatelessWidget {
                 InfoCard(
                   title: 'Conference Details',
                   child: DetailsTable(
+                      rdNumber:
+                          "RD-${(provider.rd_number.toString()).toUpperCase()}",
                       status:
                           provider.data['profile']['status'] ?? "Not available",
                       dietaryPreference: provider.data['profile']
                               ['dietary_requirements'] ??
                           "Not available"),
+                  //RD-qr_internal_id
                 ),
                 const SizedBox(height: 12),
                 InfoCard(
@@ -296,7 +318,7 @@ class ProfileList extends StatelessWidget {
                           provider.data['profile']['social']?['twitter'];
                       return (twitter == null ||
                               twitter.toString().trim().isEmpty)
-                          ? "Not available"
+                          ? "No social links added."
                           : twitter;
                     })(),
                     style: TextStyle(
