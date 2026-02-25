@@ -45,6 +45,18 @@ class ProfileList extends StatelessWidget {
     final Color deleteBorderColor = AppColors.borderOf(context);
     final Color deleteTitleColor = AppColors.textPrimaryOf(context);
     final Color deleteMutedColor = AppColors.textMutedOf(context);
+    final Color metaChipTextColor = AppColors.gold;
+    final Color metaChipBorderColor = AppColors.gold.withOpacity(0.55);
+    final Color metaChipBgColor = AppColors.elevatedOf(context);
+    final String roleLabel =
+        (provider.userRole_name?.toString().trim().isNotEmpty == true
+                ? provider.userRole_name.toString()
+                : 'No Role Assigned')
+            .toUpperCase();
+    final String rdRaw = provider.rd_number?.toString().trim() ?? '';
+    final String rdLabel = (rdRaw.isNotEmpty && rdRaw.toLowerCase() != 'null')
+        ? "RD-${rdRaw.toUpperCase()}"
+        : "RD-N/A";
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -105,44 +117,57 @@ class ProfileList extends StatelessWidget {
                   softWrap: true,
                 ),
                 const SizedBox(height: 4),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: roleChipColor, width: 1.4),
-                  ),
-                  child: Text(
-                    (provider.userRole_name?.toString().trim().isNotEmpty ==
-                                true
-                            ? provider.userRole_name.toString()
-                            : 'Speaker')
-                        .toUpperCase(),
-                    style: const TextStyle(
-                      color: roleChipColor,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 2.0,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 4),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: roleChipColor, width: 1.4),
-                  ),
-                  child: Text(
-                    "RD-${(provider.rd_number.toString()).toUpperCase()}",
-                    style: const TextStyle(
-                      color: roleChipColor,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 2.0,
-                      fontSize: 10,
-                    ),
-                  ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final maxChipWidth = constraints.maxWidth;
+                    return Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(maxWidth: maxChipWidth),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: metaChipBgColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: metaChipBorderColor),
+                          ),
+                          child: Text(
+                            roleLabel,
+                            softWrap: true,
+                            style: TextStyle(
+                              color: metaChipTextColor,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.7,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          constraints: BoxConstraints(maxWidth: maxChipWidth),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: metaChipBgColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: metaChipBorderColor),
+                          ),
+                          child: Text(
+                            rdLabel,
+                            softWrap: true,
+                            style: TextStyle(
+                              color: metaChipTextColor,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.7,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ))
