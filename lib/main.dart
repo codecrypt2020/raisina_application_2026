@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Maps/provider/map_data.dart';
-import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+
 import 'package:attendee_app/Profile/Screens/profile_main.dart';
 import 'package:attendee_app/Profile/provider/profile_data.dart';
 import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
