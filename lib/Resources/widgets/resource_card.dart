@@ -159,13 +159,12 @@ class ResourceCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: hasValidUrl
-                          ? () => ResourceFileActions.downloadFile(
-                              context, file_url, title)
-                          : null,
+                      onPressed: null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.goldDim,
-                        foregroundColor: AppColors.gold,
+                        backgroundColor: Colors.grey.shade300,
+                        foregroundColor: Colors.grey.shade600,
+                        disabledBackgroundColor: Colors.grey.shade300,
+                        disabledForegroundColor: Colors.grey.shade600,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
