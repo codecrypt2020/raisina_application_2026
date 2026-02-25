@@ -409,129 +409,131 @@ class ProfileList extends StatelessWidget {
         //     ],
         //   ),
         // ),
-        const SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(18),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditProfileScreen(
-                      profile: provider.data['profile'] ?? {},
-                    ),
-                  ),
-                ).then((value) {
-                  provider.fetchUserProfile(); //after profile edit call api
-                });
-              },
-              child: Ink(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceOf(context),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppColors.borderOf(context)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.goldDim,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.edit_outlined,
-                        color: AppColors.gold,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "Edit Profile",
-                        style: TextStyle(
-                          color: AppColors.textPrimaryOf(context),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: AppColors.textMutedOf(context),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(18),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChangePasswordScreen(
-                      profile: provider.data['profile'] ?? {},
-                    ),
-                  ),
-                );
-              },
-              child: Ink(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceOf(context),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppColors.borderOf(context)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.goldDim,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.lock_outline_rounded,
-                        color: AppColors.gold,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "Change Password",
-                        style: TextStyle(
-                          color: AppColors.textPrimaryOf(context),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: AppColors.textMutedOf(context),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
+        //edit profile
+        // const SizedBox(height: 30),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: Material(
+        //     color: Colors.transparent,
+        //     child: InkWell(
+        //       borderRadius: BorderRadius.circular(18),
+        //       onTap: () {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (_) => EditProfileScreen(
+        //               profile: provider.data['profile'] ?? {},
+        //             ),
+        //           ),
+        //         ).then((value) {
+        //           provider.fetchUserProfile(); //after profile edit call api
+        //         });
+        //       },
+        //       child: Ink(
+        //         padding:
+        //             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        //         decoration: BoxDecoration(
+        //           color: AppColors.surfaceOf(context),
+        //           borderRadius: BorderRadius.circular(18),
+        //           border: Border.all(color: AppColors.borderOf(context)),
+        //         ),
+        //         child: Row(
+        //           children: [
+        //             Container(
+        //               padding: const EdgeInsets.all(8),
+        //               decoration: BoxDecoration(
+        //                 color: AppColors.goldDim,
+        //                 borderRadius: BorderRadius.circular(10),
+        //               ),
+        //               child: const Icon(
+        //                 Icons.edit_outlined,
+        //                 color: AppColors.gold,
+        //                 size: 20,
+        //               ),
+        //             ),
+        //             const SizedBox(width: 12),
+        //             Expanded(
+        //               child: Text(
+        //                 "Edit Profile",
+        //                 style: TextStyle(
+        //                   color: AppColors.textPrimaryOf(context),
+        //                   fontWeight: FontWeight.w700,
+        //                   fontSize: 16,
+        //                 ),
+        //               ),
+        //             ),
+        //             Icon(
+        //               Icons.chevron_right_rounded,
+        //               color: AppColors.textMutedOf(context),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // const SizedBox(height: 12),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: Material(
+        //     color: Colors.transparent,
+        //     child: InkWell(
+        //       borderRadius: BorderRadius.circular(18),
+        //       onTap: () {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (_) => ChangePasswordScreen(
+        //               profile: provider.data['profile'] ?? {},
+        //             ),
+        //           ),
+        //         );
+        //       },
+        //       child: Ink(
+        //         padding:
+        //             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        //         decoration: BoxDecoration(
+        //           color: AppColors.surfaceOf(context),
+        //           borderRadius: BorderRadius.circular(18),
+        //           border: Border.all(color: AppColors.borderOf(context)),
+        //         ),
+        //         child: Row(
+        //           children: [
+        //             Container(
+        //               padding: const EdgeInsets.all(8),
+        //               decoration: BoxDecoration(
+        //                 color: AppColors.goldDim,
+        //                 borderRadius: BorderRadius.circular(10),
+        //               ),
+        //               child: const Icon(
+        //                 Icons.lock_outline_rounded,
+        //                 color: AppColors.gold,
+        //                 size: 20,
+        //               ),
+        //             ),
+        //             const SizedBox(width: 12),
+        //             Expanded(
+        //               child: Text(
+        //                 "Change Password",
+        //                 style: TextStyle(
+        //                   color: AppColors.textPrimaryOf(context),
+        //                   fontWeight: FontWeight.w700,
+        //                   fontSize: 16,
+        //                 ),
+        //               ),
+        //             ),
+        //             Icon(
+        //               Icons.chevron_right_rounded,
+        //               color: AppColors.textMutedOf(context),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // const SizedBox(height: 12),
+        //above is change password code commented/////
         SizedBox(
           width: double.infinity,
           child: Material(
