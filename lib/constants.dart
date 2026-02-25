@@ -8,11 +8,17 @@ class Constants {
 
 //DEV
   static const String NODE_URL = 'https://devapi.raisina-orfonline.com/';
-  // static const String IMG_BASE_N_URL = 'https://api.devmisafeadmin.in/';
-  // static String NODE_URL_FORGOT_PASSWORD = "https://devmisafeadmin.in";
-  static const String registraionUrlDev =
+  static const String registraionUrl =
       "https://dev.raisina-orfonline.com/new-registration";
   static const String env = "Development";
+  static const String forgetPassUrl =
+      "https://dev.raisina-orfonline.com/forgot-pass";
+
+//Prod
+  // static const String NODE_URL = "https://raisina-orfonline.com:3000/";
+  // static const String registraionUrl =
+  //     "https://raisina-orfonline.com/#/new-registration";
+  // static const String env = "Production";
 
   static const String login = "users/login";
   static const String assignedUserDetails = "qr/assignedUserDetials";
@@ -22,4 +28,11 @@ class Constants {
   static const String assignedUserspeakingDetails =
       "speaking/assignedUserDetials";
   static const String mapsApi = "qr/maps/floorwise/maps";
+  static const String allresourcesapi = "qr/resources/all-resources";
+  static const String get_user_qr = "qr/user_list";
+  static const String delete_account = "emp/delete-user";
+  static const String userProfileApi = "userinfo/profile";
+  static const String profile_edit = "userinfo/profile/update";
+  static const String Change_password = "emp/profile/password";
+  static const String emp_profile = "emp/profile";
 }

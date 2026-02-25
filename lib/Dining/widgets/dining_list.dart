@@ -12,6 +12,10 @@ class Dining_list extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<dining_data>(context, listen: true);
+    final Color titleColor = AppColors.textPrimaryOf(context);
+    final Color surfaceColor = AppColors.surfaceSoftOf(context);
+    final Color borderColor = AppColors.elevatedOf(context);
+    final Color subtitleColor = AppColors.textSecondaryOf(context);
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: provider.dining_list.length + 1,
@@ -20,19 +24,19 @@ class Dining_list extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Dining',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: titleColor,
                 ),
               ),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                alignment: WrapAlignment.center,
+                alignment: WrapAlignment.start,
                 children: List.generate(provider.days.length, (dayIndex) {
                   final bool isSelected = provider.selectedIndex == dayIndex;
 
@@ -44,22 +48,16 @@ class Dining_list extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.goldDim
-                            : AppColors.navySurface,
+                        color: isSelected ? AppColors.goldDim : surfaceColor,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected
-                              ? AppColors.gold
-                              : AppColors.navyElevated,
+                          color: isSelected ? AppColors.gold : borderColor,
                         ),
                       ),
                       child: Text(
                         "${provider.days[dayIndex]["day"]} - ${provider.days[dayIndex]["date"]}",
                         style: TextStyle(
-                          color: isSelected
-                              ? AppColors.gold
-                              : AppColors.textSecondary,
+                          color: isSelected ? AppColors.gold : subtitleColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -73,12 +71,12 @@ class Dining_list extends StatelessWidget {
         }
 
         if (provider.dining_list.isEmpty) {
-          return const SizedBox(
+          return SizedBox(
             height: 120,
             child: Center(
               child: Text(
                 'No dining sessions found',
-                style: TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: subtitleColor),
               ),
             ),
           );

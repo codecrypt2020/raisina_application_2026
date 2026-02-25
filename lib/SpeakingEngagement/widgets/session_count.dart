@@ -38,7 +38,7 @@ class SpeakingSessionsBanner extends StatelessWidget {
             child: Text(
               "You have $sessions speaking "
               "${sessions == 1 ? "session" : "sessions"} "
-              "across $days ${days == 1 ? "day" : "days"}.",
+              "across ${(days != null || days == 0) ? "" : days} ${days == 1 ? "day" : "days"}.",
               style: const TextStyle(
                 color: AppColors.gold,
                 fontSize: 15,

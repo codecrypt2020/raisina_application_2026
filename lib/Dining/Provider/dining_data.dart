@@ -104,7 +104,7 @@ class dining_data with ChangeNotifier {
   void generateDays(DateTime startDate) {
     _days.clear();
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
       DateTime newDate = startDate.add(Duration(days: i));
 
       String formattedDate = "${_getMonthName(newDate.month)} ${newDate.day}";
@@ -270,7 +270,7 @@ class dining_data with ChangeNotifier {
       dining_list_raw.add(DiningDataItem(
         time: formatTo12Hour(dining_list?['dinnerStartTime']), // 14 FEB Sat
         title: "Dinner - ${dining_list["dinnerTopic"]}",
-        location: dining_list['tea_gate_name'] ?? '',
+        location: dining_list['dinner_gate_name'] ?? '',
         speaker: 'Session', // default
         tagColor: Colors.red,
         tag: 'Completed', // default

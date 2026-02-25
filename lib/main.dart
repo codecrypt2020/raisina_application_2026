@@ -4,10 +4,17 @@ import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
 import 'package:attendee_app/Maps/provider/map_data.dart';
 import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+import 'package:attendee_app/Profile/Screens/profile_main.dart';
+import 'package:attendee_app/Profile/provider/profile_data.dart';
+import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
+import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
+import 'package:attendee_app/Resources/provider/resources_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Provider/speaking_engagement_data.dart';
 import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main.dart';
+import 'package:attendee_app/Maps/Screens/mapMain.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/login_screen.dart';
+import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -30,6 +37,29 @@ class AppColors {
   static const textSecondary = Color(0xFF4E5873);
   static const textMuted = Color(0xFF7A85A0);
   static const red = Color(0xFFE05555);
+  static bool isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  static Color textPrimaryOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFFF2F6FF) : textPrimary;
+
+  static Color textSecondaryOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFFB3C3D9) : textSecondary;
+
+  static Color textMutedOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF8EA3C0) : textMuted;
+
+  static Color surfaceOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF131C30) : navyMid;
+
+  static Color surfaceSoftOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF1A2740) : navySurface;
+
+  static Color elevatedOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF16243B) : navyElevated;
+
+  static Color borderOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF2A3B59) : navySurface;
 }
 
 void main() async {
@@ -40,8 +70,37 @@ void main() async {
   runApp(const AttendeeApp());
 }
 
-class AttendeeApp extends StatelessWidget {
+class AttendeeApp extends StatefulWidget {
   const AttendeeApp({super.key});
+
+  @override
+  static _AttendeeAppState? _of(BuildContext context) {
+    return context.findAncestorStateOfType<_AttendeeAppState>();
+  }
+
+  static void toggleTheme(BuildContext context) {
+    _of(context)?._toggleTheme();
+  }
+
+  static bool isDarkMode(BuildContext context) {
+    final _AttendeeAppState? state = _of(context);
+    return state?._themeMode == ThemeMode.dark ||
+        Theme.of(context).brightness == Brightness.dark;
+  }
+
+  @override
+  State<AttendeeApp> createState() => _AttendeeAppState();
+}
+
+class _AttendeeAppState extends State<AttendeeApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +108,8 @@ class AttendeeApp extends StatelessWidget {
     print('this is the token${token}');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Summit Attendee',
+      // title: 'Summit Attendee',
+      title: "Raisina",
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -77,9 +137,38 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.gold,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF0C1220),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF131C30),
+          foregroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+        ),
+        navigationBarTheme: const NavigationBarThemeData(
+          backgroundColor: Color(0xFF131C30),
+          indicatorColor: Color(0x332F7BAA),
+          labelTextStyle: WidgetStatePropertyAll(
+            TextStyle(color: Color(0xFFB3C3D9), fontWeight: FontWeight.w600),
+          ),
+        ),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(fontWeight: FontWeight.w700),
+          titleMedium: TextStyle(fontWeight: FontWeight.w600),
+          bodyLarge: TextStyle(height: 1.4),
+        ),
+      ),
+      themeMode: _themeMode,
       home: (token != null)
           ? const AttendeeHomePage()
-          : const LoginScreen(signUpUrl: Constants.registraionUrlDev),
+          : const LoginScreen(
+              signUpUrl: Constants.forgetPassUrl,
+              forgetPasswordUrl: Constants.forgetPassUrl),
     );
   }
 }
@@ -92,16 +181,73 @@ class AttendeeHomePage extends StatefulWidget {
 }
 
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
+  bool isSpeakingEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isSpeakingEnabled =
+        Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+  }
+
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    // HomeDashboard(),
-    AgendaMain(),
-    DiningMain(),
-    SpeakingMain(),
-    // NetworkingView(),
-    ProfileView(),
-  ];
+  String _currentProfileName() {
+    final profile = Hive.box('LoginDetails').get("Profile_details");
+    if (profile is Map && profile['name'] != null) {
+      return profile['name'].toString().trim();
+    }
+    return "";
+  }
+
+  String _profileInitials(String name) {
+    final normalized = name.trim();
+    if (normalized.isEmpty) return "US";
+    final parts = normalized
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      return "${parts[0][0]}${parts[1][0]}".toUpperCase();
+    }
+    if (normalized.length >= 2) {
+      return normalized.substring(0, 2).toUpperCase();
+    }
+    return normalized.substring(0, 1).toUpperCase();
+  }
+
+  void _openPanelPage(Widget page) {
+    Navigator.of(context).pop();
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => page),
+    );
+  }
+
+  // final List<Widget> _pages = [
+  //   // HomeDashboard(),
+  //   AgendaMain(),
+  //   DiningMain(),
+  //   SpeakingMain(),
+  //   // NetworkingView(),
+  //   ProfileView(),
+  //  ResourcesMain()
+  // ];
+  List<Widget> get _pages {
+    final pages = [
+      AgendaMain(),
+      DiningMain(),
+    ];
+
+    if (isSpeakingEnabled) {
+      pages.add(SpeakingMain());
+    }
+
+    pages.add(ProfileMain());
+
+    return pages;
+  }
+
+  //profile changes
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +262,8 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
 
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
         ChangeNotifierProvider(create: (ctx) => MapData()),
+        ChangeNotifierProvider(create: (ctx) => ResourcesData()),
+        ChangeNotifierProvider(create: (ctx) => ProfileData()),
 
         ///speaking engagement
       ],
@@ -124,64 +272,226 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
           toolbarHeight: 72,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('Good morning, Dr. John Doe',
-                  style:
-                      TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+            children: [
+              Row(
+                children: [
+                  Text('Welcome, ',
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondaryOf(context))),
+                  Expanded(
+                    child: ValueListenableBuilder(
+                      valueListenable: Hive.box('LoginDetails')
+                          .listenable(keys: const ['Profile_details']),
+                      builder: (context, box, _) {
+                        return Text(
+                          _currentProfileName(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondaryOf(context),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(height: 4),
-              Text('Raisina Dialogue',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(
+                'Raisina Dialogue',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimaryOf(context),
+                ),
+              ),
             ],
           ),
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.search, color: AppColors.textPrimary),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_outlined,
-                  color: AppColors.textPrimary),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(Icons.search, color: AppColors.textPrimary),
+            // ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(Icons.notifications_outlined,
+            //       color: AppColors.textPrimary),
+            // ),
+            Builder(
+              builder: (context) {
+                final bool isDarkMode = AttendeeApp.isDarkMode(context);
+                return IconButton(
+                  tooltip: isDarkMode
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode',
+                  onPressed: () => AttendeeApp.toggleTheme(context),
+                  icon: Icon(
+                    isDarkMode
+                        ? Icons.light_mode_outlined
+                        : Icons.dark_mode_outlined,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                );
+              },
             ),
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: AppColors.navySurface,
-                child: const Text('JD',
-                    style: TextStyle(color: AppColors.textPrimary)),
+                backgroundColor: AppColors.surfaceSoftOf(context),
+                child: ValueListenableBuilder(
+                  valueListenable: Hive.box('LoginDetails')
+                      .listenable(keys: const ['Profile_details']),
+                  builder: (context, box, _) {
+                    return Text(
+                      _profileInitials(_currentProfileName()),
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      softWrap: false,
+                      style: TextStyle(
+                        color: AppColors.textPrimaryOf(context),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
         ),
+        // drawer: Drawer(
+        //   backgroundColor: AppColors.navyElevated,
+        //   child: SafeArea(
+        //     child: ListView(
+        //       padding: EdgeInsets.zero,
+        //       children: [
+        //         Container(
+        //           padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+        //           color: AppColors.navyMid,
+        //           child: const Text(
+        //             'Quick Access',
+        //             style: TextStyle(
+        //               fontSize: 18,
+        //               fontWeight: FontWeight.w700,
+        //               color: AppColors.textPrimary,
+        //             ),
+        //           ),
+        //         ),
+        //         ListTile(
+        //           leading: const Icon(
+        //             Icons.folder_outlined,
+        //             color: AppColors.textPrimary,
+        //           ),
+        //           title: const Text(
+        //             'Resources',
+        //             style: TextStyle(color: AppColors.textPrimary),
+        //           ),
+        //           onTap: () => _openPanelPage(const ResourcesMain()),
+        //         ),
+        //         ListTile(
+        //           leading: const Icon(
+        //             Icons.map_outlined,
+        //             color: AppColors.textPrimary,
+        //           ),
+        //           title: const Text(
+        //             'Maps',
+        //             style: TextStyle(color: AppColors.textPrimary),
+        //           ),
+        //           onTap: () => _openPanelPage(const Mapmain()),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        // body: _pages[_selectedIndex],
+        // bottomNavigationBar: NavigationBar(
+        //   selectedIndex: _selectedIndex,
+        //   onDestinationSelected: (index) {
+        //     setState(() {
+        //       _selectedIndex = index;
+        //     });
+        //   },
+        //   destinations: const [
+        //     NavigationDestination(
+        //       icon: Icon(Icons.event_note_outlined),
+        //       label: 'Agenda',
+        //     ),]
+        //   ),
+
+        drawer: Drawer(
+          backgroundColor: AppColors.elevatedOf(context),
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+                  color: AppColors.surfaceOf(context),
+                  child: Text(
+                    'Quick Access',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.folder_outlined,
+                    color: AppColors.textPrimaryOf(context),
+                  ),
+                  title: Text(
+                    'Resources',
+                    style: TextStyle(color: AppColors.textPrimaryOf(context)),
+                  ),
+                  onTap: () => _openPanelPage(const ResourcesMain()),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.map_outlined,
+                    color: AppColors.textPrimaryOf(context),
+                  ),
+                  title: Text(
+                    'Maps',
+                    style: TextStyle(color: AppColors.textPrimaryOf(context)),
+                  ),
+                  onTap: () => _openPanelPage(const Mapmain()),
+                ),
+              ],
+            ),
+          ),
+        ),
         body: _pages[_selectedIndex],
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
-          onDestinationSelected: (index) {
+          onDestinationSelected: (index) async {
+            await Network_request.assignedUserDetails();
+            isSpeakingEnabled =
+                Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
             setState(() {
               _selectedIndex = index;
             });
           },
-          destinations: const [
-            // NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
-            NavigationDestination(
+          destinations: [
+            const NavigationDestination(
               icon: Icon(Icons.event_note_outlined),
               label: 'Agenda',
             ),
-            // NavigationDestination(
-            //   icon: Icon(Icons.connect_without_contact_outlined),
-            //   label: 'Network',
-            // ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.wine_bar_outlined),
               label: 'Dining',
             ),
-            NavigationDestination(
-              icon: Icon(Icons.school_outlined),
-              label: 'Speaking Eng',
+            if (isSpeakingEnabled)
+              const NavigationDestination(
+                icon: Icon(Icons.school_outlined),
+                label: 'Speaking Eng',
+              ),
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              label: 'Profile',
             ),
-            NavigationDestination(
-                icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ),

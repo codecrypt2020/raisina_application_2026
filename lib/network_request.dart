@@ -5,6 +5,8 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/retry.dart';
+
 // default skeleton
 // Future skeletonApi() async {
 //   try {
@@ -28,7 +30,8 @@ import 'dart:convert';
 
 class Network_request {
   // login api
-  static Future login_api(username, password) async {
+
+  static Future<Map<String, dynamic>> loginApi(username, password) async {
     try {
       var body = {
         // 'username': username,
@@ -39,64 +42,58 @@ class Network_request {
 
       ;
       var response = await http.post(
-          Uri.parse(Constants.NODE_URL + Constants.login),
-          headers: {
-            "x-encrypted": "1",
-            'Content-Type': 'application/json',
-          },
-          // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
-          body: jsonEncode(
-            encryptPayload(
-              body,
-            ),
-          )
-          //body
-          );
-
-      ///mayurwabale1221@gmail.com
-
-//Mjcc$012
-      ///
-      ///
-      // print('this is the payload ${encryptPayload(
-      //       body,
-      //     )}');
-
+        Uri.parse(Constants.NODE_URL + Constants.login),
+        headers: {
+          "x-encrypted": "1",
+          'Content-Type': 'application/json',
+        },
+        // body: {"data":"U2FsdGVkX18C+bNt9XK1jDkbPN2KYx1J2LEojy8T5d9ktqcH4vAimeuE54DHSzc+mJ+CmedpqkxT7YxlJBCZungGIt9JwEmpNxJ6ZU675cA="}
+        body: jsonEncode(
+          encryptPayload(
+            body,
+          ),
+        ),
+      );
       Map<String, dynamic> jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
+        res["data"]["email"] = username;
+        res["data"]["qr_name"] = res["data"]["name"];
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
-
-        print(
-            "this is the response ${Hive.box('LoginDetails').get("Profile_details")}");
+        Hive.box("LoginDetails").put("roleId", res["data"]["role_id"]);
+        return {"success": true, "message": "Login successful"};
+      } else {
+        return {
+          "success": false,
+          "message": jsonData["message"] ?? "Login failed"
+        };
       }
-// RESPONSE
-// {
-//     "success": true,
-//     "message": "Login success",
-//     "data": {
-//         "userId": 567,
-//         "token": "581ba50d5a449325db6dcb5e4130af90",
-//         "name": "Momentum Mayur Wabale",
-//         "type": "user",
-//         "eventId": "21"
-//     }
-// }
     } catch (e) {
-      print("this is the error in login_api ${e}");
+      print("this is the error in loginApi ${e}");
+      return {"success": false, "message": "An error occurred during login."};
     }
   }
 
-  Future assignedUserDetails() async {
+  static Future assignedUserDetails() async {
     try {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.assignedUserDetails),
-        headers: {},
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(
           encryptPayload(
             {
-              "userId": "567"
+              "userId":
+                  "${Hive.box('LoginDetails').get("Profile_details")['userId']}",
 //respose
 // {
 //     "userId": "567"
@@ -108,6 +105,9 @@ class Network_request {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
+
+        final bool speakingShow = res["data"]["speakingShow"] ?? false;
+        await Hive.box('LoginDetails').put("isSpeaker", speakingShow);
 //       {
 //     "status": 200,
 //     "success": true,
@@ -119,6 +119,44 @@ class Network_request {
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteAccount(userID, email) async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.delete_account),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({"empId": userID, "email": email}),
+        ),
+      );
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        return {
+          "success": true,
+          "message": jsonData["message"] ?? "Account deleted successfully"
+        };
+      }
+      return {
+        "success": false,
+        "message": jsonData["message"] ?? "Failed to delete account"
+      };
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
+      return {
+        "success": false,
+        "message": "Unable to delete account. Please try again."
+      };
     }
   }
 
@@ -305,6 +343,53 @@ class Network_request {
       }
     } catch (e) {
       debugPrint("this is the error in eventStartDateAPI : $e");
+    }
+  }
+
+  Future get_user_qr() async {
+    try {
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.get_user_qr),
+        headers: {
+          "x-encrypted": "1",
+          //   'x-access-token': '${Hive.box("LoginDetails").get("token")}',
+          // 'x-access-type': '${Hive.box("LoginDetails").get("usertype")}',
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload(
+              //respose{
+              //"userId": "567"
+              //}
+              {
+                "searchText":
+                    "${Hive.box('LoginDetails').get("Profile_details")['name']}",
+                "sortby": "id",
+                "page": 1
+              }),
+        ),
+      );
+      print(
+          'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
+      var jsonData = decryptResponse(response.body);
+      if (response.statusCode == 200 && jsonData["success"] == true) {
+        var res = decryptResponse(response.body);
+        return res["data"][0]["user_qr_img"];
+        {
+          // "status": 200,
+          // "success": true,
+          // "message": "Fetched Successfully",
+          // "data": {
+          //     "speakingShow": false
+          // }
+        }
+      }
+    } catch (e) {
+      debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
 }

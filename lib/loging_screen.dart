@@ -135,7 +135,7 @@ class _LogingscreenState extends State<Loginscreen> {
                       print("user email id check: ${emailController.text}");
                       print("user password check: ${passwordController.text}");
 
-                      Network_request.login_api(
+                      Network_request.loginApi(
                         emailController.text.trim(),
                         passwordController.text.trim(),
                       );
