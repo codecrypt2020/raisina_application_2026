@@ -10,6 +10,7 @@ import 'package:attendee_app/SpeakingEngagement/Screens/speaking_engagement_main
 import 'package:attendee_app/Maps/Screens/mapMain.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/login_screen.dart';
+import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -95,6 +96,15 @@ class AttendeeHomePage extends StatefulWidget {
 }
 
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
+  bool isSpeakingEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isSpeakingEnabled =
+        Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+  }
+
   int _selectedIndex = 0;
 
   void _openPanelPage(Widget page) {
@@ -104,15 +114,29 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     );
   }
 
-  final List<Widget> _pages = [
-    // HomeDashboard(),
-    AgendaMain(),
-    DiningMain(),
-    SpeakingMain(),
-    // NetworkingView(),
-    ProfileView(),
-    ResourcesMain()
-  ];
+  // final List<Widget> _pages = [
+  //   // HomeDashboard(),
+  //   AgendaMain(),
+  //   DiningMain(),
+  //   SpeakingMain(),
+  //   // NetworkingView(),
+  //   ProfileView(),
+   ResourcesMain()
+  // ];
+  List<Widget> get _pages {
+    final pages = [
+      AgendaMain(),
+      DiningMain(),
+    ];
+
+    if (isSpeakingEnabled) {
+      pages.add(SpeakingMain());
+    }
+
+    pages.add(ProfileView());
+
+    return pages;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,19 +256,86 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                 icon: Icon(Icons.event_note_outlined),
                 label: 'Agenda',
               ),
-              NavigationDestination(
-                icon: Icon(Icons.wine_bar_outlined),
-                label: 'Dining',
-              ),
-              NavigationDestination(
+            ),
+          ],
+        ),
+        drawer: Drawer(
+          backgroundColor: AppColors.navyElevated,
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+                  color: AppColors.navyMid,
+                  child: const Text(
+                    'Quick Access',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.folder_outlined,
+                    color: AppColors.textPrimary,
+                  ),
+                  title: const Text(
+                    'Resources',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ),
+                  onTap: () => _openPanelPage(const ResourcesMain()),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.map_outlined,
+                    color: AppColors.textPrimary,
+                  ),
+                  title: const Text(
+                    'Maps',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ),
+                  onTap: () => _openPanelPage(const Mapmain()),
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: _pages[_selectedIndex],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) async {
+            await Network_request.assignedUserDetails();
+            isSpeakingEnabled =
+                Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(Icons.event_note_outlined),
+              label: 'Agenda',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.wine_bar_outlined),
+              label: 'Dining',
+            ),
+            if (isSpeakingEnabled)
+              const NavigationDestination(
                 icon: Icon(Icons.school_outlined),
                 label: 'Speaking Eng',
               ),
-              NavigationDestination(
-                  icon: Icon(Icons.person_outline), label: 'Profile'),
-            ],
-          ),
-        ));
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
