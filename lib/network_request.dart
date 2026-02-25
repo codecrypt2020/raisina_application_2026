@@ -60,8 +60,7 @@ class Network_request {
         res["data"]["email"] = username;
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
-        print(
-            'this is the profile details ${Hive.box("LoginDetails").get("Profile_details")}');
+        Hive.box("LoginDetails").put("roleId", res["data"]["role_id"]);
         return {"success": true, "message": "Login successful"};
       } else {
         return {
