@@ -578,6 +578,9 @@ class ProfileList extends StatelessWidget {
 
                   if (deleteResponse["success"] == true) {
                     Hive.box("LoginDetails").clear();
+                    Hive.box(AttendeeApp.settingsBoxName)
+                        .put(AttendeeApp.themeModeKey, 'light');
+                    AttendeeApp.setThemeMode(context, ThemeMode.light);
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -685,6 +688,9 @@ class ProfileList extends StatelessWidget {
                 if (shouldLogout == true) {
                   //deleting the locally stored token
                   Hive.box("LoginDetails").clear();
+                  Hive.box(AttendeeApp.settingsBoxName)
+                      .put(AttendeeApp.themeModeKey, 'light');
+                  AttendeeApp.setThemeMode(context, ThemeMode.light);
                   Navigator.pushAndRemoveUntil(
                     //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
                     context,

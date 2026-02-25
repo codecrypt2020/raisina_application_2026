@@ -11,24 +11,26 @@ class Agenda extends StatefulWidget {
 }
 
 class _AgendaState extends State<Agenda> {
+  late Future _agendaFuture;
+
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Provider.of<Agenda_data>(context, listen: false).event_start_date();
+    final provider = Provider.of<Agenda_data>(context, listen: false);
+    provider.event_start_date();
+    _agendaFuture = provider.getAgenda();
     Future.microtask(() {
       //“Do this task a little later — after the build is complete.
-      Provider.of<Agenda_data>(context, listen: false).resetSelectedIndex();
+      provider.resetSelectedIndex();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final fetch_data =
-        Provider.of<Agenda_data>(context, listen: false).getAgenda();
     return FutureBuilder(
       //putting the materail call in the api for first time loading
 
-      future: fetch_data,
+      future: _agendaFuture,
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return Center(

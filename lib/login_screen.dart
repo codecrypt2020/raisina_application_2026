@@ -137,6 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
       if (loginCheckBool["success"] == true) {
+        AttendeeApp.setThemeMode(context, ThemeMode.light);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
