@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
 
 enum ResourceFileType { pdf, image, word, powerpoint, excel, other }
 
@@ -37,16 +38,53 @@ class ResourceFileActions {
     final messenger = ScaffoldMessenger.of(context);
     final rawUrl = fileUrl.trim();
     final uri = Uri.tryParse(rawUrl);
-    if (uri == null || fileUrl.trim().isEmpty) {
+
+    if (uri == null || rawUrl.isEmpty) {
       _showMessage(messenger, 'Invalid file URL for $title');
       return;
     }
 
-    final previewUri = _buildPreviewUri(rawUrl);
-    final launched =
-        await launchUrl(previewUri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
     if (!launched) {
-      _showMessage(messenger, 'Could not open preview for $title');
+      _showMessage(messenger, 'Could not open $title — trying local open...');
+
+      final fileName = _buildFileName(rawUrl, title);
+      final file = await _downloadToFile(rawUrl, fileName);
+      if (file == null) {
+        _showMessage(messenger, 'Could not download $title to open');
+        return;
+      }
+
+      await OpenFilex.open(file.path);
+    }
+  }
+
+  static Future<File?> _downloadToFile(String rawUrl, String fileName) async {
+    final uri = Uri.tryParse(rawUrl);
+    if (uri == null) return null;
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/$fileName');
+      final client = http.Client();
+      final request = http.Request('GET', uri);
+      final response = await client.send(request);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        client.close();
+        return null;
+      }
+
+      final sink = file.openWrite();
+      await response.stream.pipe(sink);
+      await sink.close();
+      client.close();
+      return file;
+    } catch (_) {
+      return null;
     }
   }
 
