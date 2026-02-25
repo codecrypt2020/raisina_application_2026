@@ -2,7 +2,9 @@ import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
 import 'package:attendee_app/Dining/Screens/dining.dart';
-import 'package:attendee_app/Profile/Screens/Screens/profile.dart';
+import 'package:attendee_app/Profile/Screens/profile.dart';
+import 'package:attendee_app/Profile/Screens/profile_main.dart';
+import 'package:attendee_app/Profile/provider/profile_data.dart';
 import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
 import 'package:attendee_app/Resources/Screens/resourcesMain.dart';
 import 'package:attendee_app/Resources/provider/resources_data.dart';
@@ -34,6 +36,30 @@ class AppColors {
   static const textSecondary = Color(0xFF4E5873);
   static const textMuted = Color(0xFF7A85A0);
   static const red = Color(0xFFE05555);
+
+  static bool isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  static Color textPrimaryOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFFF2F6FF) : textPrimary;
+
+  static Color textSecondaryOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFFB3C3D9) : textSecondary;
+
+  static Color textMutedOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF8EA3C0) : textMuted;
+
+  static Color surfaceOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF131C30) : navyMid;
+
+  static Color surfaceSoftOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF1A2740) : navySurface;
+
+  static Color elevatedOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF16243B) : navyElevated;
+
+  static Color borderOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF2A3B59) : navySurface;
 }
 
 void main() async {
@@ -44,8 +70,36 @@ void main() async {
   runApp(const AttendeeApp());
 }
 
-class AttendeeApp extends StatelessWidget {
+class AttendeeApp extends StatefulWidget {
   const AttendeeApp({super.key});
+
+  static _AttendeeAppState? _of(BuildContext context) {
+    return context.findAncestorStateOfType<_AttendeeAppState>();
+  }
+
+  static void toggleTheme(BuildContext context) {
+    _of(context)?._toggleTheme();
+  }
+
+  static bool isDarkMode(BuildContext context) {
+    final _AttendeeAppState? state = _of(context);
+    return state?._themeMode == ThemeMode.dark ||
+        Theme.of(context).brightness == Brightness.dark;
+  }
+
+  @override
+  State<AttendeeApp> createState() => _AttendeeAppState();
+}
+
+class _AttendeeAppState extends State<AttendeeApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +136,38 @@ class AttendeeApp extends StatelessWidget {
           bodyLarge: TextStyle(height: 1.4),
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.gold,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF0C1220),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF131C30),
+          foregroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+        ),
+        navigationBarTheme: const NavigationBarThemeData(
+          backgroundColor: Color(0xFF131C30),
+          indicatorColor: Color(0x332F7BAA),
+          labelTextStyle: WidgetStatePropertyAll(
+            TextStyle(color: Color(0xFFB3C3D9), fontWeight: FontWeight.w600),
+          ),
+        ),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(fontWeight: FontWeight.w700),
+          titleMedium: TextStyle(fontWeight: FontWeight.w600),
+          bodyLarge: TextStyle(height: 1.4),
+        ),
+      ),
+      themeMode: _themeMode,
       home: (token != null)
           ? const AttendeeHomePage()
-          : const LoginScreen(signUpUrl: Constants.registraionUrl),
+          : const LoginScreen(
+              signUpUrl: Constants.forgetPassUrl,
+              forgetPasswordUrl: Constants.forgetPassUrl),
     );
   }
 }
@@ -107,6 +190,30 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   }
 
   int _selectedIndex = 0;
+
+  String _currentProfileName() {
+    final profile = Hive.box('LoginDetails').get("Profile_details");
+    if (profile is Map && profile['name'] != null) {
+      return profile['name'].toString().trim();
+    }
+    return "";
+  }
+
+  String _profileInitials(String name) {
+    final normalized = name.trim();
+    if (normalized.isEmpty) return "US";
+    final parts = normalized
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
+    if (parts.length >= 2) {
+      return "${parts[0][0]}${parts[1][0]}".toUpperCase();
+    }
+    if (normalized.length >= 2) {
+      return normalized.substring(0, 2).toUpperCase();
+    }
+    return normalized.substring(0, 1).toUpperCase();
+  }
 
   void _openPanelPage(Widget page) {
     Navigator.of(context).pop();
@@ -134,7 +241,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
       pages.add(SpeakingMain());
     }
 
-    pages.add(ProfileView());
+    pages.add(ProfileMain());
 
     return pages;
   }
@@ -151,6 +258,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         ChangeNotifierProvider(create: (ctx) => SpeakingEngagementData()),
 
         ChangeNotifierProvider(create: (ctx) => Agenda_data()),
+        ChangeNotifierProvider(create: (ctx) => ProfileData()),
         ChangeNotifierProvider(create: (ctx) => ResourcesData()),
 
         ///speaking engagement
@@ -163,21 +271,58 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             children: [
               Row(
                 children: [
-                  const Text('Welcome, ',
+                  Text('Welcome, ',
                       style: TextStyle(
-                          fontSize: 13, color: AppColors.textSecondary)),
-                  Text(
-                      "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
-                      style: TextStyle(
-                          fontSize: 13, color: AppColors.textSecondary)),
+                          fontSize: 13,
+                          color: AppColors.textSecondaryOf(context))),
+                  Expanded(
+                    child: ValueListenableBuilder(
+                      valueListenable: Hive.box('LoginDetails')
+                          .listenable(keys: const ['Profile_details']),
+                      builder: (context, box, _) {
+                        return Text(
+                          _currentProfileName(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondaryOf(context),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 4),
-              Text('Raisina Dialogue',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              Text(
+                'Raisina Dialogue',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimaryOf(context),
+                ),
+              ),
             ],
           ),
           actions: [
+            Builder(
+              builder: (context) {
+                final bool isDarkMode = AttendeeApp.isDarkMode(context);
+                return IconButton(
+                  tooltip: isDarkMode
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode',
+                  onPressed: () => AttendeeApp.toggleTheme(context),
+                  icon: Icon(
+                    isDarkMode
+                        ? Icons.light_mode_outlined
+                        : Icons.dark_mode_outlined,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                );
+              },
+            ),
             // IconButton(
             //   onPressed: () {},
             //   icon: const Icon(Icons.search, color: AppColors.textPrimary),
@@ -191,10 +336,22 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
               padding: const EdgeInsets.only(right: 12),
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: AppColors.navySurface,
-                child: Text(
-                    "${Hive.box('LoginDetails').get("Profile_details")["name"]?.substring(0, 2).toUpperCase() ?? "USER"}",
-                    style: TextStyle(color: AppColors.textPrimary)),
+                backgroundColor: AppColors.surfaceSoftOf(context),
+                child: ValueListenableBuilder(
+                  valueListenable: Hive.box('LoginDetails')
+                      .listenable(keys: const ['Profile_details']),
+                  builder: (context, box, _) {
+                    return Text(
+                      _profileInitials(_currentProfileName()),
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      softWrap: false,
+                      style: TextStyle(
+                        color: AppColors.textPrimaryOf(context),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],

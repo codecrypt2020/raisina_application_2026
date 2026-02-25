@@ -13,7 +13,7 @@ class DigitalBadgeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Digital Badge'),
       ),
@@ -23,9 +23,10 @@ class DigitalBadgeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Show this pass at venue checkpoints for quick verification.',
-                style: TextStyle(color: AppColors.textSecondary, height: 1.4),
+                style: TextStyle(
+                    color: AppColors.textSecondaryOf(context), height: 1.4),
               ),
               const SizedBox(height: 16),
               Center(
@@ -35,9 +36,9 @@ class DigitalBadgeScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: AppColors.navyMid,
+                      color: AppColors.surfaceOf(context),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.navySurface),
+                      border: Border.all(color: AppColors.borderOf(context)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.08),
@@ -84,8 +85,8 @@ class DigitalBadgeScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                         Text(
                           "${Hive.box('LoginDetails').get("Profile_details")["name"] ?? ""}",
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: AppColors.textPrimaryOf(context),
                             fontWeight: FontWeight.w700,
                             fontSize: 22,
                           ),
@@ -97,6 +98,8 @@ class DigitalBadgeScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(18),
+                            border:
+                                Border.all(color: AppColors.borderOf(context)),
                           ),
                           child: const DigitalPassApiWidget(),
                         ),
@@ -194,7 +197,7 @@ class _DigitalPassApiWidgetState extends State<DigitalPassApiWidget> {
     if (_isLoading) {
       return Container(
         decoration: BoxDecoration(
-          color: AppColors.navyMid,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.center,
@@ -208,13 +211,13 @@ class _DigitalPassApiWidgetState extends State<DigitalPassApiWidget> {
     if (_qrPayload == null) {
       return Container(
         decoration: BoxDecoration(
-          color: AppColors.navyMid,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.center,
-        child: const Text(
+        child: Text(
           'QR unavailable',
-          style: TextStyle(color: AppColors.textSecondary),
+          style: const TextStyle(color: Color(0xFF4E5873)),
         ),
       );
     }
@@ -233,13 +236,13 @@ class _DigitalPassApiWidgetState extends State<DigitalPassApiWidget> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.navyMid,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
-      child: const Text(
+      child: Text(
         'Invalid QR URL',
-        style: TextStyle(color: AppColors.textSecondary),
+        style: const TextStyle(color: Color(0xFF4E5873)),
       ),
     );
   }

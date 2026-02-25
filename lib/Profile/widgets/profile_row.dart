@@ -16,6 +16,10 @@ class ProfileRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color titleColor = AppColors.textPrimaryOf(context);
+    final Color subtitleColor = AppColors.textSecondaryOf(context);
+    final Color trailingColor = AppColors.textMutedOf(context);
+
     return Row(
       children: [
         CircleAvatar(
@@ -29,16 +33,15 @@ class ProfileRow extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                style:
+                    TextStyle(fontWeight: FontWeight.w700, color: titleColor),
               ),
               const SizedBox(height: 4),
-              Text(subtitle,
-                  style: const TextStyle(color: AppColors.textSecondary)),
+              Text(subtitle, style: TextStyle(color: subtitleColor)),
             ],
           ),
         ),
-        const Icon(Icons.chevron_right, color: AppColors.textMuted),
+        Icon(Icons.chevron_right, color: trailingColor),
       ],
     );
   }

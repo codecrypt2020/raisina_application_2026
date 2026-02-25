@@ -29,7 +29,7 @@ class AgendaView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimaryOf(context),
                   ),
                 ),
                 SizedBox(height: 12),
@@ -52,12 +52,12 @@ class AgendaView extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.goldDim
-                              : AppColors.navySurface,
+                              : AppColors.surfaceSoftOf(context),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isSelected
                                 ? AppColors.gold
-                                : AppColors.navyElevated,
+                                : AppColors.borderOf(context),
                           ),
                         ),
                         child: Text(
@@ -65,7 +65,7 @@ class AgendaView extends StatelessWidget {
                           style: TextStyle(
                             color: isSelected
                                 ? AppColors.gold
-                                : AppColors.textSecondary,
+                                : AppColors.textSecondaryOf(context),
                             fontWeight: FontWeight.w600,
                           ),
                         ),

@@ -20,12 +20,12 @@ class Dining_list extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Dining',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: AppColors.textPrimaryOf(context),
                 ),
               ),
               const SizedBox(height: 12),
@@ -46,12 +46,12 @@ class Dining_list extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.goldDim
-                            : AppColors.navySurface,
+                            : AppColors.surfaceSoftOf(context),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
                               ? AppColors.gold
-                              : AppColors.navyElevated,
+                              : AppColors.borderOf(context),
                         ),
                       ),
                       child: Text(
@@ -59,7 +59,7 @@ class Dining_list extends StatelessWidget {
                         style: TextStyle(
                           color: isSelected
                               ? AppColors.gold
-                              : AppColors.textSecondary,
+                              : AppColors.textSecondaryOf(context),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -73,12 +73,12 @@ class Dining_list extends StatelessWidget {
         }
 
         if (provider.dining_list.isEmpty) {
-          return const SizedBox(
+          return SizedBox(
             height: 120,
             child: Center(
               child: Text(
                 'No dining sessions found',
-                style: TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: AppColors.textSecondaryOf(context)),
               ),
             ),
           );

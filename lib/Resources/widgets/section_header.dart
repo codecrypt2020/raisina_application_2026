@@ -13,25 +13,25 @@ class SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: AppColors.textPrimaryOf(context),
             fontSize: 28,
             fontWeight: FontWeight.w800,
             fontFamily: 'serif',
           ),
         ),
         const SizedBox(width: 10),
-        const Expanded(
+        Expanded(
           child: Divider(
-            color: AppColors.navySurface,
+            color: AppColors.borderOf(context),
             thickness: 1,
           ),
         ),
         const SizedBox(width: 10),
         Text(
           '$count files',
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: AppColors.textMutedOf(context),
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),

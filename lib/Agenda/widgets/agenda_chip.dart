@@ -30,10 +30,18 @@ class AgendaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color cardColor = highlight
+        ? AppColors.elevatedOf(context)
+        : AppColors.surfaceOf(context);
+    final Color topSlotColor = AppColors.surfaceSoftOf(context);
+    final Color titleColor = AppColors.textPrimaryOf(context);
+    final Color subtitleColor = AppColors.textSecondaryOf(context);
+    final Color mutedColor = AppColors.textMutedOf(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlight ? AppColors.navyElevated : AppColors.navyMid,
+        color: cardColor,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: highlight ? AppColors.gold : Colors.transparent,
@@ -54,8 +62,7 @@ class AgendaCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color:
-                      highlight ? AppColors.navySurface : AppColors.navySurface,
+                  color: topSlotColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -67,8 +74,7 @@ class AgendaCard extends StatelessWidget {
                     ),
                     Text(
                       starttime.split(' ')[1],
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.textMuted),
+                      style: TextStyle(fontSize: 12, color: mutedColor),
                     ),
                   ],
                 ),
@@ -88,9 +94,8 @@ class AgendaCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, color: titleColor),
                       ),
                     ),
                     if (isLive)
@@ -112,11 +117,9 @@ class AgendaCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(location,
-                    style: const TextStyle(color: AppColors.textSecondary)),
+                Text(location, style: TextStyle(color: subtitleColor)),
                 const SizedBox(height: 4),
-                Text(speaker,
-                    style: const TextStyle(color: AppColors.textMuted)),
+                Text(speaker, style: TextStyle(color: mutedColor)),
                 if (tag != null) ...[
                   const SizedBox(height: 10),
                   Container(

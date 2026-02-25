@@ -19,12 +19,12 @@ class SpeakingEngagementList extends StatelessWidget {
       itemBuilder: (context, index) {
         // Header
         if (index == 0) {
-          return const Text(
+          return Text(
             'Speaking Engagement',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              color: AppColors.textPrimaryOf(context),
             ),
           );
         }
