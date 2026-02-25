@@ -486,7 +486,8 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             if (isSpeakingEnabled)
               const NavigationDestination(
                 icon: Icon(Icons.school_outlined),
-                label: 'Speaking Eng',
+                // label: 'Speaking Eng',
+                label: 'Speaking',
               ),
             const NavigationDestination(
               icon: Icon(Icons.person_outline),

@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 class ProfileRow extends StatelessWidget {
   const ProfileRow({
     required this.title,
-    required this.subtitle,
+ //   required this.subtitle,
     required this.icon,
     required this.color,
   });
 
   final String title;
-  final String subtitle;
+//  final String subtitle;
   final IconData icon;
   final Color color;
 
@@ -37,7 +37,7 @@ class ProfileRow extends StatelessWidget {
                     TextStyle(fontWeight: FontWeight.w700, color: titleColor),
               ),
               const SizedBox(height: 4),
-              Text(subtitle, style: TextStyle(color: subtitleColor)),
+             // Text(subtitle, style: TextStyle(color: subtitleColor)),
             ],
           ),
         ),

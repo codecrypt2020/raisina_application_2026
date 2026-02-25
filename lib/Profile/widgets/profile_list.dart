@@ -91,7 +91,7 @@ class ProfileList extends StatelessWidget {
                 const SizedBox(height: 4),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: roleChipColor, width: 1.4),
@@ -104,12 +104,29 @@ class ProfileList extends StatelessWidget {
                         .toUpperCase(),
                     style: const TextStyle(
                       color: roleChipColor,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 2.0,
-                      // fontSize: 18,
+                      fontSize: 10,
                     ),
                   ),
                 ),
+                const SizedBox(height: 4),
+                Container(
+                     padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                 decoration: BoxDecoration(
+                 borderRadius: BorderRadius.circular(10), 
+                 border: Border.all(color: roleChipColor, width: 1.4),
+                 ),
+                  child: Text("RD-${ (provider.rd_number.toString()).toUpperCase()}",               
+                style: const TextStyle(
+                  color: roleChipColor,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 2.0,
+                  fontSize: 10,
+                ),
+              ),
+              ),                 
               ],
             ))
           ],
@@ -139,13 +156,11 @@ class ProfileList extends StatelessWidget {
                     ),
                   );
                 },
-                child: const ProfileRow(
+                child: ProfileRow(
                   title: 'Digital badge',
-                  subtitle: 'Speaker pass · updated 5 mins ago',
                   icon: Icons.badge_outlined,
                   color: AppColors.gold,
-                ),
-              ),
+                     ),),
               // Divider(color: AppColors.navySurface),
               // ProfileRow(
               //   title: 'Travel & logistics',
