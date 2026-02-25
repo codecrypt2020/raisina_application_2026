@@ -58,6 +58,7 @@ class Network_request {
       if (response.statusCode == 200 && jsonData["success"] == true) {
         var res = decryptResponse(response.body);
         res["data"]["email"] = username;
+        res["data"]["qr_name"] = res["data"]["name"];
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
         Hive.box("LoginDetails").put("roleId", res["data"]["role_id"]);

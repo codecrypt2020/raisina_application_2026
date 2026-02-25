@@ -60,6 +60,14 @@ class _Resources_viewState extends State<Resources_view> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context);
+    final bool isDark = AppColors.isDark(context);
+    final Color textSecondaryColor = AppColors.textSecondaryOf(context);
+    final Color textMutedColor = AppColors.textMutedOf(context);
+    final Color cardColor = AppColors.elevatedOf(context);
+    final Color borderColor = AppColors.borderOf(context);
+    final List<Color> backgroundGradient = isDark
+        ? const [Color(0xFF0C1220), Color(0xFF101A2B)]
+        : const [Color(0xFFF8FAFD), Color(0xFFF2F6FC)];
     List<Widget> widgetss = [
       if (provider.selectedCategoryIndex == 0)
         const Alldata()
@@ -76,12 +84,12 @@ class _Resources_viewState extends State<Resources_view> {
       else if (provider.selectedCategoryIndex == 6)
         General()
       else
-        const SizedBox(
+        SizedBox(
           height: 120,
           child: Center(
             child: Text(
               'No resources found for this category',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: textSecondaryColor),
             ),
           ),
         )
@@ -91,14 +99,11 @@ class _Resources_viewState extends State<Resources_view> {
       behavior: HitTestBehavior.opaque,
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF8FAFD),
-              Color(0xFFF2F6FC),
-            ],
+            colors: backgroundGradient,
           ),
         ),
         child: Column(
@@ -109,19 +114,19 @@ class _Resources_viewState extends State<Resources_view> {
               child: Container(
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.navyElevated,
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.navySurface),
+                  border: Border.all(color: borderColor),
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: provider.setSearchQuery,
                   decoration: InputDecoration(
                     hintText: 'Search resources...',
-                    hintStyle: TextStyle(color: AppColors.textMuted),
+                    hintStyle: TextStyle(color: textMutedColor),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: AppColors.textMuted,
+                      color: textMutedColor,
                     ),
                     suffixIcon: provider.searchQuery.isNotEmpty
                         ? IconButton(
@@ -129,9 +134,9 @@ class _Resources_viewState extends State<Resources_view> {
                               _searchController.clear();
                               provider.setSearchQuery('');
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.close,
-                              color: AppColors.textMuted,
+                              color: textMutedColor,
                             ),
                           )
                         : null,

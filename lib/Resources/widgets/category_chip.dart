@@ -13,6 +13,10 @@ class CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ResourcesData>(context, listen: true);
+    final Color cardColor = AppColors.elevatedOf(context);
+    final Color borderColor = AppColors.borderOf(context);
+    final Color textColor = AppColors.textSecondaryOf(context);
+    final Color counterBgColor = AppColors.surfaceSoftOf(context);
     return GestureDetector(
       onTap: onTap ??
           () {
@@ -24,12 +28,12 @@ class CategoryChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: index == provider.selectedCategoryIndex
               ? AppColors.goldDim
-              : AppColors.navyElevated,
+              : cardColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: index == provider.selectedCategoryIndex
                 ? AppColors.gold
-                : AppColors.navySurface,
+                : borderColor,
           ),
         ),
         child: Row(
@@ -40,7 +44,7 @@ class CategoryChip extends StatelessWidget {
               style: TextStyle(
                 color: index == provider.selectedCategoryIndex
                     ? AppColors.gold
-                    : AppColors.textSecondary,
+                    : textColor,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -48,13 +52,13 @@ class CategoryChip extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.navySurface,
+                color: counterBgColor,
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
                 '${provider.getCountByIndex(item.index)}',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: TextStyle(
+                  color: textColor,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),

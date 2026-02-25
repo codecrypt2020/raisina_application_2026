@@ -1,4 +1,5 @@
 import 'package:attendee_app/Resources/provider/resources_data.dart';
+import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 
 import 'package:attendee_app/Resources/widgets/resource_card.dart';
@@ -14,10 +15,10 @@ class Sessions extends StatelessWidget {
     final filteredList = provider.searchedSessionsList;
 
     if (filteredList.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No resources found',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: AppColors.textSecondaryOf(context)),
         ),
       );
     }

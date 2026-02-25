@@ -23,7 +23,7 @@ class _ResourcesState extends State<Resources> {
     final fetch_data =
         Provider.of<ResourcesData>(context, listen: false).fetchResources();
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Resources'),
         centerTitle: false,

@@ -9,29 +9,32 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color titleColor = AppColors.textPrimaryOf(context);
+    final Color dividerColor = AppColors.borderOf(context);
+    final Color mutedColor = AppColors.textMutedOf(context);
     return Row(
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: titleColor,
             fontSize: 28,
             fontWeight: FontWeight.w800,
             fontFamily: 'serif',
           ),
         ),
         const SizedBox(width: 10),
-        const Expanded(
+        Expanded(
           child: Divider(
-            color: AppColors.navySurface,
+            color: dividerColor,
             thickness: 1,
           ),
         ),
         const SizedBox(width: 10),
         Text(
           '$count files',
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: mutedColor,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),

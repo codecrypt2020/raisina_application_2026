@@ -11,6 +11,10 @@ class AgendaView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<Agenda_data>(context, listen: true);
+    final Color titleColor = AppColors.textPrimaryOf(context);
+    final Color surfaceColor = AppColors.surfaceSoftOf(context);
+    final Color borderColor = AppColors.elevatedOf(context);
+    final Color subtitleColor = AppColors.textSecondaryOf(context);
     print("bhjfhjfbgvh:${provider.agenda_list}");
     return ListView.builder(
       padding: const EdgeInsets.all(20),
@@ -29,7 +33,7 @@ class AgendaView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: titleColor,
                   ),
                 ),
                 SizedBox(height: 12),
@@ -50,22 +54,16 @@ class AgendaView extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.goldDim
-                              : AppColors.navySurface,
+                          color: isSelected ? AppColors.goldDim : surfaceColor,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isSelected
-                                ? AppColors.gold
-                                : AppColors.navyElevated,
+                            color: isSelected ? AppColors.gold : borderColor,
                           ),
                         ),
                         child: Text(
                           "${provider.days[index]["day"]} - ${provider.days[index]["date"]}",
                           style: TextStyle(
-                            color: isSelected
-                                ? AppColors.gold
-                                : AppColors.textSecondary,
+                            color: isSelected ? AppColors.gold : subtitleColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

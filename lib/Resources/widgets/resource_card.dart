@@ -28,12 +28,18 @@ class ResourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasValidUrl = file_url.trim().isNotEmpty;
+    final Color cardColor = AppColors.elevatedOf(context);
+    final Color borderColor = AppColors.borderOf(context);
+    final Color titleColor = AppColors.textPrimaryOf(context);
+    final Color secondaryColor = AppColors.textSecondaryOf(context);
+    final Color mutedColor = AppColors.textMutedOf(context);
+    final bool isDarkMode = AppColors.isDark(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.navyElevated,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.navySurface),
+        border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -61,10 +67,10 @@ class ResourceCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: titleColor,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -72,8 +78,8 @@ class ResourceCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: secondaryColor,
                       fontSize: 15,
                     ),
                   ),
@@ -88,32 +94,31 @@ class ResourceCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.insert_drive_file_outlined,
-                        size: 16, color: AppColors.textMuted),
+                    Icon(Icons.insert_drive_file_outlined,
+                        size: 16, color: mutedColor),
                     const SizedBox(width: 4),
                     Text(
                       type,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: mutedColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Icon(Icons.access_time,
-                        size: 16, color: AppColors.textMuted),
+                    Icon(Icons.access_time, size: 16, color: mutedColor),
                     const SizedBox(width: 4),
                     Text(
                       date,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: mutedColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       size,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: mutedColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -146,8 +151,8 @@ class ResourceCard extends StatelessWidget {
                               context, file_url, title)
                           : null,
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.navySurface),
-                        foregroundColor: AppColors.textSecondary,
+                        side: BorderSide(color: borderColor),
+                        foregroundColor: secondaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -161,10 +166,16 @@ class ResourceCard extends StatelessWidget {
                     ElevatedButton(
                       onPressed: null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade300,
-                        foregroundColor: Colors.grey.shade600,
-                        disabledBackgroundColor: Colors.grey.shade300,
-                        disabledForegroundColor: Colors.grey.shade600,
+                        backgroundColor: isDarkMode
+                            ? AppColors.surfaceSoftOf(context)
+                            : Colors.grey.shade300,
+                        foregroundColor:
+                            isDarkMode ? mutedColor : Colors.grey.shade600,
+                        disabledBackgroundColor: isDarkMode
+                            ? AppColors.surfaceSoftOf(context)
+                            : Colors.grey.shade300,
+                        disabledForegroundColor:
+                            isDarkMode ? mutedColor : Colors.grey.shade600,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
