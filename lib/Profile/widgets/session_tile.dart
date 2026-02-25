@@ -15,7 +15,7 @@ class SessionTile extends StatelessWidget {
     if (sessions.isEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        alignment: Alignment.center,
+        alignment: Alignment.topLeft,
         child: Text(
           'No speaking sessions assigned.',
           style: TextStyle(
