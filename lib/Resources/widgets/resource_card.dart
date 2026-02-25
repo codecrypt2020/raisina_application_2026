@@ -1,3 +1,4 @@
+import 'package:attendee_app/Resources/utils/resource_file_actions.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class ResourceCard extends StatelessWidget {
     required this.type,
     required this.date,
     required this.size,
+    required this.file_url,
     this.badgeText,
   });
 
@@ -20,6 +22,7 @@ class ResourceCard extends StatelessWidget {
   final String type;
   final String date;
   final String size;
+  final String file_url;
   final String? badgeText;
 
   @override
@@ -30,6 +33,7 @@ class ResourceCard extends StatelessWidget {
     final Color subtitleColor = AppColors.textSecondaryOf(context);
     final Color mutedColor = AppColors.textMutedOf(context);
 
+    final hasValidUrl = file_url.trim().isNotEmpty;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -70,13 +74,23 @@ class ResourceCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: subtitleColor,
-                    fontSize: 15,
+                if (subtitle != "") ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
+                ],
+                // Text(
+                //   subtitle,
+                //   style: const TextStyle(
+                //     color: AppColors.textSecondary,
+                //     fontSize: 15,
+                //   ),
+                // ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -132,7 +146,10 @@ class ResourceCard extends StatelessWidget {
                 Row(
                   children: [
                     OutlinedButton(
-                      onPressed: () {},
+                      onPressed: hasValidUrl
+                          ? () => ResourceFileActions.previewFile(
+                              context, file_url, title)
+                          : null,
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: borderColor),
                         foregroundColor: subtitleColor,
@@ -147,10 +164,12 @@ class ResourceCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.goldDim,
-                        foregroundColor: AppColors.gold,
+                        backgroundColor: Colors.grey.shade300,
+                        foregroundColor: Colors.grey.shade600,
+                        disabledBackgroundColor: Colors.grey.shade300,
+                        disabledForegroundColor: Colors.grey.shade600,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),

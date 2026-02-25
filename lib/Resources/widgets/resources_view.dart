@@ -1,99 +1,179 @@
 import 'package:attendee_app/Resources/Model/resource_category_datatype.dart';
+import 'package:attendee_app/Resources/provider/resources_data.dart';
+import 'package:attendee_app/Resources/widgets/allData.dart';
 import 'package:attendee_app/Resources/widgets/category_chip.dart';
+import 'package:attendee_app/Resources/widgets/eventInfo.dart';
+import 'package:attendee_app/Resources/widgets/forYou.dart';
+import 'package:attendee_app/Resources/widgets/general.dart';
+import 'package:attendee_app/Resources/widgets/mediaKit.dart';
 import 'package:attendee_app/Resources/widgets/resource_card.dart';
 import 'package:attendee_app/Resources/widgets/section_header.dart';
+import 'package:attendee_app/Resources/widgets/sessions.dart';
+import 'package:attendee_app/Resources/widgets/speaker.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class Resources_view extends StatelessWidget {
+class Resources_view extends StatefulWidget {
   const Resources_view({
     super.key,
-    required this.categories,
   });
 
-  final List<ResourceCategory> categories;
+  @override
+  State<Resources_view> createState() => _Resources_viewState();
+}
+
+class _Resources_viewState extends State<Resources_view> {
+  List<GlobalKey> _chipKeys = [];
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final categoriesLength =
+        Provider.of<ResourcesData>(context, listen: false).categories.length;
+    if (_chipKeys.length != categoriesLength) {
+      _chipKeys = List.generate(categoriesLength, (_) => GlobalKey());
+    }
+  }
+
+  void _scrollToChip(int index) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || index >= _chipKeys.length) return;
+      final chipContext = _chipKeys[index].currentContext;
+      if (chipContext == null) return;
+      Scrollable.ensureVisible(
+        chipContext,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeInOut,
+        alignment: 0.5,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = AppColors.isDark(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? const [
-                  Color(0xFF0C1220),
-                  Color(0xFF10192B),
-                ]
-              : const [
-                  Color(0xFFF8FAFD),
-                  Color(0xFFF2F6FC),
-                ],
-        ),
-      ),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-        children: [
-          Container(
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.elevatedOf(context),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.borderOf(context)),
+    final provider = Provider.of<ResourcesData>(context);
+    List<Widget> widgetss = [
+      if (provider.selectedCategoryIndex == 0)
+        const Alldata()
+      else if (provider.selectedCategoryIndex == 1)
+        const ForYou()
+      else if (provider.selectedCategoryIndex == 2)
+        const Eventinfo()
+      else if (provider.selectedCategoryIndex == 3)
+        const Sessions()
+      else if (provider.selectedCategoryIndex == 4)
+        Mediakit()
+      else if (provider.selectedCategoryIndex == 5)
+        const Speaker()
+      else if (provider.selectedCategoryIndex == 6)
+        General()
+      else
+        const SizedBox(
+          height: 120,
+          child: Center(
+            child: Text(
+              'No resources found for this category',
+              style: TextStyle(color: AppColors.textSecondary),
             ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search resources...',
-                hintStyle: TextStyle(color: AppColors.textMutedOf(context)),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: AppColors.textMutedOf(context),
+          ),
+        )
+    ];
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF8FAFD),
+              Color(0xFFF2F6FC),
+            ],
+          ),
+        ),
+        child: Column(
+          // padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.navyElevated,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.navySurface),
                 ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: provider.setSearchQuery,
+                  decoration: InputDecoration(
+                    hintText: 'Search resources...',
+                    hintStyle: TextStyle(color: AppColors.textMuted),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: AppColors.textMuted,
+                    ),
+                    suffixIcon: provider.searchQuery.isNotEmpty
+                        ? IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              provider.setSearchQuery('');
+                            },
+                            icon: const Icon(
+                              Icons.close,
+                              color: AppColors.textMuted,
+                            ),
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 14),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: categories
-                  .map((item) => Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: CategoryChip(item: item),
-                      ))
-                  .toList(),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children:
+                      provider.categories.asMap().entries.map<Widget>((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: KeyedSubtree(
+                        key: _chipKeys[index],
+                        child: CategoryChip(
+                          item: item,
+                          index: index,
+                          onTap: () {
+                            provider.setSelectedCategoryIndex(index);
+                            _scrollToChip(index);
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 18),
-          const SectionHeader(title: 'Speaker Kit', count: 1),
-          const SizedBox(height: 10),
-          const ResourceCard(
-            icon: Icons.image_outlined,
-            iconColor: Color(0xFF9A58DC),
-            title: 'Speaker resource 1',
-            subtitle: 'Speaker resource 1',
-            type: 'IMAGE',
-            date: 'Feb 16, 2026',
-            size: '497.3 KB',
-            badgeText: 'FOR YOU',
-          ),
-          const SizedBox(height: 18),
-          const SectionHeader(title: 'Session Materials', count: 1),
-          const SizedBox(height: 10),
-          const ResourceCard(
-            icon: Icons.description_outlined,
-            iconColor: Color(0xFFE35C5C),
-            title: 'Session Material testing Doc',
-            subtitle: 'Session Material testing Doc',
-            type: 'PDF',
-            date: 'Feb 16, 2026',
-            size: '131.1 KB',
-          ),
-        ],
+            Expanded(
+              child: widgetss[0],
+            )
+          ],
+        ),
       ),
     );
   }

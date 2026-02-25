@@ -20,9 +20,7 @@ dependencies:
   url_launcher: ^6.3.1
   intl: ^0.20.2
   country_code_picker: ^3.3.0
-  
-
-  
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -31,7 +29,6 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.0
 
-  
 flutter:
   uses-material-design: true
   assets:
@@ -50,5 +47,3 @@ flutter_native_splash:
   android_12:
     color: "#FFFFFF"
     image: assets/images/RaisinaLauncherIconFinal.png
-    
-    
