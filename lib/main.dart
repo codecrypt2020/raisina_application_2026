@@ -67,11 +67,14 @@ void main() async {
   Directory directory = await getApplicationDocumentsDirectory();
   await Hive.initFlutter(directory.path);
   await Hive.openBox('LoginDetails');
+  await Hive.openBox('AppSettings');
   runApp(const AttendeeApp());
 }
 
 class AttendeeApp extends StatefulWidget {
   const AttendeeApp({super.key});
+  static const String settingsBoxName = 'AppSettings';
+  static const String themeModeKey = 'theme_mode';
 
   @override
   static _AttendeeAppState? _of(BuildContext context) {
@@ -80,6 +83,10 @@ class AttendeeApp extends StatefulWidget {
 
   static void toggleTheme(BuildContext context) {
     _of(context)?._toggleTheme();
+  }
+
+  static void setThemeMode(BuildContext context, ThemeMode mode) {
+    _of(context)?._setThemeMode(mode);
   }
 
   static bool isDarkMode(BuildContext context) {
@@ -95,11 +102,39 @@ class AttendeeApp extends StatefulWidget {
 class _AttendeeAppState extends State<AttendeeApp> {
   ThemeMode _themeMode = ThemeMode.light;
 
-  void _toggleTheme() {
+  @override
+  void initState() {
+    super.initState();
+    final box = Hive.box(AttendeeApp.settingsBoxName);
+    final mode = box.get(AttendeeApp.themeModeKey, defaultValue: 'light');
+    if (box.get(AttendeeApp.themeModeKey) == null) {
+      box.put(AttendeeApp.themeModeKey, 'light');
+    }
+    if (mode == 'dark') {
+      _themeMode = ThemeMode.dark;
+    } else {
+      _themeMode = ThemeMode.light;
+      if (mode != 'light') {
+        box.put(AttendeeApp.themeModeKey, 'light');
+      }
+    }
+  }
+
+  void _setThemeMode(ThemeMode mode) {
+    if (_themeMode == mode) return;
     setState(() {
-      _themeMode =
-          _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+      _themeMode = mode;
     });
+    Hive.box(AttendeeApp.settingsBoxName).put(
+      AttendeeApp.themeModeKey,
+      mode == ThemeMode.dark ? 'dark' : 'light',
+    );
+  }
+
+  void _toggleTheme() {
+    _setThemeMode(
+      _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
+    );
   }
 
   @override
@@ -467,6 +502,9 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         bottomNavigationBar: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: (index) async {
+            if (index == _selectedIndex) {
+              return;
+            }
             await Network_request.assignedUserDetails();
             isSpeakingEnabled =
                 Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);

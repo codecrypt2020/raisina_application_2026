@@ -1,4 +1,5 @@
 import 'package:attendee_app/constants.dart';
+import 'package:attendee_app/main.dart';
 import 'package:attendee_app/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -62,6 +63,8 @@ class Network_request {
         Hive.box('LoginDetails').put("Profile_details", res["data"]);
         Hive.box("LoginDetails").put("token", res["data"]["token"]);
         Hive.box("LoginDetails").put("roleId", res["data"]["role_id"]);
+        Hive.box(AttendeeApp.settingsBoxName)
+            .put(AttendeeApp.themeModeKey, 'light');
         return {"success": true, "message": "Login successful"};
       } else {
         return {
