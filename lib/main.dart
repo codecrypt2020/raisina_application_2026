@@ -304,10 +304,19 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
       ],
       child: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 72,
+          toolbarHeight: 80,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Raisina Dialogue',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimaryOf(context),
+                ),
+              ),
+              SizedBox(height: 4),
               Row(
                 children: [
                   Text('Welcome, ',
@@ -332,15 +341,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                     ),
                   ),
                 ],
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Raisina Dialogue',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimaryOf(context),
-                ),
               ),
             ],
           ),
@@ -505,7 +505,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             if (index == _selectedIndex) {
               return;
             }
-            await Network_request.assignedUserDetails();
+            Network_request.assignedUserDetails();
             isSpeakingEnabled =
                 Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
             setState(() {

@@ -104,8 +104,11 @@ class Agenda_data with ChangeNotifier {
 
         if (res != null && res.isNotEmpty) {
           String startDateString = res[0]['start_date'];
-
-          DateTime startDate = DateTime.parse(startDateString).toLocal();
+          final DateTime utcStartDate = DateTime.parse(startDateString).toUtc();
+          final DateTime istStartDate =
+              utcStartDate.add(const Duration(hours: 5, minutes: 30));
+          final DateTime startDate =
+              DateTime(istStartDate.year, istStartDate.month, istStartDate.day);
 
           generateDays(startDate);
           notifyListeners();

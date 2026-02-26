@@ -76,6 +76,7 @@ class SpeakingEngagementData with ChangeNotifier {
           //     "speakingShow": false
           // }
         }
+        notifyListeners();
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
