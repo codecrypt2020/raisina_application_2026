@@ -11,94 +11,133 @@ class AgendaView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<Agenda_data>(context, listen: true);
+    final bool isAgendaLoading = provider.isAgendaLoading;
+    final bool isAgendaEmpty = provider.agenda_list.isEmpty;
     final Color titleColor = AppColors.textPrimaryOf(context);
     final Color surfaceColor = AppColors.surfaceSoftOf(context);
     final Color borderColor = AppColors.elevatedOf(context);
     final Color subtitleColor = AppColors.textSecondaryOf(context);
     print("bhjfhjfbgvh:${provider.agenda_list}");
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: provider.agenda_list.length + 2, // header + spacing
-      itemBuilder: (context, index) {
-        // Header
-        if (index == 0) {
-          return Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Agenda',
+    return RefreshIndicator(
+      onRefresh: () async {
+        await provider.getAgenda(provider.selectedIndex + 1);
+      },
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        itemCount: isAgendaLoading
+            ? 3 // header + spacing + loader
+            : isAgendaEmpty
+                ? 3 // header + spacing + empty message
+                : provider.agenda_list.length + 2, // header + spacing + agenda
+        itemBuilder: (context, index) {
+          // Header
+          if (index == 0) {
+            return Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    'Agenda',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.start,
+                    children: List.generate(provider.days.length, (index) {
+                      bool isSelected = provider.selectedIndex == index;
+
+                      return GestureDetector(
+                        onTap: () {
+                          // setState(() {
+                          provider.selectedIndexfun(index); //= index;
+                          // });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected ? AppColors.goldDim : surfaceColor,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected ? AppColors.gold : borderColor,
+                            ),
+                          ),
+                          child: Text(
+                            "${provider.days[index]["day"]} - ${provider.days[index]["date"]}",
+                            style: TextStyle(
+                              color:
+                                  isSelected ? AppColors.gold : subtitleColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  )
+                ],
+              ),
+            );
+          }
+          // Space after header
+          if (index == 1) {
+            return SizedBox(height: 20);
+          }
+
+          if (isAgendaLoading) {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.55,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (isAgendaEmpty) {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.55,
+              child: Center(
+                child: Text(
+                  'No agenda assigned',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: titleColor,
+                    color: subtitleColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.start,
-                  children: List.generate(provider.days.length, (index) {
-                    bool isSelected = provider.selectedIndex == index;
+              ),
+            );
+          }
 
-                    return GestureDetector(
-                      onTap: () {
-                        // setState(() {
-                        provider.selectedIndexfun(index); //= index;
-                        // });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppColors.goldDim : surfaceColor,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isSelected ? AppColors.gold : borderColor,
-                          ),
-                        ),
-                        child: Text(
-                          "${provider.days[index]["day"]} - ${provider.days[index]["date"]}",
-                          style: TextStyle(
-                            color: isSelected ? AppColors.gold : subtitleColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                )
-              ],
+          final item = provider.agenda_list[index - 2];
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: AgendaCard(
+              time: item.time,
+              title: item.title,
+              location: item.location,
+              speaker: item.speaker,
+              tag: item.tag,
+              description: item.description,
+              starttime: item.start_time,
+              endtime: item.end_time,
+              tagColor: item.tagColor,
+              highlight: item.highlight,
+              isLive: item.isLive,
             ),
           );
-        }
-        // Space after header
-        if (index == 1) {
-          return SizedBox(height: 20);
-        }
-
-        final item = provider.agenda_list[index - 2];
-
-        return Padding(
-          padding: EdgeInsets.only(bottom: 12),
-          child: AgendaCard(
-            time: item.time,
-            title: item.title,
-            location: item.location,
-            speaker: item.speaker,
-            tag: item.tag,
-            description: item.description,
-            starttime: item.start_time,
-            endtime: item.end_time,
-            tagColor: item.tagColor,
-            highlight: item.highlight,
-            isLive: item.isLive,
-          ),
-        );
-      },
+        },
+      ),
     );
 
     //  return

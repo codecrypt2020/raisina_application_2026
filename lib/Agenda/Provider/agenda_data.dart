@@ -14,6 +14,7 @@ class Agenda_data with ChangeNotifier {
 
   var _selectedIndex = 0;
   List<Map<String, String>> _days = [];
+  bool _isAgendaLoading = false;
 
   // final List<Map<String, String>> _days = [
   //   {"day": "Day 1", "date": "Feb 14"},
@@ -33,6 +34,10 @@ class Agenda_data with ChangeNotifier {
 
   get selectedIndex {
     return _selectedIndex;
+  }
+
+  get isAgendaLoading {
+    return _isAgendaLoading;
   }
 
   void selectedIndexfun(int index) {
@@ -146,6 +151,8 @@ class Agenda_data with ChangeNotifier {
 
 //agenda
   Future getAgenda([i]) async {
+    _isAgendaLoading = true;
+    notifyListeners();
     try {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.getAgenda),
@@ -178,10 +185,12 @@ class Agenda_data with ChangeNotifier {
       if (response.statusCode == 200) {
         var res = decryptResponse(response.body);
         _agenda_list = mapSessionsToEngagements(res);
-        notifyListeners();
       }
     } catch (e) {
       debugPrint("this is the error in getAgendaApi: ${e}");
+    } finally {
+      _isAgendaLoading = false;
+      notifyListeners();
     }
   }
 

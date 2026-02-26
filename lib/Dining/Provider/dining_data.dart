@@ -12,6 +12,7 @@ class dining_data with ChangeNotifier {
   List<DiningDataItem> _dining_list = [];
   var _selectedIndex = 0;
   List<Map<String, String>> _days = [];
+  bool _isDiningLoading = false;
 
   // final List<Map<String, String>> _days = [
   //   {"day": "Day 1", "date": "Feb 14"},
@@ -30,6 +31,10 @@ class dining_data with ChangeNotifier {
 
   get selectedIndex {
     return _selectedIndex;
+  }
+
+  get isDiningLoading {
+    return _isDiningLoading;
   }
 
   void selectedIndexfun(int index) {
@@ -136,6 +141,9 @@ class dining_data with ChangeNotifier {
 
 //Dining APIs
   Future dining([i]) async {
+    _isDiningLoading = true;
+    notifyListeners();
+
     //empyting the list
     _dining_list = [];
 
@@ -173,6 +181,9 @@ class dining_data with ChangeNotifier {
       }
     } catch (e) {
       debugPrint("this is the error in Dining : $e");
+    } finally {
+      _isDiningLoading = false;
+      notifyListeners();
     }
   }
 
