@@ -22,6 +22,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
+  var success;
 
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
@@ -174,18 +175,75 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     setState(() => _isSaving = true);
-    final bool success = await Profile_edit_save();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false, // Back button disable
+          child: Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 8,
+            child: SizedBox(
+              height: 120,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8, top: 8),
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.black),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ),
+                  const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 15),
+                        Text(
+                          "Saving...",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    await Profile_edit_save();
     if (!mounted) return;
     setState(() => _isSaving = false);
 
     if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile updated successfully')),
+      );
+
+      Navigator.pop(context);
       Navigator.pop(context, true);
       return;
+    } else {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong')),
+      );
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Something went wrong')),
-    );
   }
 
   @override
@@ -468,25 +526,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: _isSaving
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.4,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                            Colors.white,
-                                          ),
-                                        ),
-                                      )
-                                    : const Text(
-                                        'Save Changes',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16,
-                                        ),
-                                      ),
+                                child: const Text(
+                                  'Save Changes',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -548,8 +594,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       print(
           'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
       if (response.statusCode == 200) {
+        success = true;
         return true;
       }
+      success = false;
       return false;
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
