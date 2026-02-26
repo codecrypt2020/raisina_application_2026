@@ -35,9 +35,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   var profile_picture;
   var profileimageurl;
   File? _selectedImage;
+  bool _isSaving = false;
+  bool _isSavingimage = false;
+  var success;
+  var successimage;
 
-
-final ImagePicker _picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
 
   bool _hideOldPassword = true;
   bool _hideNewPassword = true;
@@ -83,67 +86,66 @@ final ImagePicker _picker = ImagePicker();
     );
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? pickedFile = await _picker.pickImage(source: source);
 
-Future<void> _pickImage(ImageSource source) async {
-  final XFile? pickedFile =
-      await _picker.pickImage(source: source);
-
-  if (pickedFile != null) {
-    setState(() {
-      _selectedImage = File(pickedFile.path);
-    });
-    print("test check image:${_selectedImage}");
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+      print("test check image:${_selectedImage}");
+    }
   }
-}
 
-Future<bool> _requestPermissions(ImageSource source) async {
-  if (source == ImageSource.camera) {
-    var status = await Permission.camera.request();
-    return status.isGranted;
-  } else {
-    if (await Permission.photos.isGranted ||
-        await Permission.storage.isGranted) {
-      return true;
+  Future<bool> _requestPermissions(ImageSource source) async {
+    if (source == ImageSource.camera) {
+      var status = await Permission.camera.request();
+      return status.isGranted;
+    } else {
+      if (await Permission.photos.isGranted ||
+          await Permission.storage.isGranted) {
+        return true;
+      }
+
+      if (await Permission.photos.request().isGranted) {
+        return true;
+      }
+
+      if (await Permission.storage.request().isGranted) {
+        return true;
+      }
+
+      return false;
     }
-
-    if (await Permission.photos.request().isGranted) {
-      return true;
-    }
-
-    if (await Permission.storage.request().isGranted) {
-      return true;
-    }
-
-    return false;
   }
-}
-void _showImagePickerOptions() {
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return Wrap(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.photo_library),
-            title: const Text("Choose from Gallery"),
-            onTap: () {
-              Navigator.pop(context);
-              _pickImage(ImageSource.gallery);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.camera_alt),
-            title: const Text("Take Photo"),
-            onTap: () {
-              Navigator.pop(context);
-              _pickImage(ImageSource.camera);
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+
+  void _showImagePickerOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text("Choose from Gallery"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text("Take Photo"),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget _label(BuildContext context, String text) {
     return Padding(
@@ -173,25 +175,76 @@ void _showImagePickerOptions() {
 
   void _updatePassword() async {
     if (!_passwordFormKey.currentState!.validate()) return;
-
-    // Loader show
+    setState(() => _isSaving = true);
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) {
+        return PopScope(
+          canPop: false, // Back button disable
+          child: Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 8,
+            child: SizedBox(
+              height: 120,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8, top: 8),
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.black),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ),
+                  const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 15),
+                        Text(
+                          "Saving...",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
+    await password_change();
+    if (!mounted) return;
+    setState(() => _isSaving = false);
 
-    await password_change(); // API call
+    if (success) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(tosattext)),
+      );
 
-    Navigator.pop(context); // Loader close
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(tosattext)),
-    );
-
-    Navigator.pop(context, true); // Back screen
+      return;
+    } else {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong')),
+      );
+    }
   }
 
   @override
@@ -254,55 +307,63 @@ void _showImagePickerOptions() {
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-              CircleAvatar(
-            radius: 56,
-            backgroundColor: AppColors.goldDim,
-            backgroundImage: _selectedImage != null
-                ? FileImage(_selectedImage!) as ImageProvider
-                : (profile_picture != null &&
-              profile_picture['emp_profilepic'] != null &&
-              profile_picture['emp_profilepic'].toString().isNotEmpty)
-          ? NetworkImage(profile_picture['emp_profilepic']) as ImageProvider
-          : null,
-            child: (_selectedImage == null &&
-              (profile_picture == null ||
-              profile_picture['emp_profilepic'] == null ||
-              profile_picture['emp_profilepic'].toString().isEmpty))
-                ? Text(
-                    initials.isEmpty ? 'U' : initials,
-                    style: TextStyle(
-                      color: AppColors.textPrimaryOf(context),
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  )
-                : null,
-            ),
-            Positioned(
-            right: -2,
-            bottom: -2,
-            child: GestureDetector(
-            onTap: _showImagePickerOptions, 
-            child: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-            color: AppColors.elevatedOf(context),
-            shape: BoxShape.circle,
-            border: Border.all(
-            color: AppColors.borderOf(context),
-           ),
-        ),
-        child: const Icon(
-        Icons.edit_outlined,
-        size: 18,
-        color: AppColors.gold,
-      ),
-    ),
-  ),
-),
+                            CircleAvatar(
+                              radius: 56,
+                              backgroundColor: AppColors.goldDim,
+                              backgroundImage: _selectedImage != null
+                                  ? FileImage(_selectedImage!) as ImageProvider
+                                  : (profile_picture != null &&
+                                          profile_picture['emp_profilepic'] !=
+                                              null &&
+                                          profile_picture['emp_profilepic']
+                                              .toString()
+                                              .isNotEmpty)
+                                      ? NetworkImage(
+                                              profile_picture['emp_profilepic'])
+                                          as ImageProvider
+                                      : null,
+                              child: (_selectedImage == null &&
+                                      (profile_picture == null ||
+                                          profile_picture['emp_profilepic'] ==
+                                              null ||
+                                          profile_picture['emp_profilepic']
+                                              .toString()
+                                              .isEmpty))
+                                  ? Text(
+                                      initials.isEmpty ? 'U' : initials,
+                                      style: TextStyle(
+                                        color: AppColors.textPrimaryOf(context),
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            Positioned(
+                              right: -2,
+                              bottom: -2,
+                              child: GestureDetector(
+                                onTap: _showImagePickerOptions,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.elevatedOf(context),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.borderOf(context),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit_outlined,
+                                    size: 18,
+                                    color: AppColors.gold,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                      ),  
+                      ),
                       const SizedBox(height: 20),
                       if (isWide)
                         Row(
@@ -343,56 +404,142 @@ void _showImagePickerOptions() {
                           width: 210,
                           height: 48,
                           child:
-                          // FilledButton(
-                          //   onPressed: () {
-                          //   if(_selectedImage !=null){
-                          //      profileImageUpload(_selectedImage!).then((value) {
-                          //      Fetch_emp_profile();
-                          //      Navigator.pop(context, true);
-                          //      });
-                          //   }                            
-                          //   },
-                          //   style: FilledButton.styleFrom(
-                          //     backgroundColor: primaryButtonBg,
-                          //     foregroundColor: Colors.white,
-                          //     shape: RoundedRectangleBorder(
-                          //       borderRadius: BorderRadius.circular(8),
-                          //     ),
-                          //   ),
-                          //   child: const Text(
-                          //     'Save Changes',
-                          //     style: TextStyle(
-                          //       fontWeight: FontWeight.w700,
-                          //       fontSize: 16,
-                          //     ),
-                          //   ),
-                          // ),
-                          FilledButton(
-                         onPressed: _selectedImage == null
-                        ? null
-                        : () async {
-                            await profileImageUpload(_selectedImage!).then((value) {
-                               Fetch_emp_profile();
-                               Navigator.pop(context, true);
-                               });
-                          },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: primaryButtonBg,
-                      disabledBackgroundColor: Colors.grey,  
-                      disabledForegroundColor: Colors.white70,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Save Changes',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                     ),
-                    ),
-                  ),
+                              // FilledButton(
+                              //   onPressed: () {
+                              //   if(_selectedImage !=null){
+                              //      profileImageUpload(_selectedImage!).then((value) {
+                              //      Fetch_emp_profile();
+                              //      Navigator.pop(context, true);
+                              //      });
+                              //   }
+                              //   },
+                              //   style: FilledButton.styleFrom(
+                              //     backgroundColor: primaryButtonBg,
+                              //     foregroundColor: Colors.white,
+                              //     shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(8),
+                              //     ),
+                              //   ),
+                              //   child: const Text(
+                              //     'Save Changes',
+                              //     style: TextStyle(
+                              //       fontWeight: FontWeight.w700,
+                              //       fontSize: 16,
+                              //     ),
+                              //   ),
+                              // ),
+                              FilledButton(
+                            onPressed: _selectedImage == null
+                                ? null
+                                : () async {
+                                    setState(() => _isSavingimage = true);
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) {
+                                        return PopScope(
+                                          canPop: false, // Back button disable
+                                          child: Dialog(
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            elevation: 8,
+                                            child: SizedBox(
+                                              height: 120,
+                                              child: Stack(
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 8, top: 8),
+                                                      child: IconButton(
+                                                        icon: const Icon(
+                                                            Icons.close,
+                                                            color:
+                                                                Colors.black),
+                                                        onPressed: () {
+                                                          Navigator.of(
+                                                            context,
+                                                          ).pop();
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const Center(
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        CircularProgressIndicator(),
+                                                        SizedBox(height: 15),
+                                                        Text(
+                                                          "Saving...",
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+
+                                    await profileImageUpload(_selectedImage!)
+                                        .then((value) {
+                                      Fetch_emp_profile();
+                                    });
+                                    if (!mounted) return;
+                                    setState(() => _isSavingimage = false);
+
+                                    if (successimage) {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Profile updated successfully')),
+                                      );
+
+                                      return;
+                                    } else {
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Something went wrong')),
+                                      );
+                                    }
+                                  },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: primaryButtonBg,
+                              disabledBackgroundColor: Colors.grey,
+                              disabledForegroundColor: Colors.white70,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Save Changes',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -688,7 +835,7 @@ void _showImagePickerOptions() {
         },
         body: jsonEncode(
           encryptPayload(
-            {"empId":null },
+            {"empId": null},
           ),
         ),
       );
@@ -697,68 +844,67 @@ void _showImagePickerOptions() {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         old_password = jsonData['data'][0]['password'];
-        profile_picture =  jsonData['emp_profilepic'][0];
-        setState(() {          
-        });
+        profile_picture = jsonData['emp_profilepic'][0];
+        setState(() {});
         print("password test:${profile_picture}");
         var res = decryptResponse(response.body);
         return res["data"][0]["user_qr_img"];
       }
     } catch (e) {
-      debugPrint("this is the error in assignedUserDetailsApidvgdfgghgfjgghgdfdshjffdsffsds : $e");
+      debugPrint(
+          "this is the error in assignedUserDetailsApidvgdfgghgfjgghgdfdshjffdsffsds : $e");
     }
   }
 
+  Future<void> profileImageUpload(File _selectedImage) async {
+    try {
+      var request = http.MultipartRequest(
+        "POST",
+        Uri.parse(Constants.NODE_URL + Constants.profile_image),
+      );
 
-Future<void> profileImageUpload(File _selectedImage) async {
-  try {
-    var request = http.MultipartRequest(
-      "POST",
-      Uri.parse(Constants.NODE_URL + Constants.profile_image),
-    );
+      // Headers
+      request.headers.addAll({
+        "x-encrypted": "1",
+        'x-access-token':
+            '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+        'x-access-type':
+            '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+      });
 
-    // Headers
-    request.headers.addAll({
-      "x-encrypted": "1",
-      'x-access-token':
-          '${Hive.box('LoginDetails').get("Profile_details")['token']}',
-      'x-access-type':
-          '${Hive.box('LoginDetails').get("Profile_details")['token']}',
-    });
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          "images",
+          _selectedImage.path,
+        ),
+      );
 
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        "images", 
-        _selectedImage.path,
-      ),
-    );
+      // Send request
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
 
-
-    // Send request
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData =decryptResponse(response.body); 
-      profileimageurl = jsonData['image']['url'];
-      emp_profile_save_photo();
-      // Hive.box("LoginDetails")
-      //     .put("Profile_details", jsonData["data"]);
-       print("image url test done:${profileimageurl}");
-      if (mounted) {
-        setState(() {});
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = decryptResponse(response.body);
+        profileimageurl = jsonData['image']['url'];
+        successimage = true;
+        emp_profile_save_photo();
+        // Hive.box("LoginDetails")
+        //     .put("Profile_details", jsonData["data"]);
+        print("image url test done:${profileimageurl}");
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        successimage = false;
+        print("Upload failed: ${response.statusCode}");
       }
-    } else {
-      print("Upload failed: ${response.statusCode}");
+    } catch (e) {
+      print("This is the error $e");
     }
-
-  } catch (e) {
-    print("This is the error $e");
   }
-}
 
 //////////////////////////
-///emp_profile_save_photo
+  ///emp_profile_save_photo
   Future emp_profile_save_photo() async {
     try {
       var response = await http.post(
@@ -775,30 +921,47 @@ Future<void> profileImageUpload(File _selectedImage) async {
         },
         body: jsonEncode(
           encryptPayload(
-   {
-    "name": "${Hive.box('LoginDetails').get("imagsave")['profile']['name']}",
-    "first_name": "${Hive.box('LoginDetails').get("imagsave")['profile']['first_name']}",
-    "last_name": "${Hive.box('LoginDetails').get("imagsave")['profile']['last_name']}",
-    "designation": "${Hive.box('LoginDetails').get("imagsave")['profile']['designation']}",
-    "organization": "${Hive.box('LoginDetails').get("imagsave")['profile']['organization']}",
-    "primary_phone": "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_phone']}",
-    "country_code": "${Hive.box('LoginDetails').get("imagsave")['profile']['country_code']}",
-    "primary_email": "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_email']}",
-    "bio": "${Hive.box('LoginDetails').get("imagsave")['profile']['bio']}",
-    "area_of_expertise": "${Hive.box('LoginDetails').get("imagsave")['profile']['area_of_expertise']}",
-    "social": {
-        "twitter": "${Hive.box('LoginDetails').get("imagsave")['profile']['social']['twitter']}"
-    },
-    "id":  "${Hive.box('LoginDetails').get("imagsave")['profile']['id']}",
-    "qr_internal_id":  "${Hive.box('LoginDetails').get("imagsave")['profile']['qr_internal_id']}",
-    "status":  "${Hive.box('LoginDetails').get("imagsave")['profile']['status']}",
-    "title":  "${Hive.box('LoginDetails').get("imagsave")['profile']['title']}",
-    "dietary_requirements":  "${Hive.box('LoginDetails').get("imagsave")['profile']['dietary_requirements']}",
-    "dining_invites":  "${Hive.box('LoginDetails').get("imagsave")['profile']['dining_invites']}",
-    "email": "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_email']}",
-    "emp_profilepic":"${profileimageurl}",
-
-           },
+            {
+              "name":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['name']}",
+              "first_name":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['first_name']}",
+              "last_name":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['last_name']}",
+              "designation":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['designation']}",
+              "organization":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['organization']}",
+              "primary_phone":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_phone']}",
+              "country_code":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['country_code']}",
+              "primary_email":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_email']}",
+              "bio":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['bio']}",
+              "area_of_expertise":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['area_of_expertise']}",
+              "social": {
+                "twitter":
+                    "${Hive.box('LoginDetails').get("imagsave")['profile']['social']['twitter']}"
+              },
+              "id":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['id']}",
+              "qr_internal_id":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['qr_internal_id']}",
+              "status":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['status']}",
+              "title":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['title']}",
+              "dietary_requirements":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['dietary_requirements']}",
+              "dining_invites":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['dining_invites']}",
+              "email":
+                  "${Hive.box('LoginDetails').get("imagsave")['profile']['primary_email']}",
+              "emp_profilepic": "${profileimageurl}",
+            },
           ),
         ),
       );
@@ -807,10 +970,9 @@ Future<void> profileImageUpload(File _selectedImage) async {
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
         old_password = jsonData['data'][0]['password'];
-        profile_picture =  jsonData['emp_profilepic'][0];
-        setState(() {          
-        });
-       
+        profile_picture = jsonData['emp_profilepic'][0];
+        setState(() {});
+
         // var res = decryptResponse(response.body);
         // return res["data"][0]["user_qr_img"];
       }
@@ -850,8 +1012,11 @@ Future<void> profileImageUpload(File _selectedImage) async {
           'this is the profile details ${Hive.box('LoginDetails').get("Profile_details")}');
       var jsonData = decryptResponse(response.body);
       if (response.statusCode == 200 && jsonData["success"] == true) {
+        success = true;
         tosattext = jsonData['message'];
         setState(() {});
+      } else {
+        success = false;
       }
     } catch (e) {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
