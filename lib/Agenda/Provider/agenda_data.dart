@@ -11,6 +11,7 @@ import 'dart:convert';
 
 class Agenda_data with ChangeNotifier {
 //Agenda data storing varible
+  static const Duration _istOffset = Duration(hours: 5, minutes: 30);
 
   var _selectedIndex = 0;
   List<Map<String, String>> _days = [];
@@ -248,41 +249,50 @@ class Agenda_data with ChangeNotifier {
     required String startTime,
     required String endTime,
   }) {
-    final date = DateTime.parse(sessionDate);
-
-    final year = date.year;
-    final month = date.month;
-    final day = date.day;
+    final sessionIst = _convertUtcToIst(sessionDate);
 
     final startParts = startTime.split(":");
-    final startDateTime = DateTime(
-      year,
-      month,
-      day,
+    final endParts = endTime.split(":");
+    final startSecond = startParts.length > 2 ? int.parse(startParts[2]) : 0;
+    final endSecond = endParts.length > 2 ? int.parse(endParts[2]) : 0;
+
+    final startIst = DateTime.utc(
+      sessionIst.year,
+      sessionIst.month,
+      sessionIst.day,
       int.parse(startParts[0]),
       int.parse(startParts[1]),
-      int.parse(startParts[2]),
+      startSecond,
     );
 
-    final endParts = endTime.split(":");
-    final endDateTime = DateTime(
-      year,
-      month,
-      day,
+    final endIst = DateTime.utc(
+      sessionIst.year,
+      sessionIst.month,
+      sessionIst.day,
       int.parse(endParts[0]),
       int.parse(endParts[1]),
-      int.parse(endParts[2]),
+      endSecond,
     );
 
-    final now = DateTime.now();
+    final nowIst = _currentIst();
 
-    if (now.isAfter(endDateTime)) {
+    if (nowIst.isAfter(endIst)) {
       return "Completed";
-    } else if (now.isBefore(startDateTime)) {
+    } else if (nowIst.isBefore(startIst)) {
       return "Upcoming";
     } else {
       return "Live";
     }
+  }
+
+  DateTime _convertUtcToIst(String utcDateTime) {
+    final parsed = DateTime.parse(utcDateTime);
+    final utcDate = parsed.isUtc ? parsed : parsed.toUtc();
+    return utcDate.add(_istOffset);
+  }
+
+  DateTime _currentIst() {
+    return DateTime.now().toUtc().add(_istOffset);
   }
 }
 
