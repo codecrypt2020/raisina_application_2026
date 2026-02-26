@@ -222,34 +222,40 @@ class ProfileList extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: StatCard(
-                value: "${provider.data['sessions']?.length ?? 0}",
-                label: 'SPEAKING SESSION',
-              ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: StatCard(
+                    value: "${provider.data['sessions']?.length ?? 0}",
+                    label: 'SPEAKING SESSION',
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: StatCard(
+                    value: "${provider.totalUniqueDays}",
+                    label: 'CONFERENCE DAYS',
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: StatCard(
+                    value: (provider.data['profile']['dining_invites']
+                                ?.toString()
+                                .isNotEmpty ==
+                            true)
+                        ? provider.data['profile']['dining_invites'].toString()
+                        : "0",
+                    label: 'DINING INVITES',
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 10),
-            Expanded(
-              child: StatCard(
-                value: "${provider.totalUniqueDays}",
-                label: 'CONFERENCE DAYS',
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: StatCard(
-                value: (provider.data['profile']['dining_invites']
-                            ?.toString()
-                            .isNotEmpty ==
-                        true)
-                    ? provider.data['profile']['dining_invites'].toString()
-                    : "0",
-                label: 'DINING INVITES',
-              ),
-            ),
-          ],
+          ),
         ),
         const SizedBox(height: 16),
         // Provider.of<ProfileData>(context, listen: false)

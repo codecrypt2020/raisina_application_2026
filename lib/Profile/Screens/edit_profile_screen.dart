@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:attendee_app/constants.dart';
 import 'package:attendee_app/utility.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,6 +21,7 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  static const int _bioWordLimit = 50;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
   var success;
@@ -259,7 +261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.surfaceOf(context),
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('Edit profile'),
       ),
       body: Stack(
         children: [
@@ -294,7 +296,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _label(context, 'TITLE'),
+                                        _label(context, 'Title'),
                                         DropdownButtonFormField<String>(
                                           value: _selectedTitle,
                                           decoration: _fieldDecoration(context),
@@ -326,14 +328,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _label(context, 'FIRST NAME'),
+                                        _label(context, 'First Name'),
                                         TextFormField(
                                           controller: _firstNameController,
                                           decoration: _fieldDecoration(context),
                                           validator: (value) {
                                             if (value == null ||
                                                 value.trim().isEmpty) {
-                                              return 'First name is required';
+                                              return 'First Name is required';
                                             }
                                             return null;
                                           },
@@ -348,7 +350,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        _label(context, 'LAST NAME'),
+                                        _label(context, 'Last Name'),
                                         TextFormField(
                                           controller: _lastNameController,
                                           decoration: _fieldDecoration(context),
@@ -359,7 +361,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ],
                               )
                             else ...[
-                              _label(context, 'TITLE'),
+                              _label(context, 'Title'),
                               DropdownButtonFormField<String>(
                                 value: _selectedTitle,
                                 decoration: _fieldDecoration(context),
@@ -381,7 +383,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                               ),
                               const SizedBox(height: 16),
-                              _label(context, 'FIRST NAME'),
+                              _label(context, 'First Name'),
                               TextFormField(
                                 controller: _firstNameController,
                                 decoration: _fieldDecoration(context),
@@ -393,7 +395,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                               ),
                               const SizedBox(height: 16),
-                              _label(context, 'LAST NAME'),
+                              _label(context, 'Last Name'),
                               TextFormField(
                                 controller: _lastNameController,
                                 decoration: _fieldDecoration(context),
@@ -406,11 +408,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             //   keyboardType: TextInputType.phone,
                             //   decoration: _fieldDecoration(context),
                             // ),
-                            _label(context, 'PRIMARY PHONE'),
+                            _label(context, 'Primary Phone'),
 
                             TextFormField(
                               controller: _phoneController,
-                              keyboardType: TextInputType.phone,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter
+                                    .digitsOnly, // only number
+                                LengthLimitingTextInputFormatter(
+                                    14), // Max 14 digits
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Please enter phone number";
+                                }
+                                if (value.length < 6) {
+                                  return "Phone number must be at least 6 digits";
+                                }
+                                if (value.length > 14) {
+                                  return "Phone number cannot exceed 14 digits";
+                                }
+                                return null;
+                              },
                               decoration: _fieldDecoration(context).copyWith(
                                 prefixIcon: CountryCodePicker(
                                   onChanged: (country) {
@@ -428,14 +448,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                               ),
                             ),
+
                             const SizedBox(height: 16),
-                            _label(context, 'BIO (Not more than 50 Words)'),
+                            _label(context, 'Bio (Not more than 50 words)'),
                             TextFormField(
                               controller: _bioController,
                               maxLines: 5,
+                              inputFormatters: [
+                                TextInputFormatter.withFunction(
+                                    (oldValue, newValue) {
+                                  final count = _wordCount(newValue.text);
+                                  if (count > _bioWordLimit) {
+                                    return oldValue;
+                                  }
+                                  return newValue;
+                                }),
+                              ],
                               decoration: _fieldDecoration(context).copyWith(
                                 alignLabelWithHint: true,
-                                helperText: '$bioWords / 50 words',
+                                helperText: '$bioWords / $_bioWordLimit words',
                                 helperStyle: TextStyle(
                                   color: AppColors.textMutedOf(context),
                                 ),
@@ -443,8 +474,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               onChanged: (_) => setState(() {}),
                               validator: (value) {
                                 final count = _wordCount(value ?? '');
-                                if (count > 50) {
-                                  return 'Bio should be 50 words or less';
+                                if (count > _bioWordLimit) {
+                                  return 'Bio should be $_bioWordLimit words or less';
                                 }
                                 return null;
                               },
@@ -456,7 +487,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             //     decoration: _fieldDecoration(context),
                             //  ),
 
-                            _label(context, 'DIETARY PREFERENCE'),
+                            _label(context, 'Dietary Preference'),
 
                             DropdownButtonFormField<String>(
                               value: _selectedDietary,
@@ -580,7 +611,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               "lastName": "${_lastNameController.text}",
               "countryCode": "${_selectedCountryCode}",
               "phone": "${_phoneController.text}",
-              "bio": "${_bioController.text}",
+              "bio": "${_bioController.text.trim()}",
               "twitter_handle": "",
               "linkedin_url": "",
               "website_url": "",

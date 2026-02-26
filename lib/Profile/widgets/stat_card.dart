@@ -21,12 +21,15 @@ class StatCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            value,
-            style: const TextStyle(
-              color: AppColors.gold,
-              fontWeight: FontWeight.w700,
-              fontSize: 22,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: AppColors.gold,
+                fontWeight: FontWeight.w700,
+                fontSize: 22,
+              ),
             ),
           ),
           const SizedBox(height: 4),
