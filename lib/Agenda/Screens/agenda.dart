@@ -16,13 +16,17 @@ class _AgendaState extends State<Agenda> {
   @override
   void initState() {
     super.initState();
+    _agendaFuture = _loadInitialAgenda();
+  }
+
+  Future<void> _loadInitialAgenda() async {
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+
     final provider = Provider.of<Agenda_data>(context, listen: false);
-    provider.event_start_date();
-    _agendaFuture = provider.getAgenda();
-    Future.microtask(() {
-      //“Do this task a little later — after the build is complete.
-      provider.resetSelectedIndex();
-    });
+    provider.resetSelectedIndex();
+    await provider.event_start_date();
+    await provider.getAgenda();
   }
 
   @override

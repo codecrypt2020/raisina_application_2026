@@ -21,13 +21,17 @@ class _DiningState extends State<Dining> {
   @override
   void initState() {
     super.initState();
+    _diningFuture = _loadInitialDining();
+  }
+
+  Future<void> _loadInitialDining() async {
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+
     final provider = Provider.of<dining_data>(context, listen: false);
-    provider.event_start_date();
-    _diningFuture = provider.dining();
-    Future.microtask(() {
-      //“Do this task a little later — after the build is complete.
-      provider.resetSelectedIndex();
-    });
+    provider.resetSelectedIndex();
+    await provider.event_start_date();
+    await provider.dining();
   }
 
   @override

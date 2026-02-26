@@ -13,52 +13,79 @@ class SpeakingEngagementList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SpeakingEngagementData>(context, listen: true);
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: provider.sessions_list.length + 2, // header + spacing
-      itemBuilder: (context, index) {
-        // Header
-        if (index == 0) {
-          return Text(
-            'Speaking Engagement',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimaryOf(context),
+    final bool isSpeakingEmpty = provider.sessions_list.isEmpty;
+    final Color subtitleColor = AppColors.textSecondaryOf(context);
+    return RefreshIndicator(
+      onRefresh: () async {
+        await provider.SpeakingDetails();
+      },
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        itemCount: isSpeakingEmpty
+            ? 3 // header + banner + empty state
+            : provider.sessions_list.length + 2, // header + banner + sessions
+        itemBuilder: (context, index) {
+          // Header
+          if (index == 0) {
+            return Text(
+              'Speaking Engagement',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimaryOf(context),
+              ),
+            );
+          }
+
+          // Space after header
+          // if (index == 1) {
+          //   return const SizedBox(height: 20);
+          // }
+
+          //count banner to be added
+          if (index == 1) {
+            return SpeakingSessionsBanner(
+              sessions: provider.session_count,
+              days:
+                  provider.sessions_days, // to be changed by the backend team.
+            );
+          }
+
+          if (isSpeakingEmpty) {
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.55,
+              child: Center(
+                child: Text(
+                  'No speaking engagement assigned',
+                  style: TextStyle(
+                    color: subtitleColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          final item = provider.sessions_list[index - 2];
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SpeakingEngagementCard(
+              date: item.date,
+              title: item.title,
+              location: item.location,
+              speaker: item.speaker,
+              time: item.time,
+              tag: item.tag,
+              tagColor: item.tagColor,
+              highlight: item.highlight,
+              isLive: item.isLive,
             ),
           );
-        }
-
-        // Space after header
-        // if (index == 1) {
-        //   return const SizedBox(height: 20);
-        // }
-
-        //count banner to be added
-        if (index == 1) {
-          return SpeakingSessionsBanner(
-            sessions: provider.session_count,
-            days: provider.sessions_days, // to be changed by the backend team.
-          );
-        }
-
-        final item = provider.sessions_list[index - 2];
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: SpeakingEngagementCard(
-            date: item.date,
-            title: item.title,
-            location: item.location,
-            speaker: item.speaker,
-            time: item.time,
-            tag: item.tag,
-            tagColor: item.tagColor,
-            highlight: item.highlight,
-            isLive: item.isLive,
-          ),
-        );
-      },
+        },
+      ),
     );
 
     // ListView(
