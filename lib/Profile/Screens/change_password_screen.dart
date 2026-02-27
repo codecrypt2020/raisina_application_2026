@@ -107,7 +107,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              "Warning: Image must be between 200KB and 5MB",
+              "Image must be between 200KB and 5MB",
             ),
           ),
         );
@@ -120,7 +120,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              "Warning: Don't forget to click Sava to update your photo",
+              "Don't forget to click Save to update your photo",
             ),
           ),
         );

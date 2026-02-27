@@ -175,51 +175,52 @@ class ProfileList extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceOf(context),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DigitalBadgeScreen(),
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DigitalBadgeScreen(),
-                    ),
-                  );
-                },
-                child: ProfileRow(
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceOf(context),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                ProfileRow(
                   title: 'Digital badge',
                   icon: Icons.badge_outlined,
                   color: AppColors.gold,
                 ),
-              ),
-              // Divider(color: AppColors.navySurface),
-              // ProfileRow(
-              //   title: 'Travel & logistics',
-              //   subtitle: 'Hotel car confirmed at 7:30 AM',
-              //   icon: Icons.flight_takeoff_outlined,
-              //   color: AppColors.teal,
-              // ),
-              // Divider(color: AppColors.navySurface),
-              // ProfileRow(
-              //   title: 'Speaker kit',
-              //   subtitle: 'Slides due in 2 days',
-              //   icon: Icons.shield_outlined,
-              //   color: AppColors.goldLight,
-              // ),
-            ],
+                // ),
+                // Divider(color: AppColors.navySurface),
+                // ProfileRow(
+                //   title: 'Travel & logistics',
+                //   subtitle: 'Hotel car confirmed at 7:30 AM',
+                //   icon: Icons.flight_takeoff_outlined,
+                //   color: AppColors.teal,
+                // ),
+                // Divider(color: AppColors.navySurface),
+                // ProfileRow(
+                //   title: 'Speaker kit',
+                //   subtitle: 'Slides due in 2 days',
+                //   icon: Icons.shield_outlined,
+                //   color: AppColors.goldLight,
+                // ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
