@@ -41,10 +41,10 @@ flutter_launcher_icons:
   image_path: "assets/images/Raisina_launcher.png"
 
 flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/images/RaisinaLauncherIconFinal.png
+  color: "#1772A4"
+  image: assets/images/chatgptfinal.png
   android: true
   ios: false
   android_12:
-    color: "#FFFFFF"
-    image: assets/images/RaisinaLauncherIconFinal.png
+    color: "#1772A4"
+    image: assets/images/chatgptfinal.png
