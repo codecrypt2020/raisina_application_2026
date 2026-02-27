@@ -1,4 +1,3 @@
-import 'package:attendee_app/Resources/Model/resource_category_datatype.dart';
 import 'package:attendee_app/Resources/provider/resources_data.dart';
 import 'package:attendee_app/Resources/widgets/resources_view.dart';
 import 'package:attendee_app/main.dart';
@@ -13,39 +12,68 @@ class Resources extends StatefulWidget {
 }
 
 class _ResourcesState extends State<Resources> {
+  late Future _resourcesFuture;
+
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    final provider = Provider.of<ResourcesData>(context, listen: false);
+    _resourcesFuture = provider.fetchResources();
+  }
+
+  Future<void> _refreshResources() async {
+    final refreshedFuture =
+        Provider.of<ResourcesData>(context, listen: false).fetchResources();
+    setState(() {
+      _resourcesFuture = refreshedFuture;
+    });
+    await refreshedFuture;
   }
 
   @override
   Widget build(BuildContext context) {
-    final fetch_data =
-        Provider.of<ResourcesData>(context, listen: false).fetchResources();
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Resources'),
+        title: Text(
+          'Resources',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimaryOf(context),
+          ),
+        ),
         centerTitle: false,
       ),
       body: FutureBuilder(
         //putting the materail call in the api for first time loading
 
-        future: fetch_data,
+        future: _resourcesFuture,
         builder: (ctx, dataSnapshot) {
           if (dataSnapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (dataSnapshot.error != null) {
             {
               //do error handling
-              return Center(
-                child: SingleChildScrollView(child: Text("An error occured")),
+              return RefreshIndicator(
+                onRefresh: _refreshResources,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: Text("An error occured"),
+                      ),
+                    ),
+                  ],
+                ),
               );
             }
           } else {
-            return Resources_view();
+            return const Resources_view();
           }
         },
       ),

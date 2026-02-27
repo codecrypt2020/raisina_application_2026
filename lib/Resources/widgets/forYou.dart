@@ -17,10 +17,24 @@ class ForYou extends StatelessWidget {
     final groupedData = provider.groupedFeaturedData;
 
     if (groupedData.isEmpty) {
-      return Center(
-        child: Text(
-          'No resources found',
-          style: TextStyle(color: AppColors.textSecondaryOf(context)),
+      return LayoutBuilder(
+        builder: (context, constraints) => ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: constraints.maxHeight,
+              child: Center(
+                child: Text(
+                  'No resources found',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryOf(context),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }
