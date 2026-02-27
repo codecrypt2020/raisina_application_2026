@@ -37,6 +37,7 @@ class ProfileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProfileData>(context, listen: true);
+    print("bhnvdfvfdhjv:${provider.data["profile"]["name"]}");
     final List<String> expertiseItems =
         _parseExpertise(provider.data['profile']['area_of_expertise']);
     const roleChipColor = Color(0xFF0C72A3);
@@ -189,7 +190,7 @@ class ProfileList extends StatelessWidget {
           ),
           child: Column(
             children: [
-              GestureDetector(
+              InkWell(
                 onTap: () {
                   Navigator.push(
                     context,

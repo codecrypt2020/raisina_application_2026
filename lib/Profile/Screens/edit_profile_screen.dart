@@ -200,7 +200,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: IconButton(
                         icon: const Icon(Icons.close, color: Colors.black),
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                         },
                       ),
                     ),
@@ -258,333 +258,342 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final Color cancelFg =
         isDarkMode ? AppColors.textPrimaryOf(context) : Colors.white;
     final Color saveBg = isDarkMode ? AppColors.goldLight : AppColors.gold;
-    return Scaffold(
-      backgroundColor: AppColors.surfaceOf(context),
-      appBar: AppBar(
-        title: const Text('Edit profile'),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 960),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.elevatedOf(context),
-                          borderRadius: BorderRadius.circular(14),
-                          border:
-                              Border.all(color: AppColors.borderOf(context)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (isWide)
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _label(context, 'Title'),
-                                        DropdownButtonFormField<String>(
-                                          value: _selectedTitle,
-                                          decoration: _fieldDecoration(context),
-                                          dropdownColor:
-                                              AppColors.elevatedOf(context),
-                                          items: _titles
-                                              .map(
-                                                (title) => DropdownMenuItem(
-                                                  value: title,
-                                                  child: Text(title),
-                                                ),
-                                              )
-                                              .toList(),
-                                          onChanged: (value) {
-                                            if (value != null) {
-                                              setState(() {
-                                                _selectedTitle = value;
-                                              });
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _label(context, 'First Name'),
-                                        TextFormField(
-                                          controller: _firstNameController,
-                                          decoration: _fieldDecoration(context),
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.trim().isEmpty) {
-                                              return 'First Name is required';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    flex: 4,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _label(context, 'Last Name'),
-                                        TextFormField(
-                                          controller: _lastNameController,
-                                          decoration: _fieldDecoration(context),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              )
-                            else ...[
-                              _label(context, 'Title'),
-                              DropdownButtonFormField<String>(
-                                value: _selectedTitle,
-                                decoration: _fieldDecoration(context),
-                                dropdownColor: AppColors.elevatedOf(context),
-                                items: _titles
-                                    .map(
-                                      (title) => DropdownMenuItem(
-                                        value: title,
-                                        child: Text(title),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surfaceOf(context),
+        appBar: AppBar(
+          title: const Text('Edit profile'),
+        ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 960),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: AppColors.elevatedOf(context),
+                            borderRadius: BorderRadius.circular(14),
+                            border:
+                                Border.all(color: AppColors.borderOf(context)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (isWide)
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _label(context, 'Title'),
+                                          DropdownButtonFormField<String>(
+                                            value: _selectedTitle,
+                                            decoration:
+                                                _fieldDecoration(context),
+                                            dropdownColor:
+                                                AppColors.elevatedOf(context),
+                                            items: _titles
+                                                .map(
+                                                  (title) => DropdownMenuItem(
+                                                    value: title,
+                                                    child: Text(title),
+                                                  ),
+                                                )
+                                                .toList(),
+                                            onChanged: (value) {
+                                              if (value != null) {
+                                                setState(() {
+                                                  _selectedTitle = value;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                    )
-                                    .toList(),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedTitle = value;
-                                    });
-                                  }
-                                },
-                              ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _label(context, 'First Name'),
+                                          TextFormField(
+                                            controller: _firstNameController,
+                                            decoration:
+                                                _fieldDecoration(context),
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.trim().isEmpty) {
+                                                return 'First Name is required';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _label(context, 'Last Name'),
+                                          TextFormField(
+                                            controller: _lastNameController,
+                                            decoration:
+                                                _fieldDecoration(context),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else ...[
+                                _label(context, 'Title'),
+                                DropdownButtonFormField<String>(
+                                  value: _selectedTitle,
+                                  decoration: _fieldDecoration(context),
+                                  dropdownColor: AppColors.elevatedOf(context),
+                                  items: _titles
+                                      .map(
+                                        (title) => DropdownMenuItem(
+                                          value: title,
+                                          child: Text(title),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        _selectedTitle = value;
+                                      });
+                                    }
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                _label(context, 'First Name'),
+                                TextFormField(
+                                  controller: _firstNameController,
+                                  decoration: _fieldDecoration(context),
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'First name is required';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                _label(context, 'Last Name'),
+                                TextFormField(
+                                  controller: _lastNameController,
+                                  decoration: _fieldDecoration(context),
+                                ),
+                              ],
                               const SizedBox(height: 16),
-                              _label(context, 'First Name'),
+                              // _label(context, 'PRIMARY PHONE'),
+                              // TextFormField(
+                              //   controller: _phoneController,
+                              //   keyboardType: TextInputType.phone,
+                              //   decoration: _fieldDecoration(context),
+                              // ),
+                              _label(context, 'Primary Phone'),
+
                               TextFormField(
-                                controller: _firstNameController,
-                                decoration: _fieldDecoration(context),
+                                controller: _phoneController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter
+                                      .digitsOnly, // only number
+                                  LengthLimitingTextInputFormatter(
+                                      14), // Max 14 digits
+                                ],
                                 validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return 'First name is required';
+                                  if (value == null || value.isEmpty) {
+                                    return "Please enter phone number";
+                                  }
+                                  if (value.length < 6) {
+                                    return "Phone number must be at least 6 digits";
+                                  }
+                                  if (value.length > 14) {
+                                    return "Phone number cannot exceed 14 digits";
+                                  }
+                                  return null;
+                                },
+                                decoration: _fieldDecoration(context).copyWith(
+                                  prefixIcon: CountryCodePicker(
+                                    onChanged: (country) {
+                                      _selectedCountryCode =
+                                          country.dialCode ?? "+91";
+                                    },
+                                    initialSelection:
+                                        widget.profile["country_code"] ?? 'IN',
+                                    // favorite: const ['+91', 'US', 'GB'],
+                                    showCountryOnly: false,
+                                    showOnlyCountryWhenClosed: false,
+                                    showFlag: true,
+                                    alignLeft: false,
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 16),
+                              _label(context, 'Bio (Not more than 50 words)'),
+                              TextFormField(
+                                controller: _bioController,
+                                maxLines: 5,
+                                inputFormatters: [
+                                  TextInputFormatter.withFunction(
+                                      (oldValue, newValue) {
+                                    final count = _wordCount(newValue.text);
+                                    if (count > _bioWordLimit) {
+                                      return oldValue;
+                                    }
+                                    return newValue;
+                                  }),
+                                ],
+                                decoration: _fieldDecoration(context).copyWith(
+                                  alignLabelWithHint: true,
+                                  helperText:
+                                      '$bioWords / $_bioWordLimit words',
+                                  helperStyle: TextStyle(
+                                    color: AppColors.textMutedOf(context),
+                                  ),
+                                ),
+                                onChanged: (_) => setState(() {}),
+                                validator: (value) {
+                                  final count = _wordCount(value ?? '');
+                                  if (count > _bioWordLimit) {
+                                    return 'Bio should be $_bioWordLimit words or less';
                                   }
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 16),
-                              _label(context, 'Last Name'),
-                              TextFormField(
-                                controller: _lastNameController,
+                              //   _label(context, 'DIETARY PREFERENCE'),
+                              //   TextFormField(
+                              //     controller: _dietaryController,
+                              //     decoration: _fieldDecoration(context),
+                              //  ),
+
+                              _label(context, 'Dietary Preference'),
+
+                              DropdownButtonFormField<String>(
+                                value: _selectedDietary,
                                 decoration: _fieldDecoration(context),
+                                items: const [
+                                  DropdownMenuItem(
+                                      value: 'Vegetarian',
+                                      child: Text('Vegetarian')),
+                                  DropdownMenuItem(
+                                      value: 'Non-Vegetarian',
+                                      child: Text('Non-Vegetarian')),
+                                  DropdownMenuItem(
+                                      value: 'Vegan', child: Text('Vegan')),
+                                  DropdownMenuItem(
+                                      value: 'Other', child: Text('Other')),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedDietary = value!;
+                                  });
+                                },
                               ),
                             ],
-                            const SizedBox(height: 16),
-                            // _label(context, 'PRIMARY PHONE'),
-                            // TextFormField(
-                            //   controller: _phoneController,
-                            //   keyboardType: TextInputType.phone,
-                            //   decoration: _fieldDecoration(context),
-                            // ),
-                            _label(context, 'Primary Phone'),
-
-                            TextFormField(
-                              controller: _phoneController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter
-                                    .digitsOnly, // only number
-                                LengthLimitingTextInputFormatter(
-                                    14), // Max 14 digits
-                              ],
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please enter phone number";
-                                }
-                                if (value.length < 6) {
-                                  return "Phone number must be at least 6 digits";
-                                }
-                                if (value.length > 14) {
-                                  return "Phone number cannot exceed 14 digits";
-                                }
-                                return null;
-                              },
-                              decoration: _fieldDecoration(context).copyWith(
-                                prefixIcon: CountryCodePicker(
-                                  onChanged: (country) {
-                                    _selectedCountryCode =
-                                        country.dialCode ?? "+91";
-                                  },
-                                  initialSelection:
-                                      widget.profile["country_code"] ?? 'IN',
-                                  // favorite: const ['+91', 'US', 'GB'],
-                                  showCountryOnly: false,
-                                  showOnlyCountryWhenClosed: false,
-                                  showFlag: true,
-                                  alignLeft: false,
-                                  padding: EdgeInsets.zero,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 52,
+                                child: FilledButton(
+                                  onPressed: _isSaving
+                                      ? null
+                                      : () => Navigator.pop(context),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: cancelBg,
+                                    foregroundColor: cancelFg,
+                                    side: isDarkMode
+                                        ? BorderSide(
+                                            color: AppColors.borderOf(context))
+                                        : BorderSide.none,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-
-                            const SizedBox(height: 16),
-                            _label(context, 'Bio (Not more than 50 words)'),
-                            TextFormField(
-                              controller: _bioController,
-                              maxLines: 5,
-                              inputFormatters: [
-                                TextInputFormatter.withFunction(
-                                    (oldValue, newValue) {
-                                  final count = _wordCount(newValue.text);
-                                  if (count > _bioWordLimit) {
-                                    return oldValue;
-                                  }
-                                  return newValue;
-                                }),
-                              ],
-                              decoration: _fieldDecoration(context).copyWith(
-                                alignLabelWithHint: true,
-                                helperText: '$bioWords / $_bioWordLimit words',
-                                helperStyle: TextStyle(
-                                  color: AppColors.textMutedOf(context),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: SizedBox(
+                                height: 52,
+                                child: FilledButton(
+                                  onPressed: _isSaving ? null : _saveProfile,
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: saveBg,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Save Changes',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              onChanged: (_) => setState(() {}),
-                              validator: (value) {
-                                final count = _wordCount(value ?? '');
-                                if (count > _bioWordLimit) {
-                                  return 'Bio should be $_bioWordLimit words or less';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            //   _label(context, 'DIETARY PREFERENCE'),
-                            //   TextFormField(
-                            //     controller: _dietaryController,
-                            //     decoration: _fieldDecoration(context),
-                            //  ),
-
-                            _label(context, 'Dietary Preference'),
-
-                            DropdownButtonFormField<String>(
-                              value: _selectedDietary,
-                              decoration: _fieldDecoration(context),
-                              items: const [
-                                DropdownMenuItem(
-                                    value: 'Vegetarian',
-                                    child: Text('Vegetarian')),
-                                DropdownMenuItem(
-                                    value: 'Non-Vegetarian',
-                                    child: Text('Non-Vegetarian')),
-                                DropdownMenuItem(
-                                    value: 'Vegan', child: Text('Vegan')),
-                                DropdownMenuItem(
-                                    value: 'Other', child: Text('Other')),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedDietary = value!;
-                                });
-                              },
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: 52,
-                              child: FilledButton(
-                                onPressed: _isSaving
-                                    ? null
-                                    : () => Navigator.pop(context),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: cancelBg,
-                                  foregroundColor: cancelFg,
-                                  side: isDarkMode
-                                      ? BorderSide(
-                                          color: AppColors.borderOf(context))
-                                      : BorderSide.none,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: SizedBox(
-                              height: 52,
-                              child: FilledButton(
-                                onPressed: _isSaving ? null : _saveProfile,
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: saveBg,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Save Changes',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          if (_isSaving)
-            Positioned.fill(
-              child: ColoredBox(
-                color: Colors.black26,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+            if (_isSaving)
+              Positioned.fill(
+                child: ColoredBox(
+                  color: Colors.black26,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -607,10 +616,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           encryptPayload(
             {
               "title": "${_selectedTitle}", //
-              "firstName": "${_firstNameController.text}",
-              "lastName": "${_lastNameController.text}",
+              "firstName": "${_firstNameController.text.trim()}",
+              "lastName": "${_lastNameController.text.trim()}",
               "countryCode": "${_selectedCountryCode}",
-              "phone": "${_phoneController.text}",
+              "phone": "${_phoneController.text.trim()}",
               "bio": "${_bioController.text.trim()}",
               "twitter_handle": "",
               "linkedin_url": "",
@@ -618,6 +627,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               "dietary_preference": "${_selectedDietary}",
               "id": "${_id}", //
               "email": '${_primary_email}', //
+              "userRefId":
+                  '${Hive.box('LoginDetails').get("Profile_details")['userId']}',
             },
           ),
         ),
