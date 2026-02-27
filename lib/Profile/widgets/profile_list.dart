@@ -230,12 +230,14 @@ class ProfileList extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: StatCard(
-                    value: "${provider.data['sessions']?.length ?? 0}",
-                    label: 'SPEAKING SESSION',
+                if (Hive.box('LoginDetails')
+                    .get("isSpeaker", defaultValue: false))
+                  Expanded(
+                    child: StatCard(
+                      value: "${provider.data['sessions']?.length ?? 0}",
+                      label: 'SPEAKING SESSION',
+                    ),
                   ),
-                ),
                 SizedBox(width: 10),
                 Expanded(
                   child: StatCard(
@@ -286,11 +288,16 @@ class ProfileList extends StatelessWidget {
                         color: AppColors.textSecondaryOf(context), height: 1.4),
                   ),
                 ),
-                SizedBox(height: 12),
-                InfoCard(
-                  title: 'Speaking Sessions',
-                  child: SessionTile(sessions: provider.data['sessions'] ?? []),
-                ),
+                if (Hive.box('LoginDetails')
+                    .get("isSpeaker", defaultValue: false))
+                  SizedBox(height: 12),
+                if (Hive.box('LoginDetails')
+                    .get("isSpeaker", defaultValue: false))
+                  InfoCard(
+                    title: 'Speaking Sessions',
+                    child:
+                        SessionTile(sessions: provider.data['sessions'] ?? []),
+                  ),
                 SizedBox(height: 12),
                 InfoCard(
                   title: 'Areas of Expertise',

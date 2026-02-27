@@ -238,6 +238,9 @@ class Agenda_data with ChangeNotifier {
             sessionDate: agenda_data_map['session_date'],
             startTime: agenda_data_map['start_time']),
         tagColor: AppColors.teal, // default
+        Cat_tag:
+            (agenda_data_map["tags"] as List?)?.map((e) => e.toString()).toList() ??
+                <String>[],
         highlight: false,
         isLive: false,
       );
@@ -308,6 +311,7 @@ class AgendadataItem {
   final Color tagColor;
   final bool highlight;
   final bool isLive;
+  final List<String> Cat_tag;
 
   AgendadataItem({
     required this.time,
@@ -319,6 +323,7 @@ class AgendadataItem {
     required this.start_time,
     required this.end_time,
     required this.tagColor,
+    required this.Cat_tag,
     this.highlight = false,
     this.isLive = false,
   });

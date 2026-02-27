@@ -38,6 +38,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool _isSaving = false;
   bool _isSavingimage = false;
   bool _isImagesize = false;
+  bool _isPasswordDialogOpen = false;
+  bool _isImageDialogOpen = false;
+  bool _cancelPasswordSave = false;
+  bool _cancelImageSave = false;
   var success;
   var successimage;
 
@@ -209,9 +213,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
+  void _dismissPasswordDialogIfOpen() {
+    if (!_isPasswordDialogOpen || !mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    _isPasswordDialogOpen = false;
+  }
+
+  void _dismissImageDialogIfOpen() {
+    if (!_isImageDialogOpen || !mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    _isImageDialogOpen = false;
+  }
+
   void _updatePassword() async {
     if (!_passwordFormKey.currentState!.validate()) return;
+    _cancelPasswordSave = false;
     setState(() => _isSaving = true);
+    _isPasswordDialogOpen = true;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -235,7 +253,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       child: IconButton(
                         icon: const Icon(Icons.close, color: Colors.black),
                         onPressed: () {
-                          Navigator.of(context, rootNavigator: true).pop();
+                          _cancelPasswordSave = true;
+                          if (mounted) {
+                            setState(() => _isSaving = false);
+                          }
+                          _dismissPasswordDialogIfOpen();
                         },
                       ),
                     ),
@@ -266,9 +288,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     await password_change();
     if (!mounted) return;
     setState(() => _isSaving = false);
+    if (_cancelPasswordSave) return;
 
     if (success) {
-      Navigator.pop(context);
+      _dismissPasswordDialogIfOpen();
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(tosattext)),
@@ -276,7 +299,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
       return;
     } else {
-      Navigator.of(context).pop();
+      _dismissPasswordDialogIfOpen();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Something went wrong')),
       );
@@ -476,7 +499,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               onPressed: (_isImagesize == false)
                                   ? null
                                   : () async {
+                                      _cancelImageSave = false;
                                       setState(() => _isSavingimage = true);
+                                      _isImageDialogOpen = true;
                                       showDialog(
                                         context: context,
                                         barrierDismissible: false,
@@ -510,11 +535,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                                               color:
                                                                   Colors.black),
                                                           onPressed: () {
-                                                            Navigator.of(
-                                                                    context,
-                                                                    rootNavigator:
-                                                                        true)
-                                                                .pop();
+                                                            _cancelImageSave =
+                                                                true;
+                                                            if (mounted) {
+                                                              setState(() =>
+                                                                  _isSavingimage =
+                                                                      false);
+                                                            }
+                                                            _dismissImageDialogIfOpen();
                                                           },
                                                         ),
                                                       ),
@@ -545,15 +573,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                         },
                                       );
 
-                                      await profileImageUpload(_selectedImage!)
-                                          .then((value) {
-                                        Fetch_emp_profile();
-                                      });
+                                      await profileImageUpload(_selectedImage!);
+                                      if (_cancelImageSave || !mounted) return;
+                                      await Fetch_emp_profile();
+                                      if (_cancelImageSave || !mounted) return;
                                       if (!mounted) return;
                                       setState(() => _isSavingimage = false);
+                                      if (_cancelImageSave) return;
 
                                       if (successimage) {
-                                        Navigator.pop(context);
+                                        _dismissImageDialogIfOpen();
                                         Navigator.pop(context);
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -564,7 +593,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                                         return;
                                       } else {
-                                        Navigator.of(context).pop();
+                                        _dismissImageDialogIfOpen();
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
