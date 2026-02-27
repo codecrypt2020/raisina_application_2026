@@ -415,17 +415,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                 ),
                 ListTile(
                   leading: const Icon(
-                    Icons.folder_outlined,
-                    color: AppColors.textPrimary,
-                  ),
-                  title: const Text(
-                    'Resources',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  onTap: () => _openPanelPage(const ResourcesMain()),
-                ),
-                ListTile(
-                  leading: const Icon(
                     Icons.map_outlined,
                     color: AppColors.textPrimary,
                   ),
@@ -434,6 +423,17 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                     style: TextStyle(color: AppColors.textPrimary),
                   ),
                   onTap: () => _openPanelPage(const Mapmain()),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.folder_outlined,
+                    color: AppColors.textPrimary,
+                  ),
+                  title: const Text(
+                    'Resources',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ),
+                  onTap: () => _openPanelPage(const ResourcesMain()),
                 ),
               ],
             ),

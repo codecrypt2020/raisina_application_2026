@@ -25,6 +25,35 @@ class ResourceCard extends StatelessWidget {
   final String file_url;
   final String? badgeText;
 
+  IconData getFileIcon(String fileUrl) {
+    String extension = fileUrl.split('.').last.toLowerCase();
+
+    switch (extension) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+
+      case 'xls':
+      case 'xlsx':
+        return Icons.table_chart;
+
+      case 'ppt':
+      case 'pptx':
+        return Icons.slideshow;
+
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image;
+
+      case 'doc':
+      case 'docx':
+        return Icons.description;
+
+      default:
+        return Icons.insert_drive_file_outlined;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasValidUrl = file_url.trim().isNotEmpty;
@@ -57,7 +86,11 @@ class ResourceCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               color: iconColor.withOpacity(0.14),
             ),
-            child: Icon(icon, color: iconColor),
+            child: Icon(
+              getFileIcon(file_url),
+              color: iconColor,
+            ),
+            //Icon(icon, color: iconColor),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -165,16 +198,17 @@ class ResourceCard extends StatelessWidget {
                     ElevatedButton(
                       onPressed: hasValidUrl
                           ? () => ResourceFileActions.downloadFile(
-                              context,
-                              file_url,
-                              title,
-                              fileTypeHint: type,
-                            )
+                                context,
+                                file_url,
+                                title,
+                                fileTypeHint: type,
+                              )
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.goldDim,
                         foregroundColor: AppColors.gold,
-                        disabledBackgroundColor: AppColors.surfaceSoftOf(context),
+                        disabledBackgroundColor:
+                            AppColors.surfaceSoftOf(context),
                         disabledForegroundColor: mutedColor,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
