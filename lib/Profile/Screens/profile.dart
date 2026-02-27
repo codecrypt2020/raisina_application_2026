@@ -18,9 +18,12 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  late Future _fetch_data;
   @override
   void initState() {
     super.initState();
+    _fetch_data =
+        Provider.of<ProfileData>(context, listen: false).fetchUserProfile();
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   Provider.of<ProfileData>(context, listen: false).fetchUserProfile();
     // });
@@ -28,12 +31,11 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    final fetch_data =
-        Provider.of<ProfileData>(context, listen: false).fetchUserProfile();
+    // final fetch_data;
     return FutureBuilder(
       //putting the materail call in the api for first time loading
 
-      future: fetch_data,
+      future: _fetch_data,
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return Center(
