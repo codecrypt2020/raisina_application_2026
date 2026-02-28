@@ -12,6 +12,7 @@ class ResourceCard extends StatelessWidget {
     required this.date,
     required this.size,
     required this.file_url,
+    required this.showDownloadButton,
     this.badgeText,
   });
 
@@ -23,6 +24,7 @@ class ResourceCard extends StatelessWidget {
   final String date;
   final String size;
   final String file_url;
+  final bool showDownloadButton;
   final String? badgeText;
 
   IconData getFileIcon(String fileUrl) {
@@ -194,32 +196,34 @@ class ResourceCard extends StatelessWidget {
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: hasValidUrl
-                          ? () => ResourceFileActions.downloadFile(
-                                context,
-                                file_url,
-                                title,
-                                fileTypeHint: type,
-                              )
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.goldDim,
-                        foregroundColor: AppColors.gold,
-                        disabledBackgroundColor:
-                            AppColors.surfaceSoftOf(context),
-                        disabledForegroundColor: mutedColor,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    if (showDownloadButton) ...[
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: hasValidUrl
+                            ? () => ResourceFileActions.downloadFile(
+                                  context,
+                                  file_url,
+                                  title,
+                                  fileTypeHint: type,
+                                )
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.goldDim,
+                          foregroundColor: AppColors.gold,
+                          disabledBackgroundColor:
+                              AppColors.surfaceSoftOf(context),
+                          disabledForegroundColor: mutedColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Download',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
-                      child: const Text(
-                        'Download',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
+                    ],
                   ],
                 ),
               ],

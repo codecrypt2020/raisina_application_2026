@@ -65,6 +65,7 @@ class ForYou extends StatelessWidget {
                   date: provider.formatDate(item['created_at']),
                   size: provider.formatFileSize(item['file_size']),
                   file_url: item['file_url'],
+                  showDownloadButton: item['is_download']?.toString() == '1',
                   badgeText: item['is_featured'] == 1 ? "FOR YOU" : null,
                 ),
               );

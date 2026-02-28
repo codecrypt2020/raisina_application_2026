@@ -57,6 +57,7 @@ class ResourceFileActions {
     String fileUrl,
     String title, {
     String? fileTypeHint,
+    bool openAfterDownload = false,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
     final rawUrl = fileUrl.trim();
@@ -88,6 +89,9 @@ class ResourceFileActions {
         sourceUrl: rawUrl,
         alreadyExists: true,
       );
+      if (openAfterDownload) {
+        await _openDownloadedFile(context, file.path, sourceUrl: rawUrl);
+      }
       return;
     }
 
@@ -114,6 +118,9 @@ class ResourceFileActions {
         file.path,
         sourceUrl: rawUrl,
       );
+      if (openAfterDownload) {
+        await _openDownloadedFile(context, file.path, sourceUrl: rawUrl);
+      }
     } catch (_) {
       if (await tempFile.exists()) {
         await tempFile.delete();
@@ -175,6 +182,7 @@ class ResourceFileActions {
       return;
     }
 
+    bool noAppFound = false;
     try {
       final result = await OpenFilex.open(filePath);
       if (result.type == ResultType.done) {
@@ -182,9 +190,7 @@ class ResourceFileActions {
       }
 
       if (result.type == ResultType.noAppToOpen) {
-        _showMessage(
-            messenger, 'No app found to open this file type on your device');
-        return;
+        noAppFound = true;
       }
     } on MissingPluginException {
       // Fallback when plugin isn't registered in the current runtime.
@@ -197,7 +203,8 @@ class ResourceFileActions {
     } catch (_) {}
 
     if (sourceUrl != null && sourceUrl.trim().isNotEmpty) {
-      final previewUri = _buildPreviewUri(sourceUrl.trim());
+      final trimmedSourceUrl = sourceUrl.trim();
+      final previewUri = _buildPreviewUri(trimmedSourceUrl);
       final openedOnline = await launchUrl(
         previewUri,
         mode: LaunchMode.externalApplication,
@@ -205,19 +212,40 @@ class ResourceFileActions {
       if (openedOnline) {
         return;
       }
+
+      // iOS fallback: open original URL directly (Safari/associated apps).
+      final rawUri = Uri.tryParse(trimmedSourceUrl);
+      if (rawUri != null) {
+        final openedRaw = await launchUrl(
+          rawUri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (openedRaw) {
+          return;
+        }
+      }
     }
 
-    _showMessage(messenger, 'Could not open downloaded file');
+    if (noAppFound) {
+      _showMessage(
+          messenger, 'No app found to open this file type on your device');
+    } else {
+      _showMessage(messenger, 'Could not open downloaded file');
+    }
   }
 
   static Future<Directory?> _getDownloadDirectory() async {
     Directory? baseDir;
     if (Platform.isAndroid) {
-      baseDir = await getExternalStorageDirectory();
+      // Prefer Downloads so users can find files easily in file managers.
+      baseDir = await getDownloadsDirectory();
+      baseDir ??= await getExternalStorageDirectory();
     } else if (Platform.isIOS) {
+      // iOS app sandbox; visible via Files app only when file sharing is enabled.
       baseDir = await getApplicationDocumentsDirectory();
     } else {
-      baseDir = await getApplicationDocumentsDirectory();
+      baseDir = await getDownloadsDirectory();
+      baseDir ??= await getApplicationDocumentsDirectory();
     }
 
     if (baseDir == null) return null;
