@@ -134,25 +134,35 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   Future<bool> _requestPermissions(ImageSource source) async {
+    Permission permission;
+
     if (source == ImageSource.camera) {
-      var status = await Permission.camera.request();
-      return status.isGranted;
+      permission = Permission.camera;
     } else {
-      if (await Permission.photos.isGranted ||
-          await Permission.storage.isGranted) {
-        return true;
-      }
-
-      if (await Permission.photos.request().isGranted) {
-        return true;
-      }
-
-      if (await Permission.storage.request().isGranted) {
-        return true;
-      }
-
-      return false;
+      permission = Permission.photos;
     }
+
+    var status = await permission.status;
+
+    //Already granted OR limited access
+    if (status.isGranted || status.isLimited) {
+      return true;
+    }
+
+    /// Request permission
+    status = await permission.request();
+
+    // After request also check limited
+    if (status.isGranted || status.isLimited) {
+      return true;
+    }
+
+    /// Permanently denied → open settings
+    if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+
+    return false;
   }
 
   void _showImagePickerOptions() {
@@ -167,17 +177,41 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ListTile(
                 leading: const Icon(Icons.photo_library),
                 title: const Text("Choose from Gallery"),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
+
+                  bool granted = await _requestPermissions(ImageSource.gallery);
+
+                  if (granted) {
+                    _pickImage(ImageSource.gallery);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text("Permission denied. Please allow permission."),
+                      ),
+                    );
+                  }
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt),
                 title: const Text("Take Photo"),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
+
+                  bool granted = await _requestPermissions(ImageSource.camera);
+
+                  if (granted) {
+                    _pickImage(ImageSource.camera);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text("Permission denied. Please allow permission."),
+                      ),
+                    );
+                  }
                 },
               ),
             ],
