@@ -36,7 +36,8 @@ class Dining_list extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dining',
+                  // 'Dining',
+                  'Dining Invitations',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,

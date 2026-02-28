@@ -37,6 +37,7 @@ class ProfileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProfileData>(context, listen: true);
+    print("bhnvdfvfdhjv:${provider.data["profile"]["name"]}");
     final List<String> expertiseItems =
         _parseExpertise(provider.data['profile']['area_of_expertise']);
     const roleChipColor = Color(0xFF0C72A3);
@@ -174,51 +175,52 @@ class ProfileList extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceOf(context),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DigitalBadgeScreen(),
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DigitalBadgeScreen(),
-                    ),
-                  );
-                },
-                child: ProfileRow(
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceOf(context),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                ProfileRow(
                   title: 'Digital badge',
                   icon: Icons.badge_outlined,
                   color: AppColors.gold,
                 ),
-              ),
-              // Divider(color: AppColors.navySurface),
-              // ProfileRow(
-              //   title: 'Travel & logistics',
-              //   subtitle: 'Hotel car confirmed at 7:30 AM',
-              //   icon: Icons.flight_takeoff_outlined,
-              //   color: AppColors.teal,
-              // ),
-              // Divider(color: AppColors.navySurface),
-              // ProfileRow(
-              //   title: 'Speaker kit',
-              //   subtitle: 'Slides due in 2 days',
-              //   icon: Icons.shield_outlined,
-              //   color: AppColors.goldLight,
-              // ),
-            ],
+                // ),
+                // Divider(color: AppColors.navySurface),
+                // ProfileRow(
+                //   title: 'Travel & logistics',
+                //   subtitle: 'Hotel car confirmed at 7:30 AM',
+                //   icon: Icons.flight_takeoff_outlined,
+                //   color: AppColors.teal,
+                // ),
+                // Divider(color: AppColors.navySurface),
+                // ProfileRow(
+                //   title: 'Speaker kit',
+                //   subtitle: 'Slides due in 2 days',
+                //   icon: Icons.shield_outlined,
+                //   color: AppColors.goldLight,
+                // ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -228,29 +230,41 @@ class ProfileList extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (Hive.box('LoginDetails')
+                    .get("isSpeaker", defaultValue: false))
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: StatCard(
+                        value: "${provider.data['sessions']?.length ?? 0}",
+                        label: 'SPEAKING SESSION',
+                      ),
+                    ),
+                  ),
+                SizedBox(width: 10),
                 Expanded(
-                  child: StatCard(
-                    value: "${provider.data['sessions']?.length ?? 0}",
-                    label: 'SPEAKING SESSION',
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: StatCard(
+                      value: "${provider.totalUniqueDays}",
+                      label: 'CONFERENCE DAYS',
+                    ),
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: StatCard(
-                    value: "${provider.totalUniqueDays}",
-                    label: 'CONFERENCE DAYS',
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: StatCard(
-                    value: (provider.data['profile']['dining_invites']
-                                ?.toString()
-                                .isNotEmpty ==
-                            true)
-                        ? provider.data['profile']['dining_invites'].toString()
-                        : "0",
-                    label: 'DINING INVITES',
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: StatCard(
+                      value: (provider.data['profile']['dining_invites']
+                                  ?.toString()
+                                  .isNotEmpty ==
+                              true)
+                          ? provider.data['profile']['dining_invites']
+                              .toString()
+                          : "0",
+                      label: 'DINING INVITES',
+                    ),
                   ),
                 ),
               ],
@@ -284,11 +298,16 @@ class ProfileList extends StatelessWidget {
                         color: AppColors.textSecondaryOf(context), height: 1.4),
                   ),
                 ),
-                SizedBox(height: 12),
-                InfoCard(
-                  title: 'Speaking Sessions',
-                  child: SessionTile(sessions: provider.data['sessions'] ?? []),
-                ),
+                if (Hive.box('LoginDetails')
+                    .get("isSpeaker", defaultValue: false))
+                  SizedBox(height: 12),
+                if (Hive.box('LoginDetails')
+                    .get("isSpeaker", defaultValue: false))
+                  InfoCard(
+                    title: 'Speaking Sessions',
+                    child:
+                        SessionTile(sessions: provider.data['sessions'] ?? []),
+                  ),
                 SizedBox(height: 12),
                 InfoCard(
                   title: 'Areas of Expertise',

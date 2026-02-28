@@ -131,6 +131,7 @@ class AgendaView extends StatelessWidget {
               description: item.description,
               starttime: item.start_time,
               endtime: item.end_time,
+              Cat_tag: item.Cat_tag,
               tagColor: item.tagColor,
               highlight: item.highlight,
               isLive: item.isLive,

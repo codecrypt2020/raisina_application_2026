@@ -37,6 +37,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   File? _selectedImage;
   bool _isSaving = false;
   bool _isSavingimage = false;
+  bool _isImagesize = false;
+  bool _isPasswordDialogOpen = false;
+  bool _isImageDialogOpen = false;
+  bool _cancelPasswordSave = false;
+  bool _cancelImageSave = false;
   var success;
   var successimage;
 
@@ -90,10 +95,41 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final XFile? pickedFile = await _picker.pickImage(source: source);
 
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-      print("test check image:${_selectedImage}");
+      File imageFile = File(pickedFile.path);
+
+      // Image size in bytes
+      int imageSize = await imageFile.length();
+
+      // Convert limits
+      // int minSize = 200 * 1024; // 200 KB
+      // int maxSize = 5 * 1024 * 1024; // 5 MB
+      int minSize = 200000;
+      int maxSize = 5242880;
+
+      // Validation
+      if (imageSize < minSize || imageSize > maxSize) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Image must be between 200KB and 5MB",
+            ),
+          ),
+        );
+        return;
+      } else {
+        _isImagesize = true;
+        setState(() {
+          _selectedImage = imageFile;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Don't forget to click Save to update your photo",
+            ),
+          ),
+        );
+      }
+      print("Selected Image: $_selectedImage");
     }
   }
 
@@ -177,9 +213,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
+  void _dismissPasswordDialogIfOpen() {
+    if (!_isPasswordDialogOpen || !mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    _isPasswordDialogOpen = false;
+  }
+
+  void _dismissImageDialogIfOpen() {
+    if (!_isImageDialogOpen || !mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    _isImageDialogOpen = false;
+  }
+
   void _updatePassword() async {
     if (!_passwordFormKey.currentState!.validate()) return;
+    _cancelPasswordSave = false;
     setState(() => _isSaving = true);
+    _isPasswordDialogOpen = true;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -203,7 +253,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       child: IconButton(
                         icon: const Icon(Icons.close, color: Colors.black),
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          _cancelPasswordSave = true;
+                          if (mounted) {
+                            setState(() => _isSaving = false);
+                          }
+                          _dismissPasswordDialogIfOpen();
                         },
                       ),
                     ),
@@ -234,9 +288,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     await password_change();
     if (!mounted) return;
     setState(() => _isSaving = false);
+    if (_cancelPasswordSave) return;
 
     if (success) {
-      Navigator.pop(context);
+      _dismissPasswordDialogIfOpen();
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(tosattext)),
@@ -244,7 +299,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
       return;
     } else {
-      Navigator.of(context).pop();
+      _dismissPasswordDialogIfOpen();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Something went wrong')),
       );
@@ -275,340 +330,114 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final Color primaryButtonBg =
         isDarkMode ? AppColors.goldLight : AppColors.gold;
 
-    return Scaffold(
-      backgroundColor: AppColors.surfaceOf(context),
-      appBar: AppBar(
-        title: const Text('Change Password'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 960),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.elevatedOf(context),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.borderOf(context)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'My Profile',
-                        style: TextStyle(
-                          color: AppColors.textPrimaryOf(context),
-                          fontSize: 30,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Center(
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            CircleAvatar(
-                              radius: 56,
-                              backgroundColor: AppColors.goldDim,
-                              backgroundImage: _selectedImage != null
-                                  ? FileImage(_selectedImage!) as ImageProvider
-                                  : (profile_picture != null &&
-                                          profile_picture['emp_profilepic'] !=
-                                              null &&
-                                          profile_picture['emp_profilepic']
-                                              .toString()
-                                              .isNotEmpty)
-                                      ? NetworkImage(
-                                              profile_picture['emp_profilepic'])
-                                          as ImageProvider
-                                      : null,
-                              child: (_selectedImage == null &&
-                                      (profile_picture == null ||
-                                          profile_picture['emp_profilepic'] ==
-                                              null ||
-                                          profile_picture['emp_profilepic']
-                                              .toString()
-                                              .isEmpty))
-                                  ? Text(
-                                      initials.isEmpty ? 'U' : initials,
-                                      style: TextStyle(
-                                        color: AppColors.textPrimaryOf(context),
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    )
-                                  : null,
-                            ),
-                            Positioned(
-                              right: -2,
-                              bottom: -2,
-                              child: GestureDetector(
-                                onTap: _showImagePickerOptions,
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.elevatedOf(context),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: AppColors.borderOf(context),
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.edit_outlined,
-                                    size: 18,
-                                    color: AppColors.gold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      if (isWide)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _label(context, 'Name'),
-                                  _readOnlyProfileText(context, displayName),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _label(context, 'Email'),
-                                  _readOnlyProfileText(context,
-                                      email.isEmpty ? 'Not available' : email),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      else ...[
-                        _label(context, 'Name'),
-                        _readOnlyProfileText(context, displayName),
-                        const SizedBox(height: 14),
-                        _label(context, 'Email'),
-                        _readOnlyProfileText(
-                            context, email.isEmpty ? 'Not available' : email),
-                      ],
-                      const SizedBox(height: 16),
-                      Center(
-                        child: SizedBox(
-                          width: 210,
-                          height: 48,
-                          child:
-                              // FilledButton(
-                              //   onPressed: () {
-                              //   if(_selectedImage !=null){
-                              //      profileImageUpload(_selectedImage!).then((value) {
-                              //      Fetch_emp_profile();
-                              //      Navigator.pop(context, true);
-                              //      });
-                              //   }
-                              //   },
-                              //   style: FilledButton.styleFrom(
-                              //     backgroundColor: primaryButtonBg,
-                              //     foregroundColor: Colors.white,
-                              //     shape: RoundedRectangleBorder(
-                              //       borderRadius: BorderRadius.circular(8),
-                              //     ),
-                              //   ),
-                              //   child: const Text(
-                              //     'Save Changes',
-                              //     style: TextStyle(
-                              //       fontWeight: FontWeight.w700,
-                              //       fontSize: 16,
-                              //     ),
-                              //   ),
-                              // ),
-                              FilledButton(
-                            onPressed: _selectedImage == null
-                                ? null
-                                : () async {
-                                    setState(() => _isSavingimage = true);
-                                    showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (context) {
-                                        return PopScope(
-                                          canPop: false, // Back button disable
-                                          child: Dialog(
-                                            backgroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            elevation: 8,
-                                            child: SizedBox(
-                                              height: 120,
-                                              child: Stack(
-                                                children: [
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.topRight,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 8, top: 8),
-                                                      child: IconButton(
-                                                        icon: const Icon(
-                                                            Icons.close,
-                                                            color:
-                                                                Colors.black),
-                                                        onPressed: () {
-                                                          Navigator.of(
-                                                            context,
-                                                          ).pop();
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const Center(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        CircularProgressIndicator(),
-                                                        SizedBox(height: 15),
-                                                        Text(
-                                                          "Saving...",
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: Colors.black,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-
-                                    await profileImageUpload(_selectedImage!)
-                                        .then((value) {
-                                      Fetch_emp_profile();
-                                    });
-                                    if (!mounted) return;
-                                    setState(() => _isSavingimage = false);
-
-                                    if (successimage) {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content: Text(
-                                                'Profile updated successfully')),
-                                      );
-
-                                      return;
-                                    } else {
-                                      Navigator.of(context).pop();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content:
-                                                Text('Something went wrong')),
-                                      );
-                                    }
-                                  },
-                            style: FilledButton.styleFrom(
-                              backgroundColor: primaryButtonBg,
-                              disabledBackgroundColor: Colors.grey,
-                              disabledForegroundColor: Colors.white70,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.elevatedOf(context),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.borderOf(context)),
-                  ),
-                  child: Form(
-                    key: _passwordFormKey,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.surfaceOf(context),
+        appBar: AppBar(
+          title: const Text('Change Password'),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 960),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevatedOf(context),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.borderOf(context)),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Change Password',
+                          'My Profile',
                           style: TextStyle(
                             color: AppColors.textPrimaryOf(context),
-                            fontSize: 28,
+                            fontSize: 30,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
+                        Center(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              CircleAvatar(
+                                radius: 56,
+                                backgroundColor: AppColors.goldDim,
+                                backgroundImage: _selectedImage != null
+                                    ? FileImage(_selectedImage!)
+                                        as ImageProvider
+                                    : (profile_picture != null &&
+                                            profile_picture['emp_profilepic'] !=
+                                                null &&
+                                            profile_picture['emp_profilepic']
+                                                .toString()
+                                                .isNotEmpty)
+                                        ? NetworkImage(profile_picture[
+                                            'emp_profilepic']) as ImageProvider
+                                        : null,
+                                child: (_selectedImage == null &&
+                                        (profile_picture == null ||
+                                            profile_picture['emp_profilepic'] ==
+                                                null ||
+                                            profile_picture['emp_profilepic']
+                                                .toString()
+                                                .isEmpty))
+                                    ? Text(
+                                        initials.isEmpty ? 'U' : initials,
+                                        style: TextStyle(
+                                          color:
+                                              AppColors.textPrimaryOf(context),
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              Positioned(
+                                right: -2,
+                                bottom: -2,
+                                child: GestureDetector(
+                                  onTap: _showImagePickerOptions,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.elevatedOf(context),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.borderOf(context),
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.edit_outlined,
+                                      size: 18,
+                                      color: AppColors.gold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                         if (isWide)
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _label(context, 'Old Password'),
-                                    TextFormField(
-                                      controller: _oldPasswordController,
-                                      obscureText: _hideOldPassword,
-                                      decoration: _fieldDecoration(
-                                        context,
-                                        hintText: 'Current Password',
-                                        suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _hideOldPassword =
-                                                  !_hideOldPassword;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            _hideOldPassword
-                                                ? Icons.visibility_outlined
-                                                : Icons.visibility_off_outlined,
-                                          ),
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return 'Enter old password';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    _label(context, 'Name'),
+                                    _readOnlyProfileText(context, displayName),
                                   ],
                                 ),
                               ),
@@ -617,192 +446,173 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _label(context, 'New Password'),
-                                    TextFormField(
-                                      controller: _newPasswordController,
-                                      obscureText: _hideNewPassword,
-                                      decoration: _fieldDecoration(
+                                    _label(context, 'Email'),
+                                    _readOnlyProfileText(
                                         context,
-                                        hintText: 'New Password',
-                                        suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _hideNewPassword =
-                                                  !_hideNewPassword;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            _hideNewPassword
-                                                ? Icons.visibility_outlined
-                                                : Icons.visibility_off_outlined,
-                                          ),
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return 'Enter new password';
-                                        }
-                                        // if (value.length < 8) {
-                                        //   return 'Use at least 8 characters';
-                                        // }
-                                        // return null;
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _label(context, 'Confirm Password'),
-                                    TextFormField(
-                                      controller: _confirmPasswordController,
-                                      obscureText: _hideConfirmPassword,
-                                      decoration: _fieldDecoration(
-                                        context,
-                                        hintText: 'Confirm Password',
-                                        suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _hideConfirmPassword =
-                                                  !_hideConfirmPassword;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            _hideConfirmPassword
-                                                ? Icons.visibility_outlined
-                                                : Icons.visibility_off_outlined,
-                                          ),
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return 'Confirm password';
-                                        }
-                                        if (value !=
-                                            _newPasswordController.text) {
-                                          return 'Passwords do not match';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                        email.isEmpty
+                                            ? 'Not available'
+                                            : email),
                                   ],
                                 ),
                               ),
                             ],
                           )
                         else ...[
-                          _label(context, 'Old Password'),
-                          TextFormField(
-                            controller: _oldPasswordController,
-                            obscureText: _hideOldPassword,
-                            decoration: _fieldDecoration(
-                              context,
-                              hintText: 'Current Password',
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _hideOldPassword = !_hideOldPassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _hideOldPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Enter old password';
-                              }
-                              return null;
-                            },
-                          ),
+                          _label(context, 'Name'),
+                          _readOnlyProfileText(context, displayName),
                           const SizedBox(height: 14),
-                          _label(context, 'New Password'),
-                          TextFormField(
-                            controller: _newPasswordController,
-                            obscureText: _hideNewPassword,
-                            decoration: _fieldDecoration(
-                              context,
-                              hintText: 'New Password',
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _hideNewPassword = !_hideNewPassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _hideNewPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Enter new password';
-                              }
-                              // if (value.length < 8) {
-                              //   return 'Use at least 8 characters';
-                              // }
-                              // return null;
-                            },
-                          ),
-                          const SizedBox(height: 14),
-                          _label(context, 'Confirm Password'),
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: _hideConfirmPassword,
-                            decoration: _fieldDecoration(
-                              context,
-                              hintText: 'Confirm Password',
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _hideConfirmPassword =
-                                        !_hideConfirmPassword;
-                                  });
-                                },
-                                icon: Icon(
-                                  _hideConfirmPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Confirm password';
-                              }
-                              if (value != _newPasswordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
+                          _label(context, 'Email'),
+                          _readOnlyProfileText(
+                              context, email.isEmpty ? 'Not available' : email),
                         ],
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 16),
                         Center(
                           child: SizedBox(
-                            width: 240,
-                            height: 50,
-                            child: FilledButton(
-                              onPressed: _updatePassword,
+                            width: 210,
+                            height: 48,
+                            child:
+                                // FilledButton(
+                                //   onPressed: () {
+                                //   if(_selectedImage !=null){
+                                //      profileImageUpload(_selectedImage!).then((value) {
+                                //      Fetch_emp_profile();
+                                //      Navigator.pop(context, true);
+                                //      });
+                                //   }
+                                //   },
+                                //   style: FilledButton.styleFrom(
+                                //     backgroundColor: primaryButtonBg,
+                                //     foregroundColor: Colors.white,
+                                //     shape: RoundedRectangleBorder(
+                                //       borderRadius: BorderRadius.circular(8),
+                                //     ),
+                                //   ),
+                                //   child: const Text(
+                                //     'Save Changes',
+                                //     style: TextStyle(
+                                //       fontWeight: FontWeight.w700,
+                                //       fontSize: 16,
+                                //     ),
+                                //   ),
+                                // ),
+                                FilledButton(
+                              onPressed: (_isImagesize == false)
+                                  ? null
+                                  : () async {
+                                      _cancelImageSave = false;
+                                      setState(() => _isSavingimage = true);
+                                      _isImageDialogOpen = true;
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) {
+                                          return PopScope(
+                                            canPop:
+                                                false, // Back button disable
+                                            child: Dialog(
+                                              backgroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              elevation: 8,
+                                              child: SizedBox(
+                                                height: 120,
+                                                child: Stack(
+                                                  children: [
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 8,
+                                                                top: 8),
+                                                        child: IconButton(
+                                                          icon: const Icon(
+                                                              Icons.close,
+                                                              color:
+                                                                  Colors.black),
+                                                          onPressed: () {
+                                                            _cancelImageSave =
+                                                                true;
+                                                            if (mounted) {
+                                                              setState(() =>
+                                                                  _isSavingimage =
+                                                                      false);
+                                                            }
+                                                            _dismissImageDialogIfOpen();
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const Center(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          CircularProgressIndicator(),
+                                                          SizedBox(height: 15),
+                                                          Text(
+                                                            "Saving...",
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+
+                                      await profileImageUpload(_selectedImage!);
+                                      if (_cancelImageSave || !mounted) return;
+                                      await Fetch_emp_profile();
+                                      if (_cancelImageSave || !mounted) return;
+                                      if (!mounted) return;
+                                      setState(() => _isSavingimage = false);
+                                      if (_cancelImageSave) return;
+
+                                      if (successimage) {
+                                        _dismissImageDialogIfOpen();
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Profile updated successfully')),
+                                        );
+
+                                        return;
+                                      } else {
+                                        _dismissImageDialogIfOpen();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content:
+                                                  Text('Something went wrong')),
+                                        );
+                                      }
+                                    },
                               style: FilledButton.styleFrom(
                                 backgroundColor: primaryButtonBg,
+                                disabledBackgroundColor: Colors.grey,
+                                disabledForegroundColor: Colors.white70,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
                               child: const Text(
-                                'Update Password',
+                                'Save Changes',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
@@ -814,8 +624,280 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevatedOf(context),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.borderOf(context)),
+                    ),
+                    child: Form(
+                      key: _passwordFormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Change Password',
+                            style: TextStyle(
+                              color: AppColors.textPrimaryOf(context),
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (isWide)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _label(context, 'Old Password'),
+                                      TextFormField(
+                                        controller: _oldPasswordController,
+                                        obscureText: _hideOldPassword,
+                                        decoration: _fieldDecoration(
+                                          context,
+                                          hintText: 'Current Password',
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _hideOldPassword =
+                                                    !_hideOldPassword;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              _hideOldPassword
+                                                  ? Icons.visibility_outlined
+                                                  : Icons
+                                                      .visibility_off_outlined,
+                                            ),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'Enter old password';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _label(context, 'New Password'),
+                                      TextFormField(
+                                        controller: _newPasswordController,
+                                        obscureText: _hideNewPassword,
+                                        decoration: _fieldDecoration(
+                                          context,
+                                          hintText: 'New Password',
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _hideNewPassword =
+                                                    !_hideNewPassword;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              _hideNewPassword
+                                                  ? Icons.visibility_outlined
+                                                  : Icons
+                                                      .visibility_off_outlined,
+                                            ),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'Enter new password';
+                                          }
+                                          // if (value.length < 8) {
+                                          //   return 'Use at least 8 characters';
+                                          // }
+                                          // return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _label(context, 'Confirm Password'),
+                                      TextFormField(
+                                        controller: _confirmPasswordController,
+                                        obscureText: _hideConfirmPassword,
+                                        decoration: _fieldDecoration(
+                                          context,
+                                          hintText: 'Confirm Password',
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _hideConfirmPassword =
+                                                    !_hideConfirmPassword;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              _hideConfirmPassword
+                                                  ? Icons.visibility_outlined
+                                                  : Icons
+                                                      .visibility_off_outlined,
+                                            ),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'Confirm password';
+                                          }
+                                          if (value !=
+                                              _newPasswordController.text) {
+                                            return 'Passwords do not match';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          else ...[
+                            _label(context, 'Old Password'),
+                            TextFormField(
+                              controller: _oldPasswordController,
+                              obscureText: _hideOldPassword,
+                              decoration: _fieldDecoration(
+                                context,
+                                hintText: 'Current Password',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _hideOldPassword = !_hideOldPassword;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    _hideOldPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Enter old password';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            _label(context, 'New Password'),
+                            TextFormField(
+                              controller: _newPasswordController,
+                              obscureText: _hideNewPassword,
+                              decoration: _fieldDecoration(
+                                context,
+                                hintText: 'New Password',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _hideNewPassword = !_hideNewPassword;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    _hideNewPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Enter new password';
+                                }
+                                // if (value.length < 8) {
+                                //   return 'Use at least 8 characters';
+                                // }
+                                // return null;
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            _label(context, 'Confirm Password'),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: _hideConfirmPassword,
+                              decoration: _fieldDecoration(
+                                context,
+                                hintText: 'Confirm Password',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _hideConfirmPassword =
+                                          !_hideConfirmPassword;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    _hideConfirmPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Confirm password';
+                                }
+                                if (value != _newPasswordController.text) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                          const SizedBox(height: 18),
+                          Center(
+                            child: SizedBox(
+                              width: 240,
+                              height: 50,
+                              child: FilledButton(
+                                onPressed: _updatePassword,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: primaryButtonBg,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Update Password',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

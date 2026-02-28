@@ -20,7 +20,8 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       backgroundColor: AppColors.navy,
       appBar: AppBar(
-        title: const Text('Maps'),
+        // title: const Text('Maps'),
+        title: const Text('Maps & Navigation'),
         centerTitle: false,
       ),
       body: FutureBuilder(

@@ -368,9 +368,9 @@ class Network_request {
               //respose{
               //"userId": "567"
               //}
-               {
-                "searchText":"${Hive.box('LoginDetails').get("Profile_details")['qr_name']}", 
-                    //"${Hive.box('LoginDetails').get("Profile_details")['name']}",
+              {
+                "searchText":
+                    "${Hive.box('LoginDetails').get("Profile_details")['name']}",
                 "sortby": "id",
                 "page": 1
               }),
