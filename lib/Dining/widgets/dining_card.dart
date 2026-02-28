@@ -26,6 +26,11 @@ class DiningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final timeParts = time.trim().split(RegExp(r'\s+'));
+    final timeValue = timeParts.isNotEmpty && timeParts.first.isNotEmpty
+        ? timeParts.first
+        : '--:--';
+    final amPmValue = timeParts.length > 1 ? timeParts[1] : '';
     final Color cardColor = highlight
         ? AppColors.elevatedOf(context)
         : AppColors.surfaceOf(context);
@@ -61,12 +66,12 @@ class DiningCard extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  time.split(' ')[0],
+                  timeValue,
                   style: const TextStyle(
                       fontWeight: FontWeight.w700, color: AppColors.gold),
                 ),
                 Text(
-                  time.split(' ')[1],
+                  amPmValue,
                   style: TextStyle(fontSize: 12, color: mutedColor),
                 ),
               ],

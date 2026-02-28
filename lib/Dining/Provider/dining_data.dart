@@ -217,96 +217,146 @@ class dining_data with ChangeNotifier {
     }
   }
 
-  mapmeal(dining_list) {
-    List<DiningDataItem> dining_list_raw = [];
-    String formattedTime = formatTo12Hour(dining_list?['breakfastStartTime']);
-    // String timeRange_breakfast = formatTimeRange(
-    //   dining_list?['breakfastStartTime'],
-    //   dining_list?['breakfastEndTime'],
-    // );
+  mapmeal(dynamic dining_list) {
+    final List<DiningDataItem> dining_list_raw = [];
 
-    //breakfast
-    if (dining_list?['breakfast_agenda'] != null &&
-        dining_list!['breakfast_agenda'].toString().isNotEmpty &&
-        (int.tryParse(dining_list['breakfast_agenda'].toString()) ?? 0) != 0) {
-      dining_list_raw.add(DiningDataItem(
-        time: formatTo12Hour(dining_list?['breakfastStartTime']), // 14 FEB Sat
-        title: "Breakfast - ${dining_list["breakfastTopic"]}",
-        location: dining_list['breakfast_gate_name'] ?? '',
-        speaker: 'Session', // default
-        tagColor: Colors.red,
-        tag: 'Completed', // default
-        // tagColor: AppColors.teal, // default
-        highlight: false,
-        isLive: false,
-        time_range: formatTimeRange(
-          dining_list?['breakfastStartTime'],
-          dining_list?['breakfastEndTime'],
-        ),
-      ));
+    // New API shape:
+    // breakfastSessions/lunchSessions/teaSessions/dinnerSessions => List<session>
+    if (dining_list is Map<String, dynamic>) {
+      _appendMealSessions(
+        target: dining_list_raw,
+        sessions: dining_list['breakfastSessions'],
+        mealLabel: 'Breakfast',
+      );
+      _appendMealSessions(
+        target: dining_list_raw,
+        sessions: dining_list['lunchSessions'],
+        mealLabel: 'Lunch',
+      );
+
+      _appendMealSessions(
+        target: dining_list_raw,
+        sessions: dining_list['dinnerSessions'],
+        mealLabel: 'Dinner',
+      );
+
+      _appendMealSessions(
+          target: dining_list_raw,
+          sessions: dining_list['teaSessions'],
+          mealLabel: 'Conversations over Kahwah');
     }
-    // //lunch
-    if (dining_list?['lunch_agenda'] != null &&
-        dining_list!['lunch_agenda'].toString().isNotEmpty &&
-        (int.tryParse(dining_list['lunch_agenda'].toString()) ?? 0) != 0) {
-      dining_list_raw.add(DiningDataItem(
-        time: "${formatTo12Hour(dining_list?['lunchStartTime'])}", // 14 FEB Sat
-        title: "Lunch - ${dining_list["lunchTopic"]}",
-        location: dining_list['lunch_gate_name'] ?? '',
-        speaker: 'Session', // default
-        tagColor: Colors.red,
-        tag: 'Completed', // default
-        // tagColor: AppColors.teal, // default
-        highlight: false,
-        isLive: false,
-        time_range: formatTimeRange(
-          dining_list?['lunchStartTime'],
-          dining_list?['lunchEndTime'],
-        ),
-      ));
-    }
-    // //tea
-    if (dining_list?['tea_agenda'] != null &&
-        dining_list!['tea_agenda'].toString().isNotEmpty &&
-        (int.tryParse(dining_list['tea_agenda'].toString()) ?? 0) != 0) {
-      dining_list_raw.add(DiningDataItem(
-        time: formatTo12Hour(dining_list?['teaStartTime']), // 14 FEB Sat
-        title: "High Tea - ${dining_list["teaTopic"]}",
-        location: dining_list['tea_gate_name'] ?? '',
-        speaker: 'Session', // default
-        tagColor: Colors.red,
-        tag: 'Completed', // default
-        // tagColor: AppColors.teal, // default
-        highlight: false,
-        isLive: false,
-        time_range: formatTimeRange(
-          dining_list?['teaStartTime'],
-          dining_list?['teaEndTime'],
-        ),
-      ));
-    }
-    // //dinner
-    if (dining_list?['dinner_agenda'] != null &&
-        dining_list!['dinner_agenda'].toString().isNotEmpty &&
-        (int.tryParse(dining_list['dinner_agenda'].toString()) ?? 0) != 0) {
-      dining_list_raw.add(DiningDataItem(
-        time: formatTo12Hour(dining_list?['dinnerStartTime']), // 14 FEB Sat
-        title: "Dinner - ${dining_list["dinnerTopic"]}",
-        location: dining_list['dinner_gate_name'] ?? '',
-        speaker: 'Session', // default
-        tagColor: Colors.red,
-        tag: 'Completed', // default
-        // tagColor: AppColors.teal, // default
-        highlight: false,
-        isLive: false,
-        time_range: formatTimeRange(
-          dining_list?['dinnerStartTime'],
-          dining_list?['dinnerEndTime'],
-        ),
-      ));
-    }
+
+    // Old API fallback (kept for backward compatibility).
+    // if (dining_list_raw.isEmpty) {
+    //   if (dining_list?['breakfast_agenda'] != null &&
+    //       dining_list!['breakfast_agenda'].toString().isNotEmpty &&
+    //       (int.tryParse(dining_list['breakfast_agenda'].toString()) ?? 0) !=
+    //           0) {
+    //     dining_list_raw.add(DiningDataItem(
+    //       time: formatTo12Hour(dining_list?['breakfastStartTime']),
+    //       title: "Breakfast - ${dining_list["breakfastTopic"]}",
+    //       location: dining_list['breakfast_gate_name'] ?? '',
+    //       speaker: 'Session',
+    //       tagColor: Colors.red,
+    //       tag: 'Completed',
+    //       highlight: false,
+    //       isLive: false,
+    //       time_range: formatTimeRange(
+    //         dining_list?['breakfastStartTime'],
+    //         dining_list?['breakfastEndTime'],
+    //       ),
+    //     ));
+    //   }
+    //   if (dining_list?['lunch_agenda'] != null &&
+    //       dining_list!['lunch_agenda'].toString().isNotEmpty &&
+    //       (int.tryParse(dining_list['lunch_agenda'].toString()) ?? 0) != 0) {
+    //     dining_list_raw.add(DiningDataItem(
+    //       time: formatTo12Hour(dining_list?['lunchStartTime']),
+    //       title: "Lunch - ${dining_list["lunchTopic"]}",
+    //       location: dining_list['lunch_gate_name'] ?? '',
+    //       speaker: 'Session',
+    //       tagColor: Colors.red,
+    //       tag: 'Completed',
+    //       highlight: false,
+    //       isLive: false,
+    //       time_range: formatTimeRange(
+    //         dining_list?['lunchStartTime'],
+    //         dining_list?['lunchEndTime'],
+    //       ),
+    //     ));
+    //   }
+    //   if (dining_list?['tea_agenda'] != null &&
+    //       dining_list!['tea_agenda'].toString().isNotEmpty &&
+    //       (int.tryParse(dining_list['tea_agenda'].toString()) ?? 0) != 0) {
+    //     dining_list_raw.add(DiningDataItem(
+    //       time: formatTo12Hour(dining_list?['teaStartTime']),
+    //       title: "High Tea - ${dining_list["teaTopic"]}",
+    //       location: dining_list['tea_gate_name'] ?? '',
+    //       speaker: 'Session',
+    //       tagColor: Colors.red,
+    //       tag: 'Completed',
+    //       highlight: false,
+    //       isLive: false,
+    //       time_range: formatTimeRange(
+    //         dining_list?['teaStartTime'],
+    //         dining_list?['teaEndTime'],
+    //       ),
+    //     ));
+    //   }
+    //   if (dining_list?['dinner_agenda'] != null &&
+    //       dining_list!['dinner_agenda'].toString().isNotEmpty &&
+    //       (int.tryParse(dining_list['dinner_agenda'].toString()) ?? 0) != 0) {
+    //     dining_list_raw.add(DiningDataItem(
+    //       time: formatTo12Hour(dining_list?['dinnerStartTime']),
+    //       title: "Dinner - ${dining_list["dinnerTopic"]}",
+    //       location: dining_list['dinner_gate_name'] ?? '',
+    //       speaker: 'Session',
+    //       tagColor: Colors.red,
+    //       tag: 'Completed',
+    //       highlight: false,
+    //       isLive: false,
+    //       time_range: formatTimeRange(
+    //         dining_list?['dinnerStartTime'],
+    //         dining_list?['dinnerEndTime'],
+    //       ),
+    //     ));
+    //   }
+    // }
+
     _dining_list = dining_list_raw;
     notifyListeners();
+  }
+
+  void _appendMealSessions({
+    required List<DiningDataItem> target,
+    required dynamic sessions,
+    required String mealLabel,
+  }) {
+    if (sessions is! List) return;
+
+    for (final raw in sessions) {
+      if (raw is! Map) continue;
+      final Map<String, dynamic> session = Map<String, dynamic>.from(raw);
+
+      final String topic = (session['title'] ?? '').toString().trim();
+      final String sessionTitle =
+          topic.isEmpty ? mealLabel : '$mealLabel - $topic';
+
+      target.add(DiningDataItem(
+        time: formatTo12Hour(session['start_time']?.toString()),
+        title: sessionTitle,
+        location: (session['gate_name'] ?? '').toString(),
+        speaker: 'Session',
+        tagColor: Colors.red,
+        tag: 'Completed',
+        highlight: false,
+        isLive: (session['is_live'] == 1 || session['is_live'] == true),
+        time_range: formatTimeRange(
+          session['start_time']?.toString(),
+          session['end_time']?.toString(),
+        ),
+      ));
+    }
   }
 }
 
