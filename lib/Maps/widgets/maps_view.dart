@@ -63,6 +63,7 @@ class _MapsViewState extends State<MapsView> {
   int _selectedFloor = 0;
   int? _selectedPoi;
   int _mapResetToken = 0;
+  bool _isMapGestureActive = false;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _mapSectionKey = GlobalKey();
 
@@ -182,7 +183,9 @@ class _MapsViewState extends State<MapsView> {
         },
         child: ListView(
           controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics: _isMapGestureActive
+              ? const NeverScrollableScrollPhysics()
+              : const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
           children: [
             _VenueCard(
@@ -190,12 +193,15 @@ class _MapsViewState extends State<MapsView> {
               floors: floors,
               selectedFloor: floorIndex,
               listItems: listItems,
-              onModeChanged: (mode) {
-                setState(() {
-                  _mode = mode;
-                  _selectedPoi = null;
-                });
-              },
+            onModeChanged: (mode) {
+              setState(() {
+                _mode = mode;
+                _selectedPoi = null;
+                if (mode != _MapMode.floorPlan) {
+                  _isMapGestureActive = false;
+                }
+              });
+            },
               onFloorChanged: (index) {
                 setState(() {
                   _selectedFloor = index;
@@ -241,12 +247,18 @@ class _MapsViewState extends State<MapsView> {
                   points: mapItems,
                   mapImageUrl: floor.mapImageUrl,
                   mapSize: floor.mapSize,
-                  legends: legends,
-                  selectedPoi: _selectedPoi,
-                  resetZoomToken: _mapResetToken,
-                  onPoiTap: (index) =>
-                      setState(() => _selectedPoi = index >= 0 ? index : null),
-                ),
+                legends: legends,
+                selectedPoi: _selectedPoi,
+                resetZoomToken: _mapResetToken,
+                onMapInteractionChanged: (isActive) {
+                  if (_isMapGestureActive == isActive) return;
+                  setState(() {
+                    _isMapGestureActive = isActive;
+                  });
+                },
+                onPoiTap: (index) =>
+                    setState(() => _selectedPoi = index >= 0 ? index : null),
+              ),
               ),
             ],
           ],
@@ -754,6 +766,7 @@ class _MapCanvas extends StatefulWidget {
     required this.legends,
     required this.selectedPoi,
     required this.resetZoomToken,
+    required this.onMapInteractionChanged,
     required this.onPoiTap,
   });
 
@@ -764,6 +777,7 @@ class _MapCanvas extends StatefulWidget {
   final List<_LegendEntry> legends;
   final int? selectedPoi;
   final int resetZoomToken;
+  final ValueChanged<bool> onMapInteractionChanged;
   final ValueChanged<int> onPoiTap;
 
   @override
@@ -776,19 +790,29 @@ class _MapCanvasState extends State<_MapCanvas> {
   static const double _minScale = 1.0;
   static const double _maxScale = 4.0;
   Size _viewportSize = Size.zero;
+  int _activePointerCount = 0;
 
   @override
   void didUpdateWidget(covariant _MapCanvas oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.resetZoomToken != oldWidget.resetZoomToken) {
       _transformController.value = Matrix4.identity();
+      _activePointerCount = 0;
+      widget.onMapInteractionChanged(false);
     }
   }
 
   @override
   void dispose() {
+    widget.onMapInteractionChanged(false);
     _transformController.dispose();
     super.dispose();
+  }
+
+  bool get _isZoomed => _transformController.value.getMaxScaleOnAxis() > 1.001;
+
+  void _updateParentScrollLockFromPointers() {
+    widget.onMapInteractionChanged(_activePointerCount > 0 && _isZoomed);
   }
 
   void _zoomBy(double step) {
@@ -874,16 +898,32 @@ class _MapCanvasState extends State<_MapCanvas> {
                 builder: (context, constraints) {
                   _viewportSize =
                       Size(constraints.maxWidth, constraints.maxHeight);
-                  return InteractiveViewer(
-                    transformationController: _transformController,
-                    minScale: _minScale,
-                    maxScale: _maxScale,
-                    onInteractionEnd: (_) {
-                      _transformController.value =
-                          _clampMatrixToViewport(_transformController.value);
+                  return Listener(
+                    onPointerDown: (_) {
+                      _activePointerCount++;
+                      _updateParentScrollLockFromPointers();
                     },
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
+                    onPointerUp: (_) {
+                      _activePointerCount =
+                          (_activePointerCount - 1).clamp(0, 99);
+                      _updateParentScrollLockFromPointers();
+                    },
+                    onPointerCancel: (_) {
+                      _activePointerCount =
+                          (_activePointerCount - 1).clamp(0, 99);
+                      _updateParentScrollLockFromPointers();
+                    },
+                    child: InteractiveViewer(
+                      transformationController: _transformController,
+                      minScale: _minScale,
+                      maxScale: _maxScale,
+                      onInteractionEnd: (_) {
+                        _transformController.value =
+                            _clampMatrixToViewport(_transformController.value);
+                        _updateParentScrollLockFromPointers();
+                      },
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
                         const markerDiameter = 28.0;
                         final canvasSize = Size(
                           constraints.maxWidth,
@@ -936,7 +976,8 @@ class _MapCanvasState extends State<_MapCanvas> {
                             }),
                           ],
                         );
-                      },
+                        },
+                      ),
                     ),
                   );
                 },

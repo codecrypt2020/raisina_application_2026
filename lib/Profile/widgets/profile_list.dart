@@ -58,6 +58,7 @@ class ProfileList extends StatelessWidget {
     final String rdLabel = (rdRaw.isNotEmpty && rdRaw.toLowerCase() != 'null')
         ? "RD-${rdRaw.toUpperCase()}"
         : "RD-N/A";
+    final int speakingSessionCount = provider.data['sessions']?.length ?? 0;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -232,8 +233,10 @@ class ProfileList extends StatelessWidget {
                   .get("isSpeaker", defaultValue: false)) ...[
                 Expanded(
                   child: StatCard(
-                    value: "${provider.data['sessions']?.length ?? 0}",
-                    label: 'SPEAKING SESSION',
+                    value: "$speakingSessionCount",
+                    label: speakingSessionCount == 1
+                        ? 'SPEAKING SESSION'
+                        : 'SPEAKING SESSIONS',
                   ),
                 ),
                 const SizedBox(width: 10),
