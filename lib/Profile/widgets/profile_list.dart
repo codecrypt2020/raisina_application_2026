@@ -233,28 +233,38 @@ class ProfileList extends StatelessWidget {
                 if (Hive.box('LoginDetails')
                     .get("isSpeaker", defaultValue: false))
                   Expanded(
-                    child: StatCard(
-                      value: "${provider.data['sessions']?.length ?? 0}",
-                      label: 'SPEAKING SESSION',
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: StatCard(
+                        value: "${provider.data['sessions']?.length ?? 0}",
+                        label: 'SPEAKING SESSION',
+                      ),
                     ),
                   ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: StatCard(
-                    value: "${provider.totalUniqueDays}",
-                    label: 'CONFERENCE DAYS',
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: StatCard(
+                      value: "${provider.totalUniqueDays}",
+                      label: 'CONFERENCE DAYS',
+                    ),
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: StatCard(
-                    value: (provider.data['profile']['dining_invites']
-                                ?.toString()
-                                .isNotEmpty ==
-                            true)
-                        ? provider.data['profile']['dining_invites'].toString()
-                        : "0",
-                    label: 'DINING INVITES',
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: StatCard(
+                      value: (provider.data['profile']['dining_invites']
+                                  ?.toString()
+                                  .isNotEmpty ==
+                              true)
+                          ? provider.data['profile']['dining_invites']
+                              .toString()
+                          : "0",
+                      label: 'DINING INVITES',
+                    ),
                   ),
                 ),
               ],

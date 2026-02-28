@@ -23,7 +23,7 @@ class SpeakingEngagementList extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(20),
         itemCount: isSpeakingEmpty
-            ? 3 // header + banner + empty state
+            ? 2 // header + banner + //empty state->this comment
             : provider.sessions_list.length + 2, // header + banner + sessions
         itemBuilder: (context, index) {
           // Header
@@ -52,21 +52,21 @@ class SpeakingEngagementList extends StatelessWidget {
             );
           }
 
-          if (isSpeakingEmpty) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.55,
-              child: Center(
-                child: Text(
-                  'No speaking engagement assigned',
-                  style: TextStyle(
-                    color: subtitleColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            );
-          }
+          // if (isSpeakingEmpty) {
+          // return SizedBox(
+          //   height: MediaQuery.of(context).size.height * 0.55,
+          //   child: Center(
+          //     child: Text(
+          //       'No speaking engagement assigned',
+          //       style: TextStyle(
+          //         color: subtitleColor,
+          //         fontSize: 16,
+          //         fontWeight: FontWeight.w500,
+          //       ),
+          //     ),
+          //   ),
+          // );
+          //}
 
           final item = provider.sessions_list[index - 2];
 
