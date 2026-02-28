@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,7 +53,12 @@ class ResourceFileActions {
   }
 
   static Future<void> downloadFile(
-      BuildContext context, String fileUrl, String title) async {
+    BuildContext context,
+    String fileUrl,
+    String title, {
+    String? fileTypeHint,
+    bool openAfterDownload = false,
+  }) async {
     final messenger = ScaffoldMessenger.of(context);
     final rawUrl = fileUrl.trim();
     final uri = Uri.tryParse(rawUrl);
@@ -66,8 +73,27 @@ class ResourceFileActions {
       return;
     }
 
-    final fileName = _buildFileName(rawUrl, title);
+    final fileName = _buildFileName(
+      rawUrl,
+      title,
+      fileTypeHint: fileTypeHint,
+    );
     final file = File('${saveDir.path}/$fileName');
+    final tempFile = File('${file.path}.part');
+
+    if (await file.exists()) {
+      _showDownloadSuccess(
+        context,
+        messenger,
+        file.path,
+        sourceUrl: rawUrl,
+        alreadyExists: true,
+      );
+      if (openAfterDownload) {
+        await _openDownloadedFile(context, file.path, sourceUrl: rawUrl);
+      }
+      return;
+    }
 
     _showMessage(messenger, 'Downloading $fileName...');
     final client = http.Client();
@@ -81,12 +107,24 @@ class ResourceFileActions {
         return;
       }
 
-      final sink = file.openWrite();
+      final sink = tempFile.openWrite();
       await response.stream.pipe(sink);
       await sink.close();
+      await tempFile.rename(file.path);
 
-      _showMessage(messenger, 'Downloaded: ${file.path}');
+      _showDownloadSuccess(
+        context,
+        messenger,
+        file.path,
+        sourceUrl: rawUrl,
+      );
+      if (openAfterDownload) {
+        await _openDownloadedFile(context, file.path, sourceUrl: rawUrl);
+      }
     } catch (_) {
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
       _showMessage(messenger, 'Download failed for $title');
     } finally {
       client.close();
@@ -110,25 +148,153 @@ class ResourceFileActions {
     messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
-  static Future<Directory?> _getDownloadDirectory() async {
-    if (Platform.isAndroid) {
-      return getExternalStorageDirectory();
-    }
-    return getApplicationDocumentsDirectory();
+  static void _showDownloadSuccess(
+    BuildContext context,
+    ScaffoldMessengerState messenger,
+    String filePath, {
+    String? sourceUrl,
+    bool alreadyExists = false,
+  }) {
+    final text = alreadyExists
+        ? 'Already downloaded: $filePath'
+        : 'Downloaded to: $filePath';
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(text),
+        action: SnackBarAction(
+          label: 'View',
+          onPressed: () =>
+              _openDownloadedFile(context, filePath, sourceUrl: sourceUrl),
+        ),
+      ),
+    );
   }
 
-  static String _buildFileName(String fileUrl, String title) {
+  static Future<void> _openDownloadedFile(
+    BuildContext context,
+    String filePath, {
+    String? sourceUrl,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final file = File(filePath);
+    if (!await file.exists()) {
+      _showMessage(messenger, 'File not found');
+      return;
+    }
+
+    bool noAppFound = false;
+    try {
+      final result = await OpenFilex.open(filePath);
+      if (result.type == ResultType.done) {
+        return;
+      }
+
+      if (result.type == ResultType.noAppToOpen) {
+        noAppFound = true;
+      }
+    } on MissingPluginException {
+      // Fallback when plugin isn't registered in the current runtime.
+      final uri = Uri.file(filePath);
+      var opened = await launchUrl(uri);
+      if (!opened) {
+        opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+      if (opened) return;
+    } catch (_) {}
+
+    if (sourceUrl != null && sourceUrl.trim().isNotEmpty) {
+      final trimmedSourceUrl = sourceUrl.trim();
+      final previewUri = _buildPreviewUri(trimmedSourceUrl);
+      final openedOnline = await launchUrl(
+        previewUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (openedOnline) {
+        return;
+      }
+
+      // iOS fallback: open original URL directly (Safari/associated apps).
+      final rawUri = Uri.tryParse(trimmedSourceUrl);
+      if (rawUri != null) {
+        final openedRaw = await launchUrl(
+          rawUri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (openedRaw) {
+          return;
+        }
+      }
+    }
+
+    if (noAppFound) {
+      _showMessage(
+          messenger, 'No app found to open this file type on your device');
+    } else {
+      _showMessage(messenger, 'Could not open downloaded file');
+    }
+  }
+
+  static Future<Directory?> _getDownloadDirectory() async {
+    Directory? baseDir;
+    if (Platform.isAndroid) {
+      // Prefer Downloads so users can find files easily in file managers.
+      baseDir = await getDownloadsDirectory();
+      baseDir ??= await getExternalStorageDirectory();
+    } else if (Platform.isIOS) {
+      // iOS app sandbox; visible via Files app only when file sharing is enabled.
+      baseDir = await getApplicationDocumentsDirectory();
+    } else {
+      baseDir = await getDownloadsDirectory();
+      baseDir ??= await getApplicationDocumentsDirectory();
+    }
+
+    if (baseDir == null) return null;
+    final resourcesDir = Directory('${baseDir.path}/resources_downloads');
+    if (!await resourcesDir.exists()) {
+      await resourcesDir.create(recursive: true);
+    }
+    return resourcesDir;
+  }
+
+  static String _buildFileName(
+    String fileUrl,
+    String title, {
+    String? fileTypeHint,
+  }) {
     final parsed = Uri.tryParse(fileUrl);
     final urlFileName = parsed != null && parsed.pathSegments.isNotEmpty
         ? parsed.pathSegments.last
         : '';
-    if (urlFileName.isNotEmpty) return _sanitizeFileName(urlFileName);
+    if (urlFileName.isNotEmpty) {
+      final safeUrlName = _sanitizeFileName(urlFileName);
+      if (safeUrlName.contains('.')) return safeUrlName;
+    }
 
-    final type = getFileTypeFromUrl(fileUrl);
-    final fallbackExt = _extensionForType(type);
+    final fallbackExt = _extensionFromFileTypeHint(fileTypeHint) ??
+        _extensionForType(getFileTypeFromUrl(fileUrl));
     final safeTitle =
         _sanitizeFileName(title.trim().isEmpty ? 'resource' : title);
     return '$safeTitle$fallbackExt';
+  }
+
+  static String? _extensionFromFileTypeHint(String? fileTypeHint) {
+    final hint = fileTypeHint?.toLowerCase().trim() ?? '';
+    if (hint.isEmpty) return null;
+
+    if (hint.contains('xlsx') || hint.contains('excel')) return '.xlsx';
+    if (hint.contains('xls')) return '.xls';
+    if (hint.contains('docx') || hint.contains('word')) return '.docx';
+    if (hint.contains('doc')) return '.doc';
+    if (hint.contains('pptx') || hint.contains('powerpoint')) return '.pptx';
+    if (hint.contains('ppt')) return '.ppt';
+    if (hint.contains('pdf')) return '.pdf';
+    if (hint.contains('png')) return '.png';
+    if (hint.contains('jpeg') || hint.contains('jpg')) return '.jpg';
+    if (hint.contains('gif')) return '.gif';
+    if (hint.contains('webp')) return '.webp';
+    if (hint.contains('image')) return '.jpg';
+
+    return null;
   }
 
   static String _sanitizeFileName(String value) {

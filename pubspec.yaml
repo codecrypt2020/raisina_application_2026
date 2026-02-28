@@ -21,7 +21,10 @@ dependencies:
   intl: ^0.20.2
   country_code_picker: ^3.3.0
   image_picker: ^1.0.7
+
   permission_handler: ^11.3.1
+  open_filex: ^4.5.0
+
 
 dev_dependencies:
   flutter_test:
@@ -41,10 +44,10 @@ flutter_launcher_icons:
   image_path: "assets/images/Raisina_launcher.png"
 
 flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/images/RaisinaLauncherIconFinal.png
+  color: "#1772A4"
+  image: assets/images/chatgptfinal.png
   android: true
   ios: false
   android_12:
-    color: "#FFFFFF"
-    image: assets/images/RaisinaLauncherIconFinal.png
+    color: "#1772A4"
+    image: assets/images/chatgptfinal.png

@@ -45,7 +45,7 @@ class CategoryChip extends StatelessWidget {
                 color: index == provider.selectedCategoryIndex
                     ? AppColors.gold
                     : textColor,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(width: 8),

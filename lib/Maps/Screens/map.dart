@@ -18,7 +18,7 @@ class _MapScreenState extends State<MapScreen> {
         Provider.of<MapData>(context, listen: false).fetchMapsApi();
 
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: AppColors.surfaceOf(context),
       appBar: AppBar(
         // title: const Text('Maps'),
         title: const Text('Maps & Navigation'),

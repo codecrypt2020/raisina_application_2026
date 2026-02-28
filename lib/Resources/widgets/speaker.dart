@@ -14,10 +14,24 @@ class Speaker extends StatelessWidget {
     final filteredList = provider.searchedSpeakerList;
 
     if (filteredList.isEmpty) {
-      return Center(
-        child: Text(
-          'No resources found',
-          style: TextStyle(color: AppColors.textSecondaryOf(context)),
+      return LayoutBuilder(
+        builder: (context, constraints) => ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: constraints.maxHeight,
+              child: Center(
+                child: Text(
+                  'No resources found',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryOf(context),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -57,6 +71,7 @@ class Speaker extends StatelessWidget {
                   date: provider.formatDate(item['created_at']),
                   size: provider.formatFileSize(item['file_size']),
                   file_url: item['file_url'],
+                  showDownloadButton: item['is_download']?.toString() == '1',
                   badgeText: item['is_featured'] == 1 ? "FOR YOU" : null,
                 ),
               );

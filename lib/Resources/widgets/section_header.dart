@@ -2,10 +2,20 @@ import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 
 class SectionHeader extends StatelessWidget {
-  const SectionHeader({required this.title, required this.count});
+  const SectionHeader({
+    super.key,
+    required this.title,
+    required this.count,
+    this.titleFontSize = 18,
+    this.titleFontWeight = FontWeight.w700,
+    this.titleFontFamily,
+  });
 
   final String title;
   final int count;
+  final double titleFontSize;
+  final FontWeight titleFontWeight;
+  final String? titleFontFamily;
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +28,9 @@ class SectionHeader extends StatelessWidget {
           title,
           style: TextStyle(
             color: titleColor,
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            fontFamily: 'serif',
+            fontSize: titleFontSize,
+            fontWeight: titleFontWeight,
+            fontFamily: titleFontFamily,
           ),
         ),
         const SizedBox(width: 10),

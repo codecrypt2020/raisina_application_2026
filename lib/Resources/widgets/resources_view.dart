@@ -26,6 +26,9 @@ class Resources_view extends StatefulWidget {
 class _Resources_viewState extends State<Resources_view> {
   List<GlobalKey> _chipKeys = [];
   final TextEditingController _searchController = TextEditingController();
+  Future<void> _refreshResources() async {
+    await Provider.of<ResourcesData>(context, listen: false).fetchResources();
+  }
 
   @override
   void dispose() {
@@ -175,7 +178,10 @@ class _Resources_viewState extends State<Resources_view> {
               ),
             ),
             Expanded(
-              child: widgetss[0],
+              child: RefreshIndicator(
+                onRefresh: _refreshResources,
+                child: widgetss[0],
+              ),
             )
           ],
         ),

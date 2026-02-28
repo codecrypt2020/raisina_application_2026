@@ -12,6 +12,7 @@ class ResourceCard extends StatelessWidget {
     required this.date,
     required this.size,
     required this.file_url,
+    required this.showDownloadButton,
     this.badgeText,
   });
 
@@ -23,7 +24,37 @@ class ResourceCard extends StatelessWidget {
   final String date;
   final String size;
   final String file_url;
+  final bool showDownloadButton;
   final String? badgeText;
+
+  IconData getFileIcon(String fileUrl) {
+    String extension = fileUrl.split('.').last.toLowerCase();
+
+    switch (extension) {
+      case 'pdf':
+        return Icons.picture_as_pdf;
+
+      case 'xls':
+      case 'xlsx':
+        return Icons.table_chart;
+
+      case 'ppt':
+      case 'pptx':
+        return Icons.slideshow;
+
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return Icons.image;
+
+      case 'doc':
+      case 'docx':
+        return Icons.description;
+
+      default:
+        return Icons.insert_drive_file_outlined;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +64,6 @@ class ResourceCard extends StatelessWidget {
     final Color titleColor = AppColors.textPrimaryOf(context);
     final Color secondaryColor = AppColors.textSecondaryOf(context);
     final Color mutedColor = AppColors.textMutedOf(context);
-    final bool isDarkMode = AppColors.isDark(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -58,7 +88,11 @@ class ResourceCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               color: iconColor.withOpacity(0.14),
             ),
-            child: Icon(icon, color: iconColor),
+            child: Icon(
+              getFileIcon(file_url),
+              color: iconColor,
+            ),
+            //Icon(icon, color: iconColor),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -68,7 +102,6 @@ class ResourceCard extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 19,
                     fontWeight: FontWeight.w700,
                     color: titleColor,
                   ),
@@ -128,16 +161,17 @@ class ResourceCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.goldDim,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       badgeText!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.gold,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -159,33 +193,37 @@ class ResourceCard extends StatelessWidget {
                       ),
                       child: const Text(
                         'Preview',
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDarkMode
-                            ? AppColors.surfaceSoftOf(context)
-                            : Colors.grey.shade300,
-                        foregroundColor:
-                            isDarkMode ? mutedColor : Colors.grey.shade600,
-                        disabledBackgroundColor: isDarkMode
-                            ? AppColors.surfaceSoftOf(context)
-                            : Colors.grey.shade300,
-                        disabledForegroundColor:
-                            isDarkMode ? mutedColor : Colors.grey.shade600,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    if (showDownloadButton) ...[
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: hasValidUrl
+                            ? () => ResourceFileActions.downloadFile(
+                                  context,
+                                  file_url,
+                                  title,
+                                  fileTypeHint: type,
+                                )
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.goldDim,
+                          foregroundColor: AppColors.gold,
+                          disabledBackgroundColor:
+                              AppColors.surfaceSoftOf(context),
+                          disabledForegroundColor: mutedColor,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Download',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
-                      child: const Text(
-                        'Download',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
+                    ],
                   ],
                 ),
               ],

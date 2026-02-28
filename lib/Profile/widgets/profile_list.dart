@@ -58,6 +58,7 @@ class ProfileList extends StatelessWidget {
     final String rdLabel = (rdRaw.isNotEmpty && rdRaw.toLowerCase() != 'null')
         ? "RD-${rdRaw.toUpperCase()}"
         : "RD-N/A";
+    final int speakingSessionCount = provider.data['sessions']?.length ?? 0;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -287,51 +288,41 @@ class ProfileList extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (Hive.box('LoginDetails')
-                    .get("isSpeaker", defaultValue: false))
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: StatCard(
-                        value: "${provider.data['sessions']?.length ?? 0}",
-                        label: 'SPEAKING SESSION',
-                      ),
-                    ),
-                  ),
-                SizedBox(width: 10),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (Hive.box('LoginDetails')
+                  .get("isSpeaker", defaultValue: false)) ...[
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: StatCard(
-                      value: "${provider.totalUniqueDays}",
-                      label: 'CONFERENCE DAYS',
-                    ),
+                  child: StatCard(
+                    value: "$speakingSessionCount",
+                    label: speakingSessionCount == 1
+                        ? 'SPEAKING SESSION'
+                        : 'SPEAKING SESSIONS',
                   ),
                 ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: StatCard(
-                      value: (provider.data['profile']['dining_invites']
-                                  ?.toString()
-                                  .isNotEmpty ==
-                              true)
-                          ? provider.data['profile']['dining_invites']
-                              .toString()
-                          : "0",
-                      label: 'DINING INVITES',
-                    ),
-                  ),
-                ),
+                const SizedBox(width: 10),
               ],
-            ),
+              Expanded(
+                child: StatCard(
+                  value: "${provider.totalUniqueDays}",
+                  label: 'CONFERENCE DAYS',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: StatCard(
+                  value: (provider.data['profile']['dining_invites']
+                              ?.toString()
+                              .isNotEmpty ==
+                          true)
+                      ? provider.data['profile']['dining_invites'].toString()
+                      : "0",
+                  label: 'DINING INVITES',
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),

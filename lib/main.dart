@@ -217,6 +217,7 @@ class AttendeeHomePage extends StatefulWidget {
 
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
   bool isSpeakingEnabled = false;
+  int _speakingRefreshRequestId = 0;
 
   @override
   void initState() {
@@ -282,10 +283,59 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     return pages;
   }
 
+  int _remapIndexForSpeakingToggle({
+    required int requestedIndex,
+    required bool previousSpeaking,
+    required bool nextSpeaking,
+  }) {
+    if (previousSpeaking == nextSpeaking) return requestedIndex;
+
+    // Tabs: [Agenda, Dining, (Speaking), Profile]
+    // When speaking disappears, old Profile(3) becomes 2.
+    if (previousSpeaking && !nextSpeaking) {
+      if (requestedIndex >= 3) return 2;
+      return requestedIndex;
+    }
+
+    // When speaking appears, old Profile(2) becomes 3.
+    if (!previousSpeaking && nextSpeaking) {
+      if (requestedIndex >= 2) return requestedIndex + 1;
+      return requestedIndex;
+    }
+
+    return requestedIndex;
+  }
+
+  void _refreshSpeakingAvailabilityInBackground() {
+    final int requestId = ++_speakingRefreshRequestId;
+    Network_request.assignedUserDetails().then((_) {
+      if (!mounted || requestId != _speakingRefreshRequestId) return;
+      final bool nextSpeaking =
+          Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+      if (nextSpeaking == isSpeakingEnabled) return;
+
+      final int remappedIndex = _remapIndexForSpeakingToggle(
+        requestedIndex: _selectedIndex,
+        previousSpeaking: isSpeakingEnabled,
+        nextSpeaking: nextSpeaking,
+      );
+      final int targetMaxIndex = nextSpeaking ? 3 : 2;
+      setState(() {
+        isSpeakingEnabled = nextSpeaking;
+        _selectedIndex = remappedIndex.clamp(0, targetMaxIndex);
+      });
+    }).catchError((_) {
+      // Keep current tab state when background sync fails.
+    });
+  }
+
   //profile changes
 
   @override
   Widget build(BuildContext context) {
+    final pages = _pages;
+    final int safeSelectedIndex =
+        pages.isEmpty ? 0 : _selectedIndex.clamp(0, pages.length - 1).toInt();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (ctx) => dining_data()),
@@ -395,50 +445,50 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             ),
           ],
         ),
-        // drawer: Drawer(
-        //   backgroundColor: AppColors.navyElevated,
-        //   child: SafeArea(
-        //     child: ListView(
-        //       padding: EdgeInsets.zero,
-        //       children: [
-        //         Container(
-        //           padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
-        //           color: AppColors.navyMid,
-        //           child: const Text(
-        //             'Quick Access',
-        //             style: TextStyle(
-        //               fontSize: 18,
-        //               fontWeight: FontWeight.w700,
-        //               color: AppColors.textPrimary,
-        //             ),
-        //           ),
-        //         ),
-        //         ListTile(
-        //           leading: const Icon(
-        //             Icons.folder_outlined,
-        //             color: AppColors.textPrimary,
-        //           ),
-        //           title: const Text(
-        //             'Resources',
-        //             style: TextStyle(color: AppColors.textPrimary),
-        //           ),
-        //           onTap: () => _openPanelPage(const ResourcesMain()),
-        //         ),
-        //         ListTile(
-        //           leading: const Icon(
-        //             Icons.map_outlined,
-        //             color: AppColors.textPrimary,
-        //           ),
-        //           title: const Text(
-        //             'Maps',
-        //             style: TextStyle(color: AppColors.textPrimary),
-        //           ),
-        //           onTap: () => _openPanelPage(const Mapmain()),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
+        drawer: Drawer(
+          backgroundColor: AppColors.elevatedOf(context),
+          child: SafeArea(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+                  color: AppColors.surfaceOf(context),
+                  child: Text(
+                    'Quick Access',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimaryOf(context),
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.map_outlined,
+                    color: AppColors.textPrimaryOf(context),
+                  ),
+                  title: Text(
+                    'Maps',
+                    style: TextStyle(color: AppColors.textPrimaryOf(context)),
+                  ),
+                  onTap: () => _openPanelPage(const Mapmain()),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.folder_outlined,
+                    color: AppColors.textPrimaryOf(context),
+                  ),
+                  title: Text(
+                    'Resources',
+                    style: TextStyle(color: AppColors.textPrimaryOf(context)),
+                  ),
+                  onTap: () => _openPanelPage(const ResourcesMain()),
+                ),
+              ],
+            ),
+          ),
+        ),
         // body: _pages[_selectedIndex],
         // bottomNavigationBar: NavigationBar(
         //   selectedIndex: _selectedIndex,
@@ -498,19 +548,17 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
         //     ),
         //   ),
         // ),
-        body: _pages[_selectedIndex],
+        body: pages[safeSelectedIndex],
         bottomNavigationBar: NavigationBar(
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (index) async {
-            if (index == _selectedIndex) {
+          selectedIndex: safeSelectedIndex,
+          onDestinationSelected: (index) {
+            if (index == safeSelectedIndex) {
               return;
             }
-            Network_request.assignedUserDetails();
-            isSpeakingEnabled =
-                Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
             setState(() {
               _selectedIndex = index;
             });
+            _refreshSpeakingAvailabilityInBackground();
           },
           destinations: [
             const NavigationDestination(
