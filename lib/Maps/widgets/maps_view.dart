@@ -204,6 +204,9 @@ class _MapsViewState extends State<MapsView> {
             },
               onFloorChanged: (index) {
                 setState(() {
+                  if (_selectedFloor != index) {
+                    _mapResetToken++;
+                  }
                   _selectedFloor = index;
                   _selectedPoi = null;
                 });
