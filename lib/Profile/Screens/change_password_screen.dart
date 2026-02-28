@@ -144,15 +144,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     var status = await permission.status;
 
-    /// Already granted
-    if (status.isGranted) {
+    //Already granted OR limited access
+    if (status.isGranted || status.isLimited) {
       return true;
     }
 
     /// Request permission
     status = await permission.request();
 
-    if (status.isGranted) {
+    // After request also check limited
+    if (status.isGranted || status.isLimited) {
       return true;
     }
 
