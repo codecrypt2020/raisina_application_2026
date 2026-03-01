@@ -16,6 +16,7 @@ import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileList extends StatelessWidget {
   const ProfileList({super.key});
@@ -32,6 +33,41 @@ class ProfileList extends StatelessWidget {
         .where((item) => item.isNotEmpty)
         .map((item) => item.toUpperCase())
         .toList();
+  }
+
+  String _normalizeTwitterHandle(String rawTwitter) {
+    final trimmed = rawTwitter.trim();
+    if (trimmed.startsWith('@')) {
+      return trimmed.substring(1);
+    }
+    if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+      final uri = Uri.tryParse(trimmed);
+      if (uri != null && uri.pathSegments.isNotEmpty) {
+        return uri.pathSegments.first;
+      }
+    }
+    return trimmed;
+  }
+
+  Future<void> _openTwitterProfile(
+      BuildContext context, String rawTwitter) async {
+    final handle = _normalizeTwitterHandle(rawTwitter);
+    if (handle.isEmpty) return;
+
+    final appUri = Uri.parse('twitter://user?screen_name=$handle');
+    final webUri = Uri.parse('https://twitter.com/$handle');
+
+    bool opened = await launchUrl(appUri);
+    if (!opened) {
+      opened = await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    }
+
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open Twitter profile.')),
+      );
+    }
   }
 
   @override
@@ -416,18 +452,47 @@ class ProfileList extends StatelessWidget {
                 const SizedBox(height: 12),
                 InfoCard(
                   title: 'Social Connect',
-                  child: Text(
-                    (() {
+                  child: Builder(
+                    builder: (context) {
                       final twitter =
                           provider.data['profile']['social']?['twitter'];
-                      return (twitter == null ||
-                              twitter.toString().trim().isEmpty)
-                          ? "No social links added."
-                          : twitter;
-                    })(),
-                    style: TextStyle(
-                      color: AppColors.textSecondaryOf(context),
-                    ),
+                      final twitterText = twitter?.toString().trim() ?? '';
+                      if (twitterText.isEmpty) {
+                        return Text(
+                          "No social links added.",
+                          style: TextStyle(
+                            color: AppColors.textSecondaryOf(context),
+                          ),
+                        );
+                      }
+
+                      return InkWell(
+                        onTap: () => _openTwitterProfile(context, twitterText),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.open_in_new_rounded,
+                                size: 16,
+                                color: AppColors.gold,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                twitterText,
+                                style: const TextStyle(
+                                  color: AppColors.gold,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
