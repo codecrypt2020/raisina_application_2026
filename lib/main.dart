@@ -230,7 +230,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
 
   String _currentProfileName() {
     final profile = (Hive.box('LoginDetails').get("Profile_details") != null)
-        ? Hive.box('LoginDetails').get("Profile_details")['name']
+        ? Hive.box('LoginDetails').get("Profile_details")
         : null;
     if (profile is Map && profile['logo_short_name'] != null) {
       return profile['logo_short_name'].toString().trim();
