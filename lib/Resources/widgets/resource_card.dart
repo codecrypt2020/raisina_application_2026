@@ -185,7 +185,9 @@ class _ResourceCardState extends State<ResourceCard> {
                   ),
                 ],
                 const SizedBox(height: 12),
-                Row(
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 8,
                   children: [
                     OutlinedButton(
                       onPressed: hasValidUrl
@@ -205,7 +207,6 @@ class _ResourceCardState extends State<ResourceCard> {
                       ),
                     ),
                     if (widget.showDownloadButton) ...[
-                      const SizedBox(width: 10),
                       ElevatedButton(
                         onPressed: hasValidUrl && !_isDownloading
                             ? () async {
@@ -236,23 +237,14 @@ class _ResourceCardState extends State<ResourceCard> {
                           ),
                         ),
                         child: _isDownloading
-                            ? const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Downloading...',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                ],
+                            ? SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(mutedColor),
+                                ),
                               )
                             : const Text(
                                 'Download',
