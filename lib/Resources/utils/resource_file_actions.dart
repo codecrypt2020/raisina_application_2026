@@ -36,11 +36,12 @@ class ResourceFileActions {
 
   static Future<void> previewFile(
       BuildContext context, String fileUrl, String title) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final route = ModalRoute.of(context);
     final rawUrl = fileUrl.trim();
     final uri = Uri.tryParse(rawUrl);
     if (uri == null || fileUrl.trim().isEmpty) {
-      _showMessage(messenger, 'Invalid file URL for $title');
+      _showMessage(messenger, route, 'Invalid file URL for $title');
       return;
     }
 
@@ -48,7 +49,7 @@ class ResourceFileActions {
     final launched =
         await launchUrl(previewUri, mode: LaunchMode.externalApplication);
     if (!launched) {
-      _showMessage(messenger, 'Could not open preview for $title');
+      _showMessage(messenger, route, 'Could not open preview for $title');
     }
   }
 
@@ -59,17 +60,18 @@ class ResourceFileActions {
     String? fileTypeHint,
     bool openAfterDownload = false,
   }) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final route = ModalRoute.of(context);
     final rawUrl = fileUrl.trim();
     final uri = Uri.tryParse(rawUrl);
     if (uri == null || rawUrl.isEmpty) {
-      _showMessage(messenger, 'Invalid file URL for $title');
+      _showMessage(messenger, route, 'Invalid file URL for $title');
       return;
     }
 
     final saveDir = await _getDownloadDirectory();
     if (saveDir == null) {
-      _showMessage(messenger, 'Could not access storage for download');
+      _showMessage(messenger, route, 'Could not access storage for download');
       return;
     }
 
@@ -83,19 +85,29 @@ class ResourceFileActions {
 
     if (await file.exists()) {
       _showDownloadSuccess(
-        context,
         messenger,
+        route,
         file.path,
-        sourceUrl: rawUrl,
+        onViewPressed: () => _openDownloadedFile(
+          messenger,
+          route,
+          file.path,
+          sourceUrl: rawUrl,
+        ),
         alreadyExists: true,
       );
       if (openAfterDownload) {
-        await _openDownloadedFile(context, file.path, sourceUrl: rawUrl);
+        await _openDownloadedFile(
+          messenger,
+          route,
+          file.path,
+          sourceUrl: rawUrl,
+        );
       }
       return;
     }
 
-    _showMessage(messenger, 'Downloading $fileName...');
+    _showMessage(messenger, route, 'Downloading $fileName...');
     final client = http.Client();
 
     try {
@@ -103,7 +115,7 @@ class ResourceFileActions {
       final response = await client.send(request);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        _showMessage(messenger, 'Download failed for $title');
+        _showMessage(messenger, route, 'Download failed for $title');
         return;
       }
 
@@ -113,19 +125,29 @@ class ResourceFileActions {
       await tempFile.rename(file.path);
 
       _showDownloadSuccess(
-        context,
         messenger,
+        route,
         file.path,
-        sourceUrl: rawUrl,
+        onViewPressed: () => _openDownloadedFile(
+          messenger,
+          route,
+          file.path,
+          sourceUrl: rawUrl,
+        ),
       );
       if (openAfterDownload) {
-        await _openDownloadedFile(context, file.path, sourceUrl: rawUrl);
+        await _openDownloadedFile(
+          messenger,
+          route,
+          file.path,
+          sourceUrl: rawUrl,
+        );
       }
     } catch (_) {
       if (await tempFile.exists()) {
         await tempFile.delete();
       }
-      _showMessage(messenger, 'Download failed for $title');
+      _showMessage(messenger, route, 'Download failed for $title');
     } finally {
       client.close();
     }
@@ -144,41 +166,57 @@ class ResourceFileActions {
     return Uri.parse(fileUrl);
   }
 
-  static void _showMessage(ScaffoldMessengerState messenger, String message) {
+  static bool _canShowFeedback(
+    ScaffoldMessengerState? messenger,
+    ModalRoute<dynamic>? route,
+  ) {
+    if (messenger == null) return false;
+    if (route == null) return true;
+    return route.isCurrent;
+  }
+
+  static void _showMessage(
+    ScaffoldMessengerState? messenger,
+    ModalRoute<dynamic>? route,
+    String message,
+  ) {
+    if (!_canShowFeedback(messenger, route)) return;
+    messenger!.hideCurrentSnackBar();
     messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   static void _showDownloadSuccess(
-    BuildContext context,
-    ScaffoldMessengerState messenger,
+    ScaffoldMessengerState? messenger,
+    ModalRoute<dynamic>? route,
     String filePath, {
-    String? sourceUrl,
+    required VoidCallback onViewPressed,
     bool alreadyExists = false,
   }) {
+    if (!_canShowFeedback(messenger, route)) return;
     final text = alreadyExists
         ? 'Already downloaded: $filePath'
         : 'Downloaded to: $filePath';
+    messenger!.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
         content: Text(text),
         action: SnackBarAction(
           label: 'View',
-          onPressed: () =>
-              _openDownloadedFile(context, filePath, sourceUrl: sourceUrl),
+          onPressed: onViewPressed,
         ),
       ),
     );
   }
 
   static Future<void> _openDownloadedFile(
-    BuildContext context,
+    ScaffoldMessengerState? messenger,
+    ModalRoute<dynamic>? route,
     String filePath, {
     String? sourceUrl,
   }) async {
-    final messenger = ScaffoldMessenger.of(context);
     final file = File(filePath);
     if (!await file.exists()) {
-      _showMessage(messenger, 'File not found');
+      _showMessage(messenger, route, 'File not found');
       return;
     }
 
@@ -228,9 +266,12 @@ class ResourceFileActions {
 
     if (noAppFound) {
       _showMessage(
-          messenger, 'No app found to open this file type on your device');
+        messenger,
+        route,
+        'No app found to open this file type on your device',
+      );
     } else {
-      _showMessage(messenger, 'Could not open downloaded file');
+      _showMessage(messenger, route, 'Could not open downloaded file');
     }
   }
 

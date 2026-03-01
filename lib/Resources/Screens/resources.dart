@@ -32,50 +32,62 @@ class _ResourcesState extends State<Resources> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Resources',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimaryOf(context),
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (_) {
+        ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
+              Navigator.of(context).maybePop();
+            },
           ),
+          title: Text(
+            'Resources',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimaryOf(context),
+            ),
+          ),
+          centerTitle: false,
         ),
-        centerTitle: false,
-      ),
-      body: FutureBuilder(
-        //putting the materail call in the api for first time loading
+        body: FutureBuilder(
+          //putting the materail call in the api for first time loading
 
-        future: _resourcesFuture,
-        builder: (ctx, dataSnapshot) {
-          if (dataSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (dataSnapshot.error != null) {
-            {
-              //do error handling
-              return RefreshIndicator(
-                onRefresh: _refreshResources,
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: const [
-                    SizedBox(
-                      height: 400,
-                      child: Center(
-                        child: Text("An error occured"),
-                      ),
-                    ),
-                  ],
-                ),
+          future: _resourcesFuture,
+          builder: (ctx, dataSnapshot) {
+            if (dataSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
               );
+            } else if (dataSnapshot.error != null) {
+              {
+                //do error handling
+                return RefreshIndicator(
+                  onRefresh: _refreshResources,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(
+                        height: 400,
+                        child: Center(
+                          child: Text("An error occured"),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            } else {
+              return const Resources_view();
             }
-          } else {
-            return const Resources_view();
-          }
-        },
+          },
+        ),
       ),
     );
   }

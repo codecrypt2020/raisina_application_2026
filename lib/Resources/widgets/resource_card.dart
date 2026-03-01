@@ -2,8 +2,9 @@ import 'package:attendee_app/Resources/utils/resource_file_actions.dart';
 import 'package:attendee_app/main.dart';
 import 'package:flutter/material.dart';
 
-class ResourceCard extends StatelessWidget {
+class ResourceCard extends StatefulWidget {
   const ResourceCard({
+    super.key,
     required this.icon,
     required this.iconColor,
     required this.title,
@@ -26,6 +27,13 @@ class ResourceCard extends StatelessWidget {
   final String file_url;
   final bool showDownloadButton;
   final String? badgeText;
+
+  @override
+  State<ResourceCard> createState() => _ResourceCardState();
+}
+
+class _ResourceCardState extends State<ResourceCard> {
+  bool _isDownloading = false;
 
   IconData getFileIcon(String fileUrl) {
     String extension = fileUrl.split('.').last.toLowerCase();
@@ -58,7 +66,7 @@ class ResourceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasValidUrl = file_url.trim().isNotEmpty;
+    final hasValidUrl = widget.file_url.trim().isNotEmpty;
     final Color cardColor = AppColors.elevatedOf(context);
     final Color borderColor = AppColors.borderOf(context);
     final Color titleColor = AppColors.textPrimaryOf(context);
@@ -86,11 +94,11 @@ class ResourceCard extends StatelessWidget {
             height: 52,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: iconColor.withOpacity(0.14),
+              color: widget.iconColor.withOpacity(0.14),
             ),
             child: Icon(
-              getFileIcon(file_url),
-              color: iconColor,
+              getFileIcon(widget.file_url),
+              color: widget.iconColor,
             ),
             //Icon(icon, color: iconColor),
           ),
@@ -100,17 +108,17 @@ class ResourceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  widget.title,
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     color: titleColor,
                   ),
                 ),
                 const SizedBox(height: 2),
-                if (subtitle != "") ...[
+                if (widget.subtitle != "") ...[
                   const SizedBox(height: 2),
                   Text(
-                    subtitle,
+                    widget.subtitle,
                     style: TextStyle(
                       color: secondaryColor,
                       fontSize: 15,
@@ -131,7 +139,7 @@ class ResourceCard extends StatelessWidget {
                         size: 16, color: mutedColor),
                     const SizedBox(width: 4),
                     Text(
-                      type,
+                      widget.type,
                       style: TextStyle(
                         color: mutedColor,
                         fontWeight: FontWeight.w600,
@@ -141,7 +149,7 @@ class ResourceCard extends StatelessWidget {
                     Icon(Icons.access_time, size: 16, color: mutedColor),
                     const SizedBox(width: 4),
                     Text(
-                      date,
+                      widget.date,
                       style: TextStyle(
                         color: mutedColor,
                         fontWeight: FontWeight.w600,
@@ -149,7 +157,7 @@ class ResourceCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      size,
+                      widget.size,
                       style: TextStyle(
                         color: mutedColor,
                         fontWeight: FontWeight.w600,
@@ -157,7 +165,7 @@ class ResourceCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (badgeText != null) ...[
+                if (widget.badgeText != null) ...[
                   const SizedBox(height: 8),
                   Container(
                     padding:
@@ -167,8 +175,8 @@ class ResourceCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      badgeText!,
-                      style: TextStyle(
+                      widget.badgeText!,
+                      style: const TextStyle(
                         color: AppColors.gold,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -182,7 +190,7 @@ class ResourceCard extends StatelessWidget {
                     OutlinedButton(
                       onPressed: hasValidUrl
                           ? () => ResourceFileActions.previewFile(
-                              context, file_url, title)
+                              context, widget.file_url, widget.title)
                           : null,
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: borderColor),
@@ -196,16 +204,25 @@ class ResourceCard extends StatelessWidget {
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
-                    if (showDownloadButton) ...[
+                    if (widget.showDownloadButton) ...[
                       const SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed: hasValidUrl
-                            ? () => ResourceFileActions.downloadFile(
-                                  context,
-                                  file_url,
-                                  title,
-                                  fileTypeHint: type,
-                                )
+                        onPressed: hasValidUrl && !_isDownloading
+                            ? () async {
+                                setState(() => _isDownloading = true);
+                                try {
+                                  await ResourceFileActions.downloadFile(
+                                    context,
+                                    widget.file_url,
+                                    widget.title,
+                                    fileTypeHint: widget.type,
+                                  );
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _isDownloading = false);
+                                  }
+                                }
+                              }
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.goldDim,
@@ -218,10 +235,29 @@ class ResourceCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text(
-                          'Download',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        child: _isDownloading
+                            ? const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Downloading...',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              )
+                            : const Text(
+                                'Download',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
                       ),
                     ],
                   ],
