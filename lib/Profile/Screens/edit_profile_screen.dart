@@ -38,6 +38,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // final List<String> _titles = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
   final List<String> _titles = [
+    'Select',
     'Mr.',
     'Ms.',
     'Mrs.',
@@ -58,7 +59,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'H.E. Amb.',
     'H.E. Dr.'
   ];
-  String _selectedTitle = 'Mr.';
+  String _selectedTitle = 'Select';
 
   @override
   void initState() {
@@ -74,8 +75,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         : "";
     // : (nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '');
     final String incomingTitle = _asString(widget.profile['title']);
-    _selectedTitle =
-        _titles.contains(incomingTitle) ? incomingTitle : _selectedTitle;
+    _selectedTitle = _titles.contains(incomingTitle)
+        ? incomingTitle
+        :
+        // (incomingTitle == "")
+        //     ?
+        "Select";
+    // : _selectedTitle;
 
     _firstNameController = TextEditingController(text: firstName);
     _lastNameController = TextEditingController(text: lastName);
@@ -450,6 +456,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     showCountryOnly: false,
                                     showOnlyCountryWhenClosed: false,
                                     showFlag: false,
+                                    textStyle: TextStyle(
+                                      color: AppColors.textPrimaryOf(context),
+                                    ),
+                                    dialogTextStyle: TextStyle(
+                                      color: AppColors.textPrimaryOf(context),
+                                    ),
+                                    dialogBackgroundColor:
+                                        AppColors.elevatedOf(context),
+                                    searchStyle: TextStyle(
+                                      color: AppColors.textPrimaryOf(context),
+                                    ),
+                                    searchDecoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: AppColors.surfaceOf(context),
+                                      hintText: 'Search country',
+                                      hintStyle: TextStyle(
+                                        color: AppColors.textMutedOf(context),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: AppColors.borderOf(context),
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: AppColors.borderOf(context),
+                                        ),
+                                      ),
+                                      focusedBorder: const OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: AppColors.gold),
+                                      ),
+                                    ),
                                     alignLeft: false,
                                     padding: EdgeInsets.zero,
                                   ),
@@ -615,7 +656,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         body: jsonEncode(
           encryptPayload(
             {
-              "title": "${_selectedTitle}", //
+              "title":
+                  "${(_selectedTitle == "Select") ? "" : _selectedTitle}", //
               "firstName": "${_firstNameController.text.trim()}",
               "lastName": "${_lastNameController.text.trim()}",
               "countryCode": "${_selectedCountryCode}",
