@@ -229,7 +229,9 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   int _selectedIndex = 0;
 
   String _currentProfileName() {
-    final profile = Hive.box('LoginDetails').get("Profile_details");
+    final profile = (Hive.box('LoginDetails').get("Profile_details") != null)
+        ? Hive.box('LoginDetails').get("Profile_details")['name']
+        : null;
     if (profile is Map && profile['logo_short_name'] != null) {
       return profile['logo_short_name'].toString().trim();
     } else if (profile is Map && profile['name'] != null) {
@@ -239,7 +241,9 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   }
 
   String _wellcomeprofilename() {
-    final profile = Hive.box('LoginDetails').get("Profile_details")['name'];
+    final profile = (Hive.box('LoginDetails').get("Profile_details") != null)
+        ? Hive.box('LoginDetails').get("Profile_details")['name']
+        : null;
     if (profile != null && profile != " ") {
       return profile;
     }
