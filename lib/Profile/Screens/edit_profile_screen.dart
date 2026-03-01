@@ -464,6 +464,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     ),
                                     dialogBackgroundColor:
                                         AppColors.elevatedOf(context),
+                                    boxDecoration: BoxDecoration(
+                                      color: AppColors.elevatedOf(context),
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: const [],
+                                    ),
                                     searchStyle: TextStyle(
                                       color: AppColors.textPrimaryOf(context),
                                     ),
