@@ -449,7 +449,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     // favorite: const ['+91', 'US', 'GB'],
                                     showCountryOnly: false,
                                     showOnlyCountryWhenClosed: false,
-                                    showFlag: true,
+                                    showFlag: false,
                                     alignLeft: false,
                                     padding: EdgeInsets.zero,
                                   ),
