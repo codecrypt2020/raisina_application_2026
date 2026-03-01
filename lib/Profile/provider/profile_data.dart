@@ -14,9 +14,8 @@ import '../../utility.dart';
 import 'package:hive/hive.dart';
 
 class ProfileData with ChangeNotifier {
-  
   //varible
-  var _data;  
+  var _data;
   var _totalUniqueDays;
   var _logo_short_name;
   var _userRole_name;
@@ -26,32 +25,25 @@ class ProfileData with ChangeNotifier {
   get data => _data;
   get totalUniqueDays => _totalUniqueDays;
   get logo_short_name => _logo_short_name;
-  get userRole_name  => _userRole_name;
+  get userRole_name => _userRole_name;
   get rd_number => _rd_numebr;
 
- 
-  fetch_userRolde(){
-      var userRole =  Hive.box('LoginDetails').get("Profile_details")['userRole'];
-      if(userRole == 1){
-        _userRole_name ="SPEAKER";
-      }
-      else if(userRole == 2){
-        _userRole_name ="DELEGATE";
-      }
-      else if(userRole == 3){
-        _userRole_name = "AFGG";
-      } 
-      else if(userRole == 4){
-        _userRole_name = "PARTICIPANTS";
-      }
-      else if(userRole == 5){
-       _userRole_name = "MEDIA";
-      }
-      else{
-       _userRole_name = "No Role Assigned";
-      }
+  fetch_userRolde() {
+    var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
+    if (userRole == 1) {
+      _userRole_name = "SPEAKER";
+    } else if (userRole == 2) {
+      _userRole_name = "DELEGATE";
+    } else if (userRole == 3) {
+      _userRole_name = "AFGG";
+    } else if (userRole == 4) {
+      _userRole_name = "PARTICIPANTS";
+    } else if (userRole == 5) {
+      _userRole_name = "MEDIA";
+    } else {
+      _userRole_name = "No Role Assigned";
+    }
   }
-
 
   Future<void> fetchUserProfile() async {
     fetch_userRolde();
@@ -80,9 +72,9 @@ class ProfileData with ChangeNotifier {
 
       if (response.statusCode == 200 && jsonData['success'] == true) {
         var res = decryptResponse(response.body);
-         _data = res['data'];
+        _data = res['data'];
         Hive.box('LoginDetails').put("imagsave", _data);
-       
+
         //fetch rd numebr
         _rd_numebr = _data['profile']['qr_internal_id'];
         //fetch day of conference
@@ -92,10 +84,14 @@ class ProfileData with ChangeNotifier {
             confernace_days_value.map((e) => e['day_number']).toSet().length;
 
         //logo short name
-        _logo_short_name = "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}" "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";        
-             
-        var profile = Map<String, dynamic>.from(Hive.box('LoginDetails').get("Profile_details"));
+        _logo_short_name =
+            "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}"
+            "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";
+
+        var profile = Map<String, dynamic>.from(
+            Hive.box('LoginDetails').get("Profile_details"));
         profile['name'] = _data['profile']['name'];
+        profile["logo_short_name"] = _logo_short_name;
         Hive.box('LoginDetails').put("Profile_details", profile);
 
         print("Profile data fetched: $data");

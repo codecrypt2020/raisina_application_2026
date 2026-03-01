@@ -132,11 +132,16 @@ class _LoginScreenState extends State<LoginScreen> {
         passwordController.text.trim(),
       );
       await Network_request.assignedUserDetails();
+
+      await Network_request.fetchUserProfile();
+
       // debugger();
       if (!mounted) {
         return;
       }
       if (loginCheckBool["success"] == true) {
+//call the profile api
+
         AttendeeApp.setThemeMode(context, ThemeMode.light);
         Navigator.pushReplacement(
           context,

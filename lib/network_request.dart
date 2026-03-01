@@ -395,4 +395,54 @@ class Network_request {
       debugPrint("this is the error in assignedUserDetailsApi: $e");
     }
   }
+
+  static Future<void> fetchUserProfile() async {
+    try {
+      var profileDetails = Hive.box('LoginDetails').get("Profile_details");
+
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.userProfileApi),
+        headers: {
+          "x-encrypted": "1",
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({
+            "email": "${profileDetails['email']}",
+            "userId": "${profileDetails['userId']}"
+          }),
+        ),
+      );
+
+      var jsonData = decryptResponse(response.body);
+
+      if (response.statusCode == 200 && jsonData['success'] == true) {
+        var res = decryptResponse(response.body);
+        var _data = res['data'];
+        Hive.box('LoginDetails').put("imagsave", _data);
+
+        //logo short name
+        var _logo_short_name =
+            "${_data["profile"]["first_name"]?[0].toUpperCase() ?? ""}"
+            "${_data["profile"]["last_name"]?[0].toUpperCase() ?? ""}";
+
+        var profile = Map<String, dynamic>.from(
+            Hive.box('LoginDetails').get("Profile_details"));
+        profile['name'] = _data['profile']['name'];
+        profile["logo_short_name"] = _logo_short_name;
+        Hive.box('LoginDetails').put("Profile_details", profile);
+
+        // print("Profile data fetched: $data");
+        // print({data['profile']?['bio']});
+        // notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error in fetchUserProfile: $e");
+      // debugger();
+    }
+  }
 }

@@ -790,105 +790,105 @@ class ProfileList extends StatelessWidget {
             ),
           ),
         ),
-        // const SizedBox(height: 12),
-        // SizedBox(
-        //   width: double.infinity,
-        //   child: Material(
-        //     color: Colors.transparent,
-        //     child: InkWell(
-        //       borderRadius: BorderRadius.circular(18),
-        //       onTap: () async {
-        //         final bool? shouldLogout = await showDialog<bool>(
-        //           context: context,
-        //           builder: (dialogContext) {
-        //             return AlertDialog(
-        //               shape: RoundedRectangleBorder(
-        //                 borderRadius: BorderRadius.circular(16),
-        //               ),
-        //               title: const Text('Logout'),
-        //               content: Text(
-        //                 'Are you sure you want to logout?',
-        //                 style: TextStyle(color: secondaryTextColor),
-        //               ),
-        //               actions: [
-        //                 TextButton(
-        //                   onPressed: () => Navigator.pop(dialogContext, false),
-        //                   child: const Text('No'),
-        //                 ),
-        //                 FilledButton(
-        //                   style: FilledButton.styleFrom(
-        //                     backgroundColor: AppColors.red,
-        //                     foregroundColor: Colors.white,
-        //                   ),
-        //                   onPressed: () => Navigator.pop(dialogContext, true),
-        //                   child: const Text('Yes'),
-        //                 ),
-        //               ],
-        //             );
-        //           },
-        //         );
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () async {
+                final bool? shouldLogout = await showDialog<bool>(
+                  context: context,
+                  builder: (dialogContext) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      title: const Text('Logout'),
+                      content: Text(
+                        'Are you sure you want to logout?',
+                        style: TextStyle(color: secondaryTextColor),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          child: const Text('No'),
+                        ),
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.red,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => Navigator.pop(dialogContext, true),
+                          child: const Text('Yes'),
+                        ),
+                      ],
+                    );
+                  },
+                );
 
-        //         if (shouldLogout == true) {
-        //           //deleting the locally stored token
-        //           Hive.box("LoginDetails").clear();
-        //           Hive.box(AttendeeApp.settingsBoxName)
-        //               .put(AttendeeApp.themeModeKey, 'light');
-        //           AttendeeApp.setThemeMode(context, ThemeMode.light);
-        //           Navigator.pushAndRemoveUntil(
-        //             //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
-        //             context,
-        //             MaterialPageRoute(
-        //               builder: (context) => const LoginScreen(
-        //                   signUpUrl: Constants.registraionUrl,
-        //                   forgetPasswordUrl: Constants.forgetPassUrl),
-        //             ),
-        //             (route) => false,
-        //           );
-        //         }
-        //       },
-        //       child: Ink(
-        //         padding:
-        //             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        //         decoration: BoxDecoration(
-        //           color: AppColors.surfaceOf(context),
-        //           borderRadius: BorderRadius.circular(18),
-        //           border: Border.all(color: AppColors.borderOf(context)),
-        //         ),
-        //         child: Row(
-        //           children: [
-        //             Container(
-        //               padding: const EdgeInsets.all(8),
-        //               decoration: BoxDecoration(
-        //                 color: AppColors.goldDim,
-        //                 borderRadius: BorderRadius.circular(10),
-        //               ),
-        //               child: const Icon(
-        //                 Icons.logout_rounded,
-        //                 color: AppColors.gold,
-        //                 size: 20,
-        //               ),
-        //             ),
-        //             const SizedBox(width: 12),
-        //             Expanded(
-        //               child: Text(
-        //                 "Logout",
-        //                 style: TextStyle(
-        //                   color: AppColors.textPrimaryOf(context),
-        //                   fontWeight: FontWeight.w700,
-        //                   fontSize: 16,
-        //                 ),
-        //               ),
-        //             ),
-        //             Icon(
-        //               Icons.chevron_right_rounded,
-        //               color: AppColors.textMutedOf(context),
-        //             ),
-        //           ],
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
+                if (shouldLogout == true) {
+                  //deleting the locally stored token
+                  Hive.box("LoginDetails").clear();
+                  Hive.box(AttendeeApp.settingsBoxName)
+                      .put(AttendeeApp.themeModeKey, 'light');
+                  AttendeeApp.setThemeMode(context, ThemeMode.light);
+                  Navigator.pushAndRemoveUntil(
+                    //pushAndRemoveUntil is used to clear the entire navigation stack so the user cannot return to previous screens after logging out.
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(
+                          signUpUrl: Constants.registraionUrl,
+                          forgetPasswordUrl: Constants.forgetPassUrl),
+                    ),
+                    (route) => false,
+                  );
+                }
+              },
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceOf(context),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderOf(context)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.goldDim,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.logout_rounded,
+                        color: AppColors.gold,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(
+                          color: AppColors.textPrimaryOf(context),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textMutedOf(context),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

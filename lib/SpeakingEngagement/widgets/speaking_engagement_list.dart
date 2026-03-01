@@ -29,7 +29,7 @@ class SpeakingEngagementList extends StatelessWidget {
           // Header
           if (index == 0) {
             return Text(
-              'Speaking Engagement',
+              'Speaking Engagements',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,

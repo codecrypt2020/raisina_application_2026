@@ -26,6 +26,16 @@ class ResourcesData with ChangeNotifier {
     notifyListeners();
   }
 
+  check_download(item) {
+    if (item == null) {
+      return true;
+    } else if (item == 0) {
+      return false;
+    } else if (item == 1) {
+      return true;
+    }
+  }
+
   var _data;
 
   List<ResourceCategory> _categories = [
