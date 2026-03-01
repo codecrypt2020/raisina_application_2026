@@ -238,6 +238,14 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     return "";
   }
 
+  String _wellcomeprofilename() {
+    final profile = Hive.box('LoginDetails').get("Profile_details")['name'];
+    if (profile != null && profile != " ") {
+      return profile;
+    }
+    return '';
+  }
+
   String _profileInitials(String name) {
     final normalized = name.trim();
     if (normalized.isEmpty) return "US";
@@ -381,7 +389,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
                           .listenable(keys: const ['Profile_details']),
                       builder: (context, box, _) {
                         return Text(
-                          _currentProfileName(),
+                          _wellcomeprofilename(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
