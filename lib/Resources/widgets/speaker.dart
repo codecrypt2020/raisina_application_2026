@@ -66,7 +66,7 @@ class Speaker extends StatelessWidget {
                   icon: Icons.image_outlined,
                   iconColor: const Color(0xFF9A58DC),
                   title: item['title'],
-                  subtitle: item['description'],
+                  subtitle: item['description'] ?? "",
                   type: item['file_type'] ?? 'Unknown',
                   date: provider.formatDate(item['created_at']),
                   size: provider.formatFileSize(item['file_size']),
