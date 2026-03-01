@@ -73,7 +73,7 @@ class Alldata extends StatelessWidget {
                   size: provider.formatFileSize(item['file_size']),
                   file_url: item['file_url'],
                   showDownloadButton:
-                      provider.check_download([item["is_download"]]),
+                      provider.check_download(item["is_download"]),
                   badgeText: item['is_featured'] == 1 ? "FOR YOU" : null,
                 ),
               );
