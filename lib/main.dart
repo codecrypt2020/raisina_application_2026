@@ -227,8 +227,8 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     super.initState();
     isSpeakingEnabled =
         Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
-    isAgendaEnabled = Network_request()
-        .fetch_userRole(); // Call the method and get the result
+    isAgendaEnabled = Hive.box('LoginDetails').get("is_agenda",
+        defaultValue: false); // Call the method and get the result
   }
 
   int _selectedIndex = 0;
@@ -329,27 +329,34 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   }
 
   void _refreshSpeakingAvailabilityInBackground() {
-    Network_request().fetch_userRole();
     final int requestId = ++_speakingRefreshRequestId;
-    Network_request.assignedUserDetails().then((_) {
-      if (!mounted || requestId != _speakingRefreshRequestId) return;
-      final bool nextSpeaking =
-          Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
-      if (nextSpeaking == isSpeakingEnabled) return;
+    Network_request().fetchUserRole().then(
+      (value) {
+        var agenda = value;
+        Hive.box('LoginDetails').put("is_agenda", agenda);
+        isAgendaEnabled =
+            Hive.box('LoginDetails').get("is_agenda", defaultValue: false);
+        Network_request.assignedUserDetails().then((_) {
+          if (!mounted || requestId != _speakingRefreshRequestId) return;
+          final bool nextSpeaking =
+              Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+          if (nextSpeaking == isSpeakingEnabled) return;
 
-      final int remappedIndex = _remapIndexForSpeakingToggle(
-        requestedIndex: _selectedIndex,
-        previousSpeaking: isSpeakingEnabled,
-        nextSpeaking: nextSpeaking,
-      );
-      final int targetMaxIndex = nextSpeaking ? 3 : 2;
-      setState(() {
-        isSpeakingEnabled = nextSpeaking;
-        _selectedIndex = remappedIndex.clamp(0, targetMaxIndex);
-      });
-    }).catchError((_) {
-      // Keep current tab state when background sync fails.
-    });
+          final int remappedIndex = _remapIndexForSpeakingToggle(
+            requestedIndex: _selectedIndex,
+            previousSpeaking: isSpeakingEnabled,
+            nextSpeaking: nextSpeaking,
+          );
+          final int targetMaxIndex = nextSpeaking ? 3 : 2;
+          setState(() {
+            isSpeakingEnabled = nextSpeaking;
+            _selectedIndex = remappedIndex.clamp(0, targetMaxIndex);
+          });
+        }).catchError((_) {
+          // Keep current tab state when background sync fails.
+        });
+      },
+    );
   }
 
   //profile changes

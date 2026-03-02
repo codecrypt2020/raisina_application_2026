@@ -450,27 +450,27 @@ class Network_request {
   get userRolename => _userRolename;
   var _assingedRole;
 
-  bool fetch_userRole() {
+  bool fetch_userRole(userRole) {
     // var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
-    var userRole = fetchUserRole();
+
     if (userRole == 1) {
-      return false;
+      return true;
     } else if (userRole == 2) {
-      return false;
+      return true;
     } else if (userRole == 3) {
-      return false;
+      return true;
     } else if (userRole == 4) {
-      return true;
+      return false;
     } else if (userRole == 5) {
-      return true;
+      return false;
     } else if (userRole == 0) {
-      return false;
+      return true;
     } else {
-      return false;
+      return true;
     }
   }
 
-  Future<int> fetchUserRole() async {
+  Future<bool> fetchUserRole() async {
     try {
       var profileDetails = Hive.box('LoginDetails').get("Profile_details");
 
@@ -494,11 +494,11 @@ class Network_request {
       if (response.statusCode == 200 && jsonData['success'] == true) {
         var res = decryptResponse(response.body);
         _assingedRole = res['data'];
-        return _assingedRole['userRole'];
+        return fetch_userRole(_assingedRole['userRole']);
       } else
-        return 0;
+        return fetch_userRole(0);
     } catch (e) {
-      return 0;
+      return fetch_userRole(0);
     }
   }
 }

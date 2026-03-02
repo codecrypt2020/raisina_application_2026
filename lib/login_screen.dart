@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:attendee_app/main.dart';
 import 'package:attendee_app/network_request.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -134,6 +135,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await Network_request.assignedUserDetails();
 
       await Network_request.fetchUserProfile();
+
+      var is_agenda = await Network_request().fetchUserRole();
+      Hive.box('LoginDetails').put("is_agenda", is_agenda);
 
       // debugger();
       if (!mounted) {
