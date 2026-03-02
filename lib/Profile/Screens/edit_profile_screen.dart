@@ -38,7 +38,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // final List<String> _titles = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
   List<Map<String, String>> titles = [
-    {"value": " ", "label": "Select"},
+    {"value": "", "label": "Select"},
     {"value": "Mr", "label": "Mr."},
     {"value": "Ms", "label": "Ms."},
     {"value": "Mrs", "label": "Mrs."},
@@ -671,7 +671,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         body: jsonEncode(
           encryptPayload(
             {
-              "title": "${_selectedTitle}", //
+              "title": "${_selectedTitle.toString().trim()}", //
               "firstName": "${_firstNameController.text.trim()}",
               "lastName": "${_lastNameController.text.trim()}",
               "countryCode": "${_selectedCountryCode}",
