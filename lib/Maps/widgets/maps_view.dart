@@ -158,7 +158,47 @@ class _MapsViewState extends State<MapsView> {
   Widget build(BuildContext context) {
     final provider = Provider.of<MapData>(context);
     final sourceFloors = _buildFloorsFromApi(provider.floors);
-    final floors = sourceFloors.isEmpty ? _floors : sourceFloors;
+    final floors = sourceFloors;
+    if (floors.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: AppColors.isDark(context)
+                ? const [Color(0xFF111A2B), Color(0xFF0C1220)]
+                : const [Color(0xFFF8FAFD), Color(0xFFF2F6FC)],
+          ),
+        ),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await provider.fetchMapsApi();
+          },
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 20),
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.elevatedOf(context),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.borderOf(context)),
+                ),
+                child: Text(
+                  'Map data not available',
+                  style: TextStyle(
+                    color: AppColors.textPrimaryOf(context),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final floorIndex = _selectedFloor >= floors.length ? 0 : _selectedFloor;
     final floor = floors[floorIndex];
     final mapItems = floor.items;
@@ -193,15 +233,15 @@ class _MapsViewState extends State<MapsView> {
               floors: floors,
               selectedFloor: floorIndex,
               listItems: listItems,
-            onModeChanged: (mode) {
-              setState(() {
-                _mode = mode;
-                _selectedPoi = null;
-                if (mode != _MapMode.floorPlan) {
-                  _isMapGestureActive = false;
-                }
-              });
-            },
+              onModeChanged: (mode) {
+                setState(() {
+                  _mode = mode;
+                  _selectedPoi = null;
+                  if (mode != _MapMode.floorPlan) {
+                    _isMapGestureActive = false;
+                  }
+                });
+              },
               onFloorChanged: (index) {
                 setState(() {
                   if (_selectedFloor != index) {
@@ -250,18 +290,18 @@ class _MapsViewState extends State<MapsView> {
                   points: mapItems,
                   mapImageUrl: floor.mapImageUrl,
                   mapSize: floor.mapSize,
-                legends: legends,
-                selectedPoi: _selectedPoi,
-                resetZoomToken: _mapResetToken,
-                onMapInteractionChanged: (isActive) {
-                  if (_isMapGestureActive == isActive) return;
-                  setState(() {
-                    _isMapGestureActive = isActive;
-                  });
-                },
-                onPoiTap: (index) =>
-                    setState(() => _selectedPoi = index >= 0 ? index : null),
-              ),
+                  legends: legends,
+                  selectedPoi: _selectedPoi,
+                  resetZoomToken: _mapResetToken,
+                  onMapInteractionChanged: (isActive) {
+                    if (_isMapGestureActive == isActive) return;
+                    setState(() {
+                      _isMapGestureActive = isActive;
+                    });
+                  },
+                  onPoiTap: (index) =>
+                      setState(() => _selectedPoi = index >= 0 ? index : null),
+                ),
               ),
             ],
           ],
@@ -927,58 +967,59 @@ class _MapCanvasState extends State<_MapCanvas> {
                       },
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                        const markerDiameter = 28.0;
-                        final canvasSize = Size(
-                          constraints.maxWidth,
-                          constraints.maxHeight,
-                        );
-                        final imageRect =
-                            _imageRectForCanvas(canvasSize, widget.mapSize);
-                        return Stack(
-                          children: [
-                            const Positioned.fill(
-                                child: _FallbackMapBackground()),
-                            if (widget.mapImageUrl != null &&
-                                widget.mapImageUrl!.isNotEmpty)
-                              Positioned.fromRect(
-                                rect: imageRect,
-                                child: Image.network(
-                                  widget.mapImageUrl!,
-                                  fit: BoxFit.fill,
-                                  errorBuilder: (_, __, ___) =>
-                                      const _FallbackMapBackground(),
+                          const markerDiameter = 28.0;
+                          final canvasSize = Size(
+                            constraints.maxWidth,
+                            constraints.maxHeight,
+                          );
+                          final imageRect =
+                              _imageRectForCanvas(canvasSize, widget.mapSize);
+                          return Stack(
+                            children: [
+                              const Positioned.fill(
+                                  child: _FallbackMapBackground()),
+                              if (widget.mapImageUrl != null &&
+                                  widget.mapImageUrl!.isNotEmpty)
+                                Positioned.fromRect(
+                                  rect: imageRect,
+                                  child: Image.network(
+                                    widget.mapImageUrl!,
+                                    fit: BoxFit.fill,
+                                    errorBuilder: (_, __, ___) =>
+                                        const _FallbackMapBackground(),
+                                  ),
+                                )
+                              else
+                                Positioned.fromRect(
+                                  rect: imageRect,
+                                  child: const _FallbackMapBackground(),
                                 ),
-                              )
-                            else
-                              Positioned.fromRect(
-                                rect: imageRect,
-                                child: const _FallbackMapBackground(),
-                              ),
-                            ...List.generate(widget.points.length, (index) {
-                              final point = widget.points[index];
-                              final isSelected = widget.selectedPoi == index;
-                              return Positioned(
-                                left: imageRect.left +
-                                    (point.markerOffset.dx * imageRect.width),
-                                top: imageRect.top +
-                                    (point.markerOffset.dy * imageRect.height),
-                                child: Transform.translate(
-                                  offset: const Offset(
-                                      -markerDiameter / 2, -markerDiameter / 2),
-                                  child: GestureDetector(
-                                    onTap: () => widget.onPoiTap(index),
-                                    child: _MarkerBubble(
-                                      icon: point.icon,
-                                      color:
-                                          point.color ?? _typeColor(point.type),
-                                      isSelected: isSelected,
+                              ...List.generate(widget.points.length, (index) {
+                                final point = widget.points[index];
+                                final isSelected = widget.selectedPoi == index;
+                                return Positioned(
+                                  left: imageRect.left +
+                                      (point.markerOffset.dx * imageRect.width),
+                                  top: imageRect.top +
+                                      (point.markerOffset.dy *
+                                          imageRect.height),
+                                  child: Transform.translate(
+                                    offset: const Offset(-markerDiameter / 2,
+                                        -markerDiameter / 2),
+                                    child: GestureDetector(
+                                      onTap: () => widget.onPoiTap(index),
+                                      child: _MarkerBubble(
+                                        icon: point.icon,
+                                        color: point.color ??
+                                            _typeColor(point.type),
+                                        isSelected: isSelected,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }),
-                          ],
-                        );
+                                );
+                              }),
+                            ],
+                          );
                         },
                       ),
                     ),
