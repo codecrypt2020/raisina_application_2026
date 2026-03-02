@@ -37,30 +37,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _selectedCountryCode = "+91";
 
   // final List<String> _titles = ['Mr.', 'Ms.', 'Mrs.', 'Dr.'];
-  final List<String> _titles = [
-    'Select',
-    'Mr.',
-    'Ms.',
-    'Mrs.',
-    'Dr.',
-    'Prof.',
-    'Shri',
-    'Smt.',
-    'Amb.',
-    'Senator',
-    'Brig',
-    'Maj. Gen.',
-    'Lt. Gen.',
-    'Air Mshl',
-    'AVM',
-    'VADM',
-    'H.E. Mr.',
-    'H.E. Ms.',
-    'H.E. Amb.',
-    'H.E. Dr.'
+  List<Map<String, String>> titles = [
+    {"value": " ", "label": "Select"},
+    {"value": "Mr", "label": "Mr."},
+    {"value": "Ms", "label": "Ms."},
+    {"value": "Mrs", "label": "Mrs."},
+    {"value": "Dr", "label": "Dr."},
+    {"value": "Prof", "label": "Prof."},
+    {"value": "Shri", "label": "Shri"},
+    {"value": "Smt", "label": "Smt."},
+    {"value": "Amb", "label": "Amb."},
+    {"value": "Senator", "label": "Senator"},
+    {"value": "Brig", "label": "Brig"},
+    {"value": "MajGen", "label": "Maj. Gen."},
+    {"value": "LtGen", "label": "Lt. Gen."},
+    {"value": "AirMshl", "label": "Air Mshl"},
+    {"value": "AVM", "label": "AVM"},
+    {"value": "VADM", "label": "VADM"},
+    {"value": "H_E_Mr", "label": "H.E. Mr."},
+    {"value": "H_E_Ms", "label": "H.E. Ms."},
+    {"value": "H_E_Amb", "label": "H.E. Amb."},
+    {"value": "H_E_Dr", "label": "H.E. Dr."},
   ];
-  String _selectedTitle = 'Select';
 
+  var _selectedTitle; // value
+  var _selectedTitleLabel; // label
   @override
   void initState() {
     super.initState();
@@ -73,15 +74,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final String lastName = _asString(widget.profile['last_name']).isNotEmpty
         ? _asString(widget.profile['last_name'])
         : "";
-    // : (nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '');
-    final String incomingTitle = _asString(widget.profile['title']);
-    _selectedTitle = _titles.contains(incomingTitle)
-        ? incomingTitle
-        :
-        // (incomingTitle == "")
-        //     ?
-        "Select";
-    // : _selectedTitle;
+
+    final incomingTitle = _asString(widget.profile['title']);
+
+    final matchedTitle = titles.firstWhere(
+      (item) => item["value"] == incomingTitle,
+      orElse: () => {},
+    );
+
+    _selectedTitle = matchedTitle.isNotEmpty ? matchedTitle["value"] : " ";
+
+    print("chekcvakluedfffff:${_selectedTitle}");
 
     _firstNameController = TextEditingController(text: firstName);
     _lastNameController = TextEditingController(text: lastName);
@@ -313,22 +316,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                 _fieldDecoration(context),
                                             dropdownColor:
                                                 AppColors.elevatedOf(context),
-                                            items: _titles
-                                                .map(
-                                                  (title) => DropdownMenuItem(
-                                                    value: title,
-                                                    child: Text(title),
-                                                  ),
-                                                )
-                                                .toList(),
+                                            items: titles.map((title) {
+                                              return DropdownMenuItem<String>(
+                                                value: title["value"],
+                                                child: Text(title["label"]!),
+                                              );
+                                            }).toList(),
                                             onChanged: (value) {
                                               if (value != null) {
+                                                final selected =
+                                                    titles.firstWhere((e) =>
+                                                        e["value"] == value);
+
                                                 setState(() {
-                                                  _selectedTitle = value;
+                                                  _selectedTitle =
+                                                      selected["value"];
+                                                  _selectedTitleLabel =
+                                                      selected["label"];
                                                 });
                                               }
                                             },
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ),
@@ -379,18 +387,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   value: _selectedTitle,
                                   decoration: _fieldDecoration(context),
                                   dropdownColor: AppColors.elevatedOf(context),
-                                  items: _titles
-                                      .map(
-                                        (title) => DropdownMenuItem(
-                                          value: title,
-                                          child: Text(title),
-                                        ),
-                                      )
-                                      .toList(),
+                                  items: titles.map((title) {
+                                    return DropdownMenuItem<String>(
+                                      value: title["value"],
+                                      child: Text(title["label"]!),
+                                    );
+                                  }).toList(),
                                   onChanged: (value) {
                                     if (value != null) {
+                                      final selected = titles.firstWhere(
+                                          (e) => e["value"] == value);
+
                                       setState(() {
-                                        _selectedTitle = value;
+                                        _selectedTitle = selected["value"];
+                                        _selectedTitleLabel = selected["label"];
                                       });
                                     }
                                   },
@@ -661,8 +671,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         body: jsonEncode(
           encryptPayload(
             {
-              "title":
-                  "${(_selectedTitle == "Select") ? "" : _selectedTitle}", //
+              "title": "${_selectedTitle}", //
               "firstName": "${_firstNameController.text.trim()}",
               "lastName": "${_lastNameController.text.trim()}",
               "countryCode": "${_selectedCountryCode}",

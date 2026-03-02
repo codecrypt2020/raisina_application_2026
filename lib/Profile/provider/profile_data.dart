@@ -46,7 +46,7 @@ class ProfileData with ChangeNotifier {
   //   }
   // }
 
-  fetch_userRole({var userRole}) async {
+  fetch_userRole() async {
     // var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
     var userRole = await fetchUserRole();
     if (userRole == 1) {
@@ -73,7 +73,7 @@ class ProfileData with ChangeNotifier {
       var response = await http.post(
         Uri.parse(Constants.NODE_URL + Constants.attendee_role),
         headers: {
-          "x-encrypted": "2",
+          "x-encrypted": "1",
           'x-access-token':
               '${Hive.box('LoginDetails').get("Profile_details")['token']}',
           'x-access-type':
@@ -99,7 +99,7 @@ class ProfileData with ChangeNotifier {
   }
 
   Future<void> fetchUserProfile() async {
-    fetch_userRole();
+    await fetch_userRole();
     try {
       var profileDetails = Hive.box('LoginDetails').get("Profile_details");
 
