@@ -445,4 +445,60 @@ class Network_request {
       // debugger();
     }
   }
+
+  var _userRolename = "";
+  get userRolename => _userRolename;
+  var _assingedRole;
+
+  bool fetch_userRole(userRole) {
+    // var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
+
+    if (userRole == 1) {
+      return true;
+    } else if (userRole == 2) {
+      return true;
+    } else if (userRole == 3) {
+      return true;
+    } else if (userRole == 4) {
+      return false;
+    } else if (userRole == 5) {
+      return false;
+    } else if (userRole == 0) {
+      return true;
+    } else {
+      return true;
+    }
+  }
+
+  Future<bool> fetchUserRole() async {
+    try {
+      var profileDetails = Hive.box('LoginDetails').get("Profile_details");
+
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.attendee_role),
+        headers: {
+          "x-encrypted": "1",
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({"userId": "${profileDetails['userId']}"}),
+        ),
+      );
+
+      var jsonData = decryptResponse(response.body);
+
+      if (response.statusCode == 200 && jsonData['success'] == true) {
+        var res = decryptResponse(response.body);
+        _assingedRole = res['data'];
+        return fetch_userRole(_assingedRole['userRole']);
+      } else
+        return fetch_userRole(0);
+    } catch (e) {
+      return fetch_userRole(0);
+    }
+  }
 }
