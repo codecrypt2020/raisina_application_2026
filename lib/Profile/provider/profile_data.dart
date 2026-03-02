@@ -20,6 +20,7 @@ class ProfileData with ChangeNotifier {
   var _logo_short_name;
   var _userRole_name;
   var _rd_numebr;
+  var _assinged_role;
 
   //geter
   get data => _data;
@@ -28,8 +29,26 @@ class ProfileData with ChangeNotifier {
   get userRole_name => _userRole_name;
   get rd_number => _rd_numebr;
 
-  fetch_userRolde() {
-    var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
+  // fetch_userRolde() {
+  //   var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
+  //   if (userRole == 1) {
+  //     _userRole_name = "SPEAKER";
+  //   } else if (userRole == 2) {
+  //     _userRole_name = "DELEGATE";
+  //   } else if (userRole == 3) {
+  //     _userRole_name = "AFGG";
+  //   } else if (userRole == 4) {
+  //     _userRole_name = "PARTICIPANTS";
+  //   } else if (userRole == 5) {
+  //     _userRole_name = "MEDIA";
+  //   } else {
+  //     _userRole_name = "No Role Assigned";
+  //   }
+  // }
+
+  fetch_userRole({var userRole}) async {
+    // var userRole = Hive.box('LoginDetails').get("Profile_details")['userRole'];
+    var userRole = await fetchUserRole();
     if (userRole == 1) {
       _userRole_name = "SPEAKER";
     } else if (userRole == 2) {
@@ -40,13 +59,47 @@ class ProfileData with ChangeNotifier {
       _userRole_name = "PARTICIPANTS";
     } else if (userRole == 5) {
       _userRole_name = "MEDIA";
+    } else if (userRole == 0) {
+      _userRole_name = "No Role Assigned";
     } else {
       _userRole_name = "No Role Assigned";
     }
   }
 
+  Future<int> fetchUserRole() async {
+    try {
+      var profileDetails = Hive.box('LoginDetails').get("Profile_details");
+
+      var response = await http.post(
+        Uri.parse(Constants.NODE_URL + Constants.attendee_role),
+        headers: {
+          "x-encrypted": "2",
+          'x-access-token':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'x-access-type':
+              '${Hive.box('LoginDetails').get("Profile_details")['token']}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          encryptPayload({"userId": "${profileDetails['userId']}"}),
+        ),
+      );
+
+      var jsonData = decryptResponse(response.body);
+
+      if (response.statusCode == 200 && jsonData['success'] == true) {
+        var res = decryptResponse(response.body);
+        _assinged_role = res['data'];
+        return _assinged_role['userRole'];
+      } else
+        return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
   Future<void> fetchUserProfile() async {
-    fetch_userRolde();
+    fetch_userRole();
     try {
       var profileDetails = Hive.box('LoginDetails').get("Profile_details");
 

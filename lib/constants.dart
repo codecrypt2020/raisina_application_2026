@@ -39,4 +39,5 @@ class Constants {
   static const String emp_profile = "emp/profile";
   static const String emp_profile_save_photo = "emp/profile/save";
   static const String profile_image = "public-upload/public-upload-profile-pic";
+  static const String attendee_role = "qr/Attendeerole";
 }
