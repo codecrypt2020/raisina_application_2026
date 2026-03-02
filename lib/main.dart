@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:attendee_app/Agenda/Provider/agenda_data.dart';
 import 'dart:io';
 import 'package:attendee_app/Agenda/Screens/agendaMain.dart';
@@ -217,6 +219,7 @@ class AttendeeHomePage extends StatefulWidget {
 
 class _AttendeeHomePageState extends State<AttendeeHomePage> {
   bool isSpeakingEnabled = false;
+  bool isAgendaEnabled = false;
   int _speakingRefreshRequestId = 0;
 
   @override
@@ -224,6 +227,8 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     super.initState();
     isSpeakingEnabled =
         Hive.box('LoginDetails').get("isSpeaker", defaultValue: false);
+    isAgendaEnabled = Network_request()
+        .fetch_userRole(); // Call the method and get the result
   }
 
   int _selectedIndex = 0;
@@ -283,10 +288,13 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   //  ResourcesMain()
   // ];
   List<Widget> get _pages {
-    final pages = [
-      AgendaMain(),
-      DiningMain(),
-    ];
+    final pages = <Widget>[];
+
+    if (isAgendaEnabled) {
+      pages.add(AgendaMain());
+    }
+
+    pages.add(DiningMain());
 
     if (isSpeakingEnabled) {
       pages.add(SpeakingMain());
@@ -321,6 +329,7 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
   }
 
   void _refreshSpeakingAvailabilityInBackground() {
+    Network_request().fetch_userRole();
     final int requestId = ++_speakingRefreshRequestId;
     Network_request.assignedUserDetails().then((_) {
       if (!mounted || requestId != _speakingRefreshRequestId) return;
@@ -575,10 +584,11 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
             _refreshSpeakingAvailabilityInBackground();
           },
           destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.event_note_outlined),
-              label: 'Agenda',
-            ),
+            if (isAgendaEnabled)
+              const NavigationDestination(
+                icon: Icon(Icons.event_note_outlined),
+                label: 'Agenda',
+              ),
             const NavigationDestination(
               icon: Icon(Icons.wine_bar_outlined),
               label: 'Dining',
@@ -599,229 +609,6 @@ class _AttendeeHomePageState extends State<AttendeeHomePage> {
     );
   }
 }
-
-// class HomeDashboard extends StatelessWidget {
-//   const HomeDashboard({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView(
-//       padding: const EdgeInsets.all(20),
-//       children: [
-//         const _EventHeroCard(),
-//         const SizedBox(height: 24),
-//         const Text(
-//           'Quick actions',
-//           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-//         ),
-//         const SizedBox(height: 12),
-//         LayoutBuilder(
-//           builder: (context, constraints) {
-//             final cardWidth = (constraints.maxWidth - 12) / 2;
-//             return Wrap(
-//               spacing: 12,
-//               runSpacing: 12,
-//               children: [
-//                 _ActionCard(
-//                   icon: Icons.mic_none,
-//                   title: 'Speaking',
-//                   subtitle: 'Your sessions',
-//                   color: AppColors.gold,
-//                   width: cardWidth,
-//                 ),
-//                 _ActionCard(
-//                   icon: Icons.restaurant_menu,
-//                   title: 'Dining',
-//                   subtitle: 'Invites & RSVP',
-//                   color: AppColors.teal,
-//                   width: cardWidth,
-//                 ),
-//                 _ActionCard(
-//                   icon: Icons.groups_outlined,
-//                   title: 'Directory',
-//                   subtitle: 'Find attendees',
-//                   color: AppColors.goldLight,
-//                   width: cardWidth,
-//                 ),
-//                 _ActionCard(
-//                   icon: Icons.folder_open,
-//                   title: 'Resources',
-//                   subtitle: 'Briefings & kits',
-//                   color: AppColors.textSecondary,
-//                   width: cardWidth,
-//                 ),
-//               ],
-//             );
-//           },
-//         ),
-//         const SizedBox(height: 24),
-//         const _SectionHeader(title: 'Today at a glance', action: 'See full agenda'),
-//         const SizedBox(height: 12),
-//         const _AgendaCard(
-//           time: '09:30 AM',
-//           title: 'Opening keynote: The geopolitics of 2030',
-//           location: 'Innovation Hall A',
-//           speaker: 'Prime Minister Arjun Mehra',
-//           isLive: true,
-//         ),
-//         const SizedBox(height: 12),
-//         const _AgendaCard(
-//           time: '11:00 AM',
-//           title: 'Roundtable: Technology and trust',
-//           location: 'Forum Studio 2',
-//           speaker: 'Dr. John Doe · Speaker',
-//           tag: "You're Speaking",
-//           tagColor: AppColors.gold,
-//         ),
-//         const SizedBox(height: 12),
-//         const _AgendaCard(
-//           time: '02:00 PM',
-//           title: 'Strategic dialogues: Indo-Pacific security',
-//           location: 'Raisina Hall B',
-//           speaker: 'Session · 45 mins',
-//           tag: 'Session',
-//           tagColor: AppColors.teal,
-//         ),
-//         const SizedBox(height: 24),
-//         const _SectionHeader(title: 'Key participants', action: 'View all'),
-//         const SizedBox(height: 12),
-//         SizedBox(
-//           height: 160,
-//           child: ListView(
-//             scrollDirection: Axis.horizontal,
-//             children: const [
-//               _SpeakerCard(
-//                 name: 'Amb. Leena Rao',
-//                 role: 'Special Envoy, MEA',
-//                 tag: 'Diplomacy',
-//               ),
-//               _SpeakerCard(
-//                 name: 'Dr. R. Banerjee',
-//                 role: 'Economist, IGS',
-//                 tag: 'Geo-economics',
-//               ),
-//               _SpeakerCard(
-//                 name: 'Maya Torres',
-//                 role: 'VP Policy, TerraNet',
-//                 tag: 'Tech Policy',
-//               ),
-//             ],
-//           ),
-//         ),
-//         const SizedBox(height: 24),
-//         const _SectionHeader(title: 'Venue updates', action: 'Live status'),
-//         const SizedBox(height: 12),
-//         Container(
-//           padding: const EdgeInsets.all(16),
-//           decoration: BoxDecoration(
-//             color: AppColors.navyMid,
-//             borderRadius: BorderRadius.circular(20),
-//             boxShadow: [
-//               BoxShadow(
-//                 color: Colors.black.withOpacity(0.2),
-//                 blurRadius: 16,
-//                 offset: const Offset(0, 8),
-//               ),
-//             ],
-//           ),
-//           child: Column(
-//             children: [
-//               _StatusRow(
-//                 label: 'Innovation Hall A',
-//                 status: 'On time',
-//                 color: AppColors.gold,
-//               ),
-//               const Divider(color: AppColors.navySurface),
-//               _StatusRow(
-//                 label: 'Wellness Suite',
-//                 status: '15 min wait',
-//                 color: AppColors.teal,
-//               ),
-//               const Divider(color: AppColors.navySurface),
-//               _StatusRow(
-//                 label: 'VIP Shuttle',
-//                 status: 'Arriving',
-//                 color: AppColors.goldLight,
-//               ),
-//             ],
-//           ),
-//         ),
-//         const SizedBox(height: 32),
-//       ],
-//     );
-//   }
-// }
-
-// class NetworkingView extends StatelessWidget {
-//   const NetworkingView({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView(
-//       padding: const EdgeInsets.all(20),
-//       children: [
-//         const Text(
-//           'Connect',
-//           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-//         ),
-//         const SizedBox(height: 12),
-//         Container(
-//           padding: const EdgeInsets.all(18),
-//           decoration: BoxDecoration(
-//             color: AppColors.navySurface,
-//             borderRadius: BorderRadius.circular(20),
-//           ),
-//           child: Row(
-//             children: [
-//               const Icon(Icons.auto_awesome, color: AppColors.gold, size: 28),
-//               const SizedBox(width: 12),
-//               const Expanded(
-//                 child: Text(
-//                   'AI introductions based on your sessions, interests, and role.',
-//                   style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//         const SizedBox(height: 20),
-//         const _SectionHeader(title: 'Recommended connections', action: 'Refresh'),
-//         const SizedBox(height: 12),
-//         const _ConnectionCard(
-//           name: 'Amb. Raghav Menon',
-//           role: 'High Commissioner · Singapore',
-//           tags: ['Diplomacy', 'ASEAN'],
-//         ),
-//         const SizedBox(height: 12),
-//         const _ConnectionCard(
-//           name: 'Dr. Salma Idris',
-//           role: 'Director · PeaceLab',
-//           tags: ['Conflict resolution', 'MENA'],
-//         ),
-//         const SizedBox(height: 12),
-//         const _ConnectionCard(
-//           name: 'Neeraj Kapoor',
-//           role: 'Partner · Bharat Ventures',
-//           tags: ['Strategic capital', 'South Asia'],
-//         ),
-//         const SizedBox(height: 20),
-//         const _SectionHeader(title: 'Meetups near you', action: 'View map'),
-//         const SizedBox(height: 12),
-//         const _MeetupCard(
-//           title: 'Geo-economics briefing',
-//           time: '4:30 PM · Lotus Lounge',
-//           members: 18,
-//         ),
-//         const SizedBox(height: 12),
-//         const _MeetupCard(
-//           title: 'Speaker green room',
-//           time: '6:00 PM · Raisina Garden',
-//           members: 9,
-//         ),
-//       ],
-//     );
-//   }
-// }
 
 class _EventHeroCard extends StatelessWidget {
   const _EventHeroCard();
