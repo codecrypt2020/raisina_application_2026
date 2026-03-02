@@ -278,7 +278,7 @@ class ResourceFileActions {
   static Future<Directory?> _getDownloadDirectory() async {
     Directory? baseDir;
     if (Platform.isAndroid) {
-      // Prefer Downloads so users can find files easily in file managers.
+      // Prefer Downloads so users can_getDownloadDirectory() find files easily in file managers.
       baseDir = await getDownloadsDirectory();
       baseDir ??= await getExternalStorageDirectory();
     } else if (Platform.isIOS) {

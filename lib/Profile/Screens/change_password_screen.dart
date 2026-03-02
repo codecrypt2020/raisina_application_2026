@@ -133,42 +133,120 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     }
   }
 
+  // Future<bool> _requestPermissions(ImageSource source) async {
+  //   Permission permission;
+
+  //   if (source == ImageSource.camera) {
+  //     permission = Permission.camera;
+  //   } else {
+  //     permission = Permission.photos;
+  //   }
+
+  //   var status = await permission.status;
+
+  //   //Already granted OR limited access
+  //   if (status.isGranted || status.isLimited) {
+  //     return true;
+  //   }
+
+  //   /// Request permission
+  //   status = await permission.request();
+
+  //   // After request also check limited
+  //   if (status.isGranted || status.isLimited) {
+  //     return true;
+  //   }
+
+  //   /// Permanently denied → open settings
+  //   if (status.isPermanentlyDenied) {
+  //     openAppSettings();
+  //   }
+
+  //   return false;
+  // }
+
   Future<bool> _requestPermissions(ImageSource source) async {
     Permission permission;
 
+    /// CAMERA
     if (source == ImageSource.camera) {
       permission = Permission.camera;
-    } else {
-      permission = Permission.photos;
     }
 
-    var status = await permission.status;
+    /// GALLERY
+    else {
+      if (Platform.isIOS) {
+        /// iOS → Photos permission
+        permission = Permission.photos;
+      } else if (Platform.isAndroid) {
+        /// Android <13 → Storage works
+        final storageStatus = await Permission.storage.request();
 
-    //Already granted OR limited access
-    if (status.isGranted || status.isLimited) {
-      return true;
+        if (storageStatus.isGranted) {
+          return true;
+        }
+
+        /// Android 13+ → Photos permission
+        permission = Permission.photos;
+      } else {
+        permission = Permission.storage;
+      }
     }
 
-    /// Request permission
-    status = await permission.request();
+    /// Request final permission
+    final status = await permission.request();
 
-    // After request also check limited
+    /// Granted or limited access
     if (status.isGranted || status.isLimited) {
       return true;
     }
 
     /// Permanently denied → open settings
     if (status.isPermanentlyDenied) {
-      openAppSettings();
+      final shouldOpenSettings = await _showOpenSettingsDialog();
+      if (shouldOpenSettings) {
+        await openAppSettings();
+      }
     }
 
     return false;
   }
 
-  void _showImagePickerOptions() {
-    showModalBottomSheet(
+  Future<bool> _showOpenSettingsDialog() async {
+    if (!mounted) return false;
+
+    final bool? shouldOpen = await showDialog<bool>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Permission Required'),
+          content: const Text(
+            'Permission is denied. Open app settings to enable access?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Open Settings'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldOpen == true;
+  }
+
+  void _showImagePickerOptions() {
+    final parentContext = context;
+    final messenger = ScaffoldMessenger.of(parentContext);
+
+    showModalBottomSheet(
+      context: parentContext,
+      builder: (sheetContext) {
         return SafeArea(
           top: false,
           minimum: const EdgeInsets.only(bottom: 12),
@@ -178,14 +256,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 leading: const Icon(Icons.photo_library),
                 title: const Text("Choose from Gallery"),
                 onTap: () async {
-                  Navigator.pop(context);
+                  Navigator.pop(sheetContext);
 
                   bool granted = await _requestPermissions(ImageSource.gallery);
+                  if (!mounted) return;
 
                   if (granted) {
                     _pickImage(ImageSource.gallery);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       const SnackBar(
                         content:
                             Text("Permission denied. Please allow permission."),
@@ -198,14 +277,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text("Take Photo"),
                 onTap: () async {
-                  Navigator.pop(context);
+                  Navigator.pop(sheetContext);
 
                   bool granted = await _requestPermissions(ImageSource.camera);
+                  if (!mounted) return;
 
                   if (granted) {
                     _pickImage(ImageSource.camera);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       const SnackBar(
                         content:
                             Text("Permission denied. Please allow permission."),

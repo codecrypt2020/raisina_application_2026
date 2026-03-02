@@ -49,23 +49,45 @@ class ProfileList extends StatelessWidget {
     return trimmed;
   }
 
+  // Future<void> _openTwitterProfile(
+  //     BuildContext context, String rawTwitter) async {
+  //   final handle = _normalizeTwitterHandle(rawTwitter);
+  //   if (handle.isEmpty) return;
+
+  //   final appUri = Uri.parse('twitter://user?screen_name=$handle');
+  //   final webUri = Uri.parse('https://twitter.com/$handle');
+
+  //   bool opened = await launchUrl(appUri);
+  //   if (!opened) {
+  //     opened = await launchUrl(webUri, mode: LaunchMode.externalApplication);
+  //   }
+
+  //   if (!opened && context.mounted) {
+  //     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Unable to open Twitter profile.')),
+  //     );
+  //   }
+  // }
+
   Future<void> _openTwitterProfile(
       BuildContext context, String rawTwitter) async {
     final handle = _normalizeTwitterHandle(rawTwitter);
     if (handle.isEmpty) return;
 
-    final appUri = Uri.parse('twitter://user?screen_name=$handle');
-    final webUri = Uri.parse('https://twitter.com/$handle');
+    final Uri url = Uri.parse('https://twitter.com/$handle');
 
-    bool opened = await launchUrl(appUri);
-    if (!opened) {
-      opened = await launchUrl(webUri, mode: LaunchMode.externalApplication);
-    }
+    final bool opened = await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
 
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open Twitter profile.')),
+        const SnackBar(
+          content: Text('Unable to open Twitter profile.'),
+        ),
       );
     }
   }
@@ -465,33 +487,54 @@ class ProfileList extends StatelessWidget {
                           ),
                         );
                       }
-
                       return InkWell(
                         onTap: () => _openTwitterProfile(context, twitterText),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.open_in_new_rounded,
-                                size: 16,
-                                color: AppColors.gold,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                twitterText,
-                                style: const TextStyle(
-                                  color: AppColors.gold,
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: AppColors.goldDim,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            "𝕏",
+                            style: TextStyle(
+                              color: AppColors.gold,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                       );
+
+                      // return InkWell(
+                      //   onTap: () => _openTwitterProfile(context, twitterText),
+                      //   borderRadius: BorderRadius.circular(8),
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.symmetric(vertical: 2),
+                      //     child: Row(
+                      //       mainAxisSize: MainAxisSize.min,
+                      //       children: [
+                      //         const Icon(
+                      //           Icons.link,
+                      //           size: 16,
+                      //           color: AppColors.gold,
+                      //         ),
+                      //         const SizedBox(width: 6),
+                      //         Text(
+                      //           twitterText,
+                      //           style: const TextStyle(
+                      //             color: AppColors.gold,
+                      //             fontWeight: FontWeight.w600,
+                      //             decoration: TextDecoration.underline,
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                 ),
