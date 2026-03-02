@@ -837,7 +837,7 @@ class ProfileList extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => const LoginScreen(
                           signUpUrl: Constants.registraionUrl,
-                          forgetPasswordUrl: '',
+                          forgetPasswordUrl: Constants.forgetPassUrl,
                         ),
                       ),
                       (route) => false,
